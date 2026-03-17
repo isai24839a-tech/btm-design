@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTM BEAT THE MIX | 千葉市のダンススタジオ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  color: #333;
+  background: #fff;
+  overflow-x: hidden;
+  line-height: 1.8;
+}
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+
+/* ===== VARIABLES ===== */
+:root {
+  --orange: #FF6B35;
+  --coral: #FF8C61;
+  --yellow: #FFD23F;
+  --dark: #2D2D2D;
+  --light-bg: #FFF9F5;
+  --white: #FFFFFF;
+  --shadow: 0 8px 30px rgba(255, 107, 53, 0.15);
+  --shadow-hover: 0 12px 40px rgba(255, 107, 53, 0.25);
+  --radius: 16px;
+}
+
+/* ===== CONCEPT BANNER ===== */
+.concept-banner {
+  background: linear-gradient(135deg, #2D2D2D 0%, #444 100%);
+  color: #fff;
+  text-align: center;
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+.concept-banner span {
+  color: var(--yellow);
+  font-weight: 700;
+}
+
+/* ===== HEADER ===== */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 70px;
+}
+.logo {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 1.4rem;
+  color: var(--orange);
+  letter-spacing: 0.02em;
+}
+.logo small {
+  display: block;
+  font-size: 0.55em;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--dark);
+}
+nav ul {
+  display: flex;
+  gap: 24px;
+}
+nav ul li a {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--dark);
+  position: relative;
+  padding: 4px 0;
+  transition: color 0.3s;
+}
+nav ul li a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: var(--orange);
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+nav ul li a:hover { color: var(--orange); }
+nav ul li a:hover::after { width: 100%; }
+.nav-cta {
+  background: var(--orange);
+  color: #fff !important;
+  padding: 8px 18px !important;
+  border-radius: 50px;
+  font-size: 0.8rem !important;
+  transition: background 0.3s, transform 0.3s !important;
+}
+.nav-cta:hover {
+  background: var(--coral) !important;
+  transform: translateY(-2px);
+}
+.nav-cta::after { display: none !important; }
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1100;
+}
+.hamburger span {
+  width: 28px;
+  height: 3px;
+  background: var(--dark);
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C61 30%, #FFD23F 70%, #FF6B35 100%);
+  background-size: 300% 300%;
+  animation: gradientShift 8s ease infinite;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: var(--white);
+  clip-path: polygon(0 60%, 100% 0, 100% 100%, 0 100%);
+}
+/* Floating shapes */
+.hero-shapes {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.12;
+  background: #fff;
+}
+.shape-1 { width: 300px; height: 300px; top: -50px; right: -80px; animation: float1 6s ease-in-out infinite; }
+.shape-2 { width: 200px; height: 200px; bottom: 100px; left: -60px; animation: float2 8s ease-in-out infinite; }
+.shape-3 { width: 150px; height: 150px; top: 40%; right: 15%; animation: float3 7s ease-in-out infinite; }
+.shape-4 { width: 80px; height: 80px; top: 20%; left: 10%; animation: float1 5s ease-in-out infinite; }
+.shape-5 { width: 120px; height: 120px; bottom: 20%; right: 5%; animation: float2 9s ease-in-out infinite; }
+@keyframes float1 {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-30px) rotate(10deg); }
+}
+@keyframes float2 {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(20px) rotate(-10deg); }
+}
+@keyframes float3 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(15px, -20px); }
+  66% { transform: translate(-10px, 10px); }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  padding: 0 24px;
+}
+.hero-content h1 {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 900;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.2;
+  margin-bottom: 16px;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.hero-content p {
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 500;
+  margin-bottom: 40px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.btn-hero {
+  display: inline-block;
+  background: #fff;
+  color: var(--orange);
+  font-weight: 900;
+  font-size: 1.1rem;
+  padding: 18px 48px;
+  border-radius: 60px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-hero:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
+.btn-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(255,107,53,0.1));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.btn-hero:hover::before { opacity: 1; }
+
+/* ===== SECTION UTILITIES ===== */
+section { padding: 100px 24px; }
+.container { max-width: 1100px; margin: 0 auto; }
+.section-title {
+  text-align: center;
+  margin-bottom: 60px;
+}
+.section-title h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+.section-title .subtitle {
+  font-size: 0.95rem;
+  color: #888;
+}
+.section-title .accent-line {
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--orange), var(--yellow));
+  border-radius: 2px;
+  margin: 16px auto 0;
+}
+
+/* ===== DIVISIONS (KIDS & FUTURE) ===== */
+.divisions {
+  background: var(--light-bg);
+  position: relative;
+}
+.divisions::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: var(--white);
+  clip-path: polygon(0 0, 100% 0, 100% 40%, 0 100%);
+}
+.div-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  position: relative;
+  z-index: 2;
+}
+.div-card {
+  background: #fff;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.4s, box-shadow 0.4s;
+}
+.div-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
+}
+.div-card-header {
+  padding: 40px 32px 24px;
+  color: #fff;
+  position: relative;
+}
+.div-card:nth-child(1) .div-card-header {
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+}
+.div-card:nth-child(2) .div-card-header {
+  background: linear-gradient(135deg, var(--coral), #E8734A);
+}
+.div-card-header .age-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.25);
+  padding: 4px 16px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.div-card-header h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 2rem;
+  letter-spacing: 0.05em;
+}
+.div-card-header p {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+.div-card-body {
+  padding: 32px;
+}
+.div-card-body p {
+  font-size: 0.95rem;
+  line-height: 1.9;
+  color: #555;
+  margin-bottom: 24px;
+}
+.btn-outline {
+  display: inline-block;
+  border: 2px solid var(--orange);
+  color: var(--orange);
+  font-weight: 700;
+  padding: 12px 32px;
+  border-radius: 50px;
+  transition: all 0.3s;
+}
+.btn-outline:hover {
+  background: var(--orange);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ===== 3 POINTS ===== */
+.points { background: #fff; }
+.points-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+.point-card {
+  text-align: center;
+  padding: 48px 28px;
+  background: var(--light-bg);
+  border-radius: var(--radius);
+  transition: transform 0.4s, box-shadow 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+.point-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--orange), var(--yellow));
+}
+.point-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow);
+}
+.point-num {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 3rem;
+  color: var(--orange);
+  opacity: 0.25;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+.point-icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 1.6rem;
+}
+.point-card h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--dark);
+}
+.point-card p {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.8;
+}
+
+/* ===== PRICE ===== */
+.price {
+  background: var(--light-bg);
+  position: relative;
+}
+.price::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background: #fff;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+.price-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  position: relative;
+  z-index: 2;
+}
+.price-card {
+  background: #fff;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.price-card-header {
+  padding: 24px 32px;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: 0.05em;
+}
+.price-card:nth-child(1) .price-card-header {
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+}
+.price-card:nth-child(2) .price-card-header {
+  background: linear-gradient(135deg, var(--coral), #E8734A);
+}
+.price-card-body {
+  padding: 32px;
+}
+.price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px dashed #eee;
+}
+.price-item:last-child { border-bottom: none; }
+.price-item .label {
+  font-size: 0.95rem;
+  color: #555;
+}
+.price-item .amount {
+  font-weight: 700;
+  color: var(--dark);
+  font-size: 1.05rem;
+}
+.price-item .amount span {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #888;
+}
+.discount-box {
+  margin-top: 40px;
+  text-align: center;
+}
+.discount-box h3 {
+  font-size: 1.2rem;
+  color: var(--dark);
+  margin-bottom: 20px;
+}
+.discount-tags {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.discount-tag {
+  background: linear-gradient(135deg, var(--yellow), #FFE066);
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--dark);
+  box-shadow: 0 4px 15px rgba(255,210,63,0.3);
+}
+
+/* ===== INSTRUCTOR ===== */
+.instructor { background: #fff; }
+.instructor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+.instructor-card {
+  text-align: center;
+  padding: 48px 32px;
+  background: var(--light-bg);
+  border-radius: var(--radius);
+  transition: transform 0.4s;
+}
+.instructor-card:hover { transform: translateY(-6px); }
+.instructor-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), var(--yellow));
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(255,107,53,0.25);
+  position: relative;
+  overflow: hidden;
+}
+.instructor-avatar::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 3px dashed rgba(255,255,255,0.4);
+}
+.instructor-card h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+.instructor-card .role {
+  font-size: 0.85rem;
+  color: var(--orange);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.instructor-meta {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.instructor-meta div {
+  font-size: 0.85rem;
+  color: #666;
+}
+.instructor-meta div strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--dark);
+}
+.instructor-card p {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.8;
+}
+
+/* ===== ACCESS ===== */
+.access {
+  background: var(--light-bg);
+  position: relative;
+}
+.access::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background: #fff;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+.access-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  position: relative;
+  z-index: 2;
+}
+.access-block {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 36px;
+  box-shadow: var(--shadow);
+}
+.access-block h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--orange);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--orange);
+  display: inline-block;
+}
+.schedule-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.schedule-item:last-child { border-bottom: none; }
+.schedule-location {
+  font-weight: 700;
+  color: var(--dark);
+  min-width: 60px;
+}
+.schedule-day {
+  background: var(--orange);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 50px;
+  margin-left: 12px;
+}
+.schedule-time {
+  margin-left: auto;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* ===== CTA ===== */
+.cta {
+  background: linear-gradient(135deg, var(--orange), var(--coral), var(--yellow));
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+  text-align: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 70%, rgba(255,255,255,0.1) 0%, transparent 50%),
+    radial-gradient(circle at 70% 30%, rgba(255,255,255,0.08) 0%, transparent 50%);
+}
+.cta-content {
+  position: relative;
+  z-index: 2;
+}
+.cta h2 {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+.cta > .container > p {
+  font-size: 1rem;
+  margin-bottom: 32px;
+  opacity: 0.9;
+}
+.cta .btn-hero {
+  font-size: 1.2rem;
+  padding: 20px 56px;
+  margin-bottom: 40px;
+}
+.contact-info {
+  display: flex;
+  gap: 48px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.contact-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+.contact-item span {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: var(--dark);
+  color: #aaa;
+  padding: 60px 24px 30px;
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+.footer-brand .logo {
+  color: #fff;
+  margin-bottom: 12px;
+}
+.footer-brand p {
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+.footer-links h4 {
+  color: #fff;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+.footer-links ul li {
+  margin-bottom: 8px;
+}
+.footer-links ul li a {
+  font-size: 0.85rem;
+  color: #aaa;
+  transition: color 0.3s;
+}
+.footer-links ul li a:hover { color: var(--orange); }
+.sns-links {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+.sns-link {
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: #ccc;
+  transition: all 0.3s;
+}
+.sns-link:hover {
+  background: var(--orange);
+  color: #fff;
+  transform: translateY(-3px);
+}
+.footer-bottom {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.8rem;
+}
+
+/* ===== SCROLL ANIMATIONS ===== */
+.fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.fade-up-delay-1 { transition-delay: 0.15s; }
+.fade-up-delay-2 { transition-delay: 0.3s; }
+.fade-up-delay-3 { transition-delay: 0.45s; }
+
+/* ===== MOBILE NAV OVERLAY ===== */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.98);
+  z-index: 1050;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.mobile-nav.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.mobile-nav a {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--dark);
+  transition: color 0.3s;
+}
+.mobile-nav a:hover { color: var(--orange); }
+.mobile-nav .nav-cta-mobile {
+  background: var(--orange);
+  color: #fff;
+  padding: 14px 40px;
+  border-radius: 50px;
+  font-weight: 700;
+  margin-top: 12px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  nav ul { display: none; }
+  .hamburger { display: flex; }
+  .mobile-nav { display: flex; }
+
+  .hero { min-height: 80vh; }
+
+  section { padding: 70px 20px; }
+
+  .div-grid,
+  .price-grid,
+  .instructor-grid,
+  .access-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .points-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .point-card { padding: 36px 24px; }
+
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .contact-info {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .discount-tags { flex-direction: column; align-items: center; }
+}
+
+@media (max-width: 480px) {
+  .hero-content h1 { font-size: 2rem; }
+  .btn-hero { padding: 16px 36px; font-size: 1rem; }
+  .header-inner { height: 60px; }
+  .logo { font-size: 1.1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Concept Banner -->
+<div class="concept-banner">
+  <span>Design A: Energy Pop</span> &#8212; 現サイトのオレンジ基調を進化させた、エネルギッシュで明るいデザイン
+</div>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      BTM<small>BEAT THE MIX</small>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#top">TOP</a></li>
+        <li><a href="#divisions">KIDS</a></li>
+        <li><a href="#divisions">FUTURE</a></li>
+        <li><a href="#price">料金</a></li>
+        <li><a href="#access">アクセス</a></li>
+        <li><a href="#instructor">インストラクター</a></li>
+        <li><a href="#cta" class="nav-cta">体験申込</a></li>
+      </ul>
+    </nav>
+    <div class="hamburger" onclick="toggleMobileNav()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#top" onclick="closeMobileNav()">TOP</a>
+  <a href="#divisions" onclick="closeMobileNav()">KIDS</a>
+  <a href="#divisions" onclick="closeMobileNav()">FUTURE</a>
+  <a href="#price" onclick="closeMobileNav()">料金</a>
+  <a href="#access" onclick="closeMobileNav()">アクセス</a>
+  <a href="#instructor" onclick="closeMobileNav()">インストラクター</a>
+  <a href="#cta" class="nav-cta-mobile" onclick="closeMobileNav()">体験申込</a>
+</div>
+
+<!-- Hero -->
+<section class="hero" id="top">
+  <div class="hero-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+    <div class="shape shape-5"></div>
+  </div>
+  <div class="hero-content">
+    <h1>千葉市でずっと、20年。</h1>
+    <p>大人から子供まで成長できるダンススタジオ</p>
+    <a href="#cta" class="btn-hero">1分で体験レッスンに申込む</a>
+  </div>
+</section>
+
+<!-- Divisions -->
+<section class="divisions" id="divisions">
+  <div class="container">
+    <div class="section-title fade-up">
+      <h2>2つのコース</h2>
+      <p class="subtitle">あなたに合ったクラスがきっと見つかる</p>
+      <span class="accent-line"></span>
+    </div>
+    <div class="div-grid">
+      <div class="div-card fade-up fade-up-delay-1">
+        <div class="div-card-header">
+          <span class="age-badge">4〜18歳</span>
+          <h3>KIDS</h3>
+          <p>ダンスの技術 + 精神的成長</p>
+        </div>
+        <div class="div-card-body">
+          <p>ダンスの技術だけでなく、挨拶・礼儀・仲間との協調性など、心の成長もサポート。お子さまが「自分に自信を持てる」ようになるレッスンを行っています。初心者からコンテスト出場まで、レベルに合わせたクラスをご用意しています。</p>
+          <a href="#" class="btn-outline">詳しく見る</a>
+        </div>
+      </div>
+      <div class="div-card fade-up fade-up-delay-2">
+        <div class="div-card-header">
+          <span class="age-badge">40歳以上</span>
+          <h3>FUTURE</h3>
+          <p>ストレッチ &amp; ダンス</p>
+        </div>
+        <div class="div-card-body">
+          <p>「運動したいけど、いきなりダンスは不安&#8230;」という方でも大丈夫。ストレッチで体をほぐしてからダンスに入る安心のプログラム。年齢を気にせず、楽しく体を動かしながら健康維持・体力アップを目指せます。</p>
+          <a href="#" class="btn-outline">詳しく見る</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 Points -->
+<section class="points" id="points">
+  <div class="container">
+    <div class="section-title fade-up">
+      <h2>BTMが選ばれる3つの理由</h2>
+      <p class="subtitle">20年間、地域に根ざしてきた信頼と実績</p>
+      <span class="accent-line"></span>
+    </div>
+    <div class="points-grid">
+      <div class="point-card fade-up fade-up-delay-1">
+        <div class="point-num">01</div>
+        <div class="point-icon">&#128205;</div>
+        <h3>楽しく通える好アクセス</h3>
+        <p>千葉市内に<strong>7箇所</strong>のスタジオを展開。お住まいの近くで通いやすい場所がきっと見つかります。</p>
+      </div>
+      <div class="point-card fade-up fade-up-delay-2">
+        <div class="point-num">02</div>
+        <div class="point-icon">&#127915;</div>
+        <h3>無駄がない「チケット制」</h3>
+        <p>月謝制ではなくチケット制だから、忙しい月も安心。自分のペースで無駄なくレッスンに参加できます。</p>
+      </div>
+      <div class="point-card fade-up fade-up-delay-3">
+        <div class="point-num">03</div>
+        <div class="point-icon">&#11088;</div>
+        <h3>有資格/専門インストラクター</h3>
+        <p>経験豊富なプロのインストラクターが丁寧に指導。資格を持ったスタッフが安心のレッスンを提供します。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Price -->
+<section class="price" id="price">
+  <div class="container">
+    <div class="section-title fade-up">
+      <h2>料金プラン</h2>
+      <p class="subtitle">チケット制でムダなく通える</p>
+      <span class="accent-line"></span>
+    </div>
+    <div class="price-grid">
+      <div class="price-card fade-up fade-up-delay-1">
+        <div class="price-card-header">KIDS</div>
+        <div class="price-card-body">
+          <div class="price-item">
+            <span class="label">入会金</span>
+            <span class="amount">5,000円 <span>(税込)</span></span>
+          </div>
+          <div class="price-item">
+            <span class="label">KIDSクラス</span>
+            <span class="amount">6,000円 <span>/ 4回券</span></span>
+          </div>
+          <div class="price-item">
+            <span class="label">TEENクラス</span>
+            <span class="amount">6,400円 <span>/ 4回券</span></span>
+          </div>
+          <div class="price-item">
+            <span class="label">レベルアップ</span>
+            <span class="amount">7,200円 <span>/ 4回</span></span>
+          </div>
+          <div class="price-item">
+            <span class="label">レベルアップ+</span>
+            <span class="amount">9,200円 <span>/ 4回</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="price-card fade-up fade-up-delay-2">
+        <div class="price-card-header">FUTURE</div>
+        <div class="price-card-body">
+          <div class="price-item">
+            <span class="label">入会金</span>
+            <span class="amount">5,000円 <span>(税込)</span></span>
+          </div>
+          <div class="price-item">
+            <span class="label">Dance ticket</span>
+            <span class="amount">8,000円 <span>/ 4回券</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="discount-box fade-up">
+      <h3>お得な割引制度</h3>
+      <div class="discount-tags">
+        <span class="discount-tag">掛け持ち割引 10% OFF</span>
+        <span class="discount-tag">家族割引 10% OFF</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Instructor -->
+<section class="instructor" id="instructor">
+  <div class="container">
+    <div class="section-title fade-up">
+      <h2>インストラクター</h2>
+      <p class="subtitle">経験豊富なプロが丁寧に指導します</p>
+      <span class="accent-line"></span>
+    </div>
+    <div class="instructor-grid">
+      <div class="instructor-card fade-up fade-up-delay-1">
+        <div class="instructor-avatar">J</div>
+        <h3>JUNJUN 先生</h3>
+        <p class="role">メインインストラクター</p>
+        <div class="instructor-meta">
+          <div>
+            <strong>32年</strong>
+            Dance歴
+          </div>
+          <div>
+            <strong>22年</strong>
+            指導歴
+          </div>
+        </div>
+        <p>長年のダンス経験と指導実績を活かし、一人ひとりに合わせた丁寧なレッスンを提供。初心者から上級者まで幅広く対応しています。</p>
+      </div>
+      <div class="instructor-card fade-up fade-up-delay-2">
+        <div class="instructor-avatar">N</div>
+        <h3>NANAMI 先生</h3>
+        <p class="role">インストラクター</p>
+        <div class="instructor-meta">
+          <div>
+            <strong>20年</strong>
+            ダンス歴
+          </div>
+          <div>
+            <strong>13年</strong>
+            指導歴
+          </div>
+        </div>
+        <p>明るく元気なレッスンが魅力。子どもたちからの人気も高く、楽しみながら上達できる指導スタイルが特徴です。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Access -->
+<section class="access" id="access">
+  <div class="container">
+    <div class="section-title fade-up">
+      <h2>スタジオ・スケジュール</h2>
+      <p class="subtitle">千葉市内7箇所で開講中</p>
+      <span class="accent-line"></span>
+    </div>
+    <div class="access-grid">
+      <div class="access-block fade-up fade-up-delay-1">
+        <h3>KIDS</h3>
+        <div class="schedule-item">
+          <span class="schedule-location">若葉</span>
+          <span class="schedule-day">水曜</span>
+          <span class="schedule-time"></span>
+        </div>
+        <div class="schedule-item">
+          <span class="schedule-location">稲毛</span>
+          <span class="schedule-day">火曜</span>
+          <span class="schedule-time"></span>
+        </div>
+      </div>
+      <div class="access-block fade-up fade-up-delay-2">
+        <h3>FUTURE</h3>
+        <div class="schedule-item">
+          <span class="schedule-location">千葉</span>
+          <span class="schedule-day">火曜</span>
+          <span class="schedule-time">19:10〜</span>
+        </div>
+        <div class="schedule-item">
+          <span class="schedule-location">美浜</span>
+          <span class="schedule-day">水・金</span>
+          <span class="schedule-time">19:10〜</span>
+        </div>
+        <div class="schedule-item">
+          <span class="schedule-location">稲毛</span>
+          <span class="schedule-day">木曜</span>
+          <span class="schedule-time">19:10〜</span>
+        </div>
+        <div class="schedule-item">
+          <span class="schedule-location">若葉</span>
+          <span class="schedule-day">土曜</span>
+          <span class="schedule-time">17:10〜</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="cta">
+  <div class="container">
+    <div class="cta-content">
+      <h2>体験レッスンに申し込む</h2>
+      <p>まずは気軽に体験してみませんか？お電話・メールでお気軽にお問い合わせください。</p>
+      <a href="#" class="btn-hero">1分で体験レッスンに申込む</a>
+    </div>
+    <div class="contact-info">
+      <div class="contact-item">
+        <div class="contact-icon">&#9742;</div>
+        <span>090-1817-9501</span>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">&#9993;</div>
+        <span>beat.the.mix7386@gmail.com</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">BTM<small>BEAT THE MIX</small></div>
+      <p>千葉市で20年。大人から子供まで、<br>一人ひとりの成長に寄り添うダンススタジオです。</p>
+      <div class="sns-links">
+        <a href="#" class="sns-link" title="Instagram">IG</a>
+        <a href="#" class="sns-link" title="YouTube">YT</a>
+        <a href="#" class="sns-link" title="LINE">LN</a>
+      </div>
+    </div>
+    <div class="footer-links">
+      <h4>メニュー</h4>
+      <ul>
+        <li><a href="#top">TOP</a></li>
+        <li><a href="#divisions">KIDS</a></li>
+        <li><a href="#divisions">FUTURE</a></li>
+        <li><a href="#price">料金</a></li>
+        <li><a href="#instructor">インストラクター</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>お問い合わせ</h4>
+      <ul>
+        <li><a href="#">体験レッスン申込</a></li>
+        <li><a href="#">アクセス</a></li>
+        <li><a href="tel:09018179501">090-1817-9501</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; 2025 BTM BEAT THE MIX. All Rights Reserved.
+  </div>
+</footer>
+
+<script>
+// Mobile Nav Toggle
+function toggleMobileNav() {
+  const nav = document.getElementById('mobileNav');
+  const hamburger = document.querySelector('.hamburger');
+  nav.classList.toggle('open');
+  hamburger.classList.toggle('active');
+}
+function closeMobileNav() {
+  const nav = document.getElementById('mobileNav');
+  const hamburger = document.querySelector('.hamburger');
+  nav.classList.remove('open');
+  hamburger.classList.remove('active');
+}
+
+// Scroll Animation (Intersection Observer)
+const observerOptions = {
+  threshold: 0.15,
+  rootMargin: '0px 0px -50px 0px'
+};
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.fade-up').forEach(el => {
+  observer.observe(el);
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>

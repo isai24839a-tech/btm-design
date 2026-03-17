@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEAT THE MIX | ダンススタジオ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: #0D0D0D;
+  color: #FFFFFF;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ===== CONCEPT BANNER ===== */
+.concept-banner {
+  background: linear-gradient(90deg, #FF2D6B, #00D4FF, #FFE600);
+  color: #0D0D0D;
+  text-align: center;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  position: relative;
+  z-index: 1001;
+}
+
+/* ===== HEADER ===== */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 16px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  background: transparent;
+}
+.header.scrolled {
+  background: rgba(13, 13, 13, 0.95);
+  box-shadow: 0 2px 20px rgba(255, 45, 107, 0.15);
+  backdrop-filter: blur(10px);
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+.logo-btm {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.4rem;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #FF2D6B, #00D4FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  line-height: 1;
+}
+.logo-full {
+  font-size: 0.7rem;
+  color: #AAAAAA;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+}
+.nav { display: flex; align-items: center; gap: 28px; }
+.nav a {
+  color: #FFFFFF;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  position: relative;
+  transition: color 0.3s;
+}
+.nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #FF2D6B;
+  transition: width 0.3s;
+  box-shadow: 0 0 8px #FF2D6B;
+}
+.nav a:hover { color: #FF2D6B; }
+.nav a:hover::after { width: 100%; }
+.nav-cta {
+  background: linear-gradient(135deg, #FF2D6B, #FF2D6B);
+  color: #FFFFFF !important;
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-size: 0.8rem !important;
+  transition: box-shadow 0.3s, transform 0.3s !important;
+}
+.nav-cta::after { display: none !important; }
+.nav-cta:hover {
+  box-shadow: 0 0 20px rgba(255, 45, 107, 0.6) !important;
+  transform: translateY(-1px);
+  color: #FFFFFF !important;
+}
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  z-index: 1002;
+}
+.hamburger span {
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: #FFFFFF;
+  transition: all 0.3s;
+}
+.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: #0D0D0D;
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255, 45, 107, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 30%, rgba(0, 212, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 60% 80%, rgba(255, 230, 0, 0.04) 0%, transparent 50%);
+  animation: heroGradient 8s ease-in-out infinite alternate;
+}
+@keyframes heroGradient {
+  0% {
+    background:
+      radial-gradient(circle at 20% 50%, rgba(255, 45, 107, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 30%, rgba(0, 212, 255, 0.06) 0%, transparent 50%),
+      radial-gradient(circle at 60% 80%, rgba(255, 230, 0, 0.04) 0%, transparent 50%);
+  }
+  100% {
+    background:
+      radial-gradient(circle at 30% 60%, rgba(255, 45, 107, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 70% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 50% 70%, rgba(255, 230, 0, 0.06) 0%, transparent 50%);
+  }
+}
+.hero-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 20px;
+}
+.hero-neon-line {
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #FF2D6B, #00D4FF);
+  margin: 0 auto 30px;
+  box-shadow: 0 0 12px rgba(255, 45, 107, 0.5), 0 0 24px rgba(0, 212, 255, 0.3);
+  border-radius: 2px;
+}
+.hero h1 {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 900;
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  line-height: 1.2;
+  margin-bottom: 20px;
+  letter-spacing: 0.04em;
+}
+.hero h1 .accent-pink { color: #FF2D6B; }
+.hero h1 .accent-blue { color: #00D4FF; }
+.hero p {
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: #AAAAAA;
+  margin-bottom: 40px;
+  font-weight: 400;
+}
+.btn-neon {
+  display: inline-block;
+  padding: 16px 48px;
+  background: transparent;
+  border: 2px solid #FF2D6B;
+  color: #FF2D6B;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s;
+  cursor: pointer;
+}
+.btn-neon:hover {
+  background: #FF2D6B;
+  color: #FFFFFF;
+  box-shadow: 0 0 30px rgba(255, 45, 107, 0.5), 0 0 60px rgba(255, 45, 107, 0.3);
+  transform: translateY(-2px);
+}
+.btn-neon-filled {
+  background: #FF2D6B;
+  color: #FFFFFF;
+  border: none;
+}
+.btn-neon-filled:hover {
+  background: #e0245a;
+  box-shadow: 0 0 40px rgba(255, 45, 107, 0.6), 0 0 80px rgba(255, 45, 107, 0.3);
+}
+.hero-neon-line-bottom {
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, #00D4FF, #FFE600);
+  margin: 40px auto 0;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+  border-radius: 2px;
+}
+
+/* ===== SECTIONS COMMON ===== */
+section { padding: 100px 20px; }
+.section-dark { background: #0D0D0D; }
+.section-darker { background: #1A1A1A; }
+.container { max-width: 1100px; margin: 0 auto; }
+.section-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  color: #FF2D6B;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.section-title {
+  font-weight: 900;
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+.section-sub {
+  color: #AAAAAA;
+  font-size: 0.95rem;
+  margin-bottom: 50px;
+}
+.neon-divider {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #FF2D6B, #00D4FF);
+  margin-bottom: 24px;
+  box-shadow: 0 0 8px rgba(255, 45, 107, 0.4);
+}
+
+/* ===== DIVISION (KIDS & FUTURE) ===== */
+.division-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+.division-card {
+  background: #1A1A1A;
+  border-radius: 12px;
+  padding: 40px 32px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.division-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 2px;
+  background: linear-gradient(135deg, #FF2D6B, #00D4FF);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.division-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 40px rgba(255, 45, 107, 0.15), 0 0 80px rgba(0, 212, 255, 0.1);
+}
+.division-icon {
+  font-size: 2.4rem;
+  margin-bottom: 16px;
+  display: inline-block;
+  filter: drop-shadow(0 0 8px rgba(255, 45, 107, 0.5));
+}
+.division-card h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+.division-age {
+  color: #00D4FF;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+.division-desc {
+  color: #AAAAAA;
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+  line-height: 1.8;
+}
+.division-classes {
+  list-style: none;
+}
+.division-classes li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.division-classes li:last-child { border-bottom: none; }
+.class-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-pink { background: #FF2D6B; box-shadow: 0 0 6px #FF2D6B; }
+.dot-blue { background: #00D4FF; box-shadow: 0 0 6px #00D4FF; }
+.dot-yellow { background: #FFE600; box-shadow: 0 0 6px #FFE600; }
+.class-age-note {
+  color: #AAAAAA;
+  font-size: 0.78rem;
+}
+
+/* ===== 3 POINTS ===== */
+.points-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.point-card {
+  background: #1A1A1A;
+  border-radius: 12px;
+  padding: 36px 28px;
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+.point-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.12);
+}
+.point-number {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.2rem;
+  line-height: 1;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #FF2D6B, #00D4FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(255, 45, 107, 0.4));
+}
+.point-card h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.point-card p {
+  color: #AAAAAA;
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+
+/* ===== PRICE ===== */
+.price-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+.price-block {
+  background: #1A1A1A;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.price-block-header {
+  padding: 24px 28px;
+  border-bottom: 2px solid;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.price-block-header.kids { border-color: #FF2D6B; }
+.price-block-header.future { border-color: #00D4FF; }
+.price-block-header h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+}
+.price-block-header .header-icon { font-size: 1.4rem; }
+.price-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.price-table tr { border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+.price-table tr:last-child { border-bottom: none; }
+.price-table td {
+  padding: 14px 28px;
+  font-size: 0.88rem;
+}
+.price-table td:first-child { color: #AAAAAA; width: 55%; }
+.price-table td:last-child {
+  text-align: right;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.discount-badges {
+  display: flex;
+  gap: 16px;
+  margin-top: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.discount-badge {
+  background: transparent;
+  border: 1px solid #FFE600;
+  color: #FFE600;
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 0 12px rgba(255, 230, 0, 0.15);
+  transition: all 0.3s;
+}
+.discount-badge:hover {
+  background: rgba(255, 230, 0, 0.08);
+  box-shadow: 0 0 24px rgba(255, 230, 0, 0.3);
+}
+
+/* ===== INSTRUCTOR ===== */
+.instructor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.instructor-card {
+  background: #1A1A1A;
+  border-radius: 12px;
+  padding: 40px 32px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.instructor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 30px rgba(255, 45, 107, 0.1);
+}
+.instructor-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: #2A2A2A;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  position: relative;
+}
+.instructor-avatar::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF2D6B, #00D4FF);
+  z-index: -1;
+  animation: neonRing 3s ease-in-out infinite alternate;
+}
+@keyframes neonRing {
+  0% { box-shadow: 0 0 10px rgba(255, 45, 107, 0.3); }
+  100% { box-shadow: 0 0 25px rgba(0, 212, 255, 0.5); }
+}
+.instructor-card h4 {
+  font-size: 1.2rem;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+.instructor-meta {
+  color: #00D4FF;
+  font-size: 0.82rem;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+.instructor-achievements {
+  list-style: none;
+  text-align: left;
+}
+.instructor-achievements li {
+  padding: 6px 0;
+  font-size: 0.82rem;
+  color: #AAAAAA;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.6;
+}
+.instructor-achievements li::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #FF2D6B;
+  margin-top: 8px;
+  flex-shrink: 0;
+  box-shadow: 0 0 4px #FF2D6B;
+}
+
+/* ===== ACCESS ===== */
+.access-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.access-block h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.access-block h3 .dot-accent {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.access-list {
+  list-style: none;
+  margin-bottom: 24px;
+}
+.access-list li {
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 4px;
+  transition: border-color 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.access-list li:hover { border-left-color: #FF2D6B; }
+.access-day {
+  color: #AAAAAA;
+  font-size: 0.8rem;
+}
+.map-placeholder {
+  width: 100%;
+  height: 180px;
+  background: #2A2A2A;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-size: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* ===== CTA ===== */
+.cta-section {
+  padding: 100px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 45, 107, 0.15), rgba(0, 212, 255, 0.1), rgba(255, 230, 0, 0.05));
+  animation: ctaShift 6s ease-in-out infinite alternate;
+}
+@keyframes ctaShift {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+.cta-content {
+  position: relative;
+  z-index: 2;
+}
+.cta-section h2 {
+  font-weight: 900;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  margin-bottom: 24px;
+}
+.cta-section .contact-info {
+  margin-top: 32px;
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+.contact-item .icon { font-size: 1.2rem; }
+.contact-item a {
+  color: #FFFFFF;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.contact-item a:hover { color: #FF2D6B; }
+
+/* ===== FOOTER ===== */
+.footer {
+  background: #0A0A0A;
+  padding: 40px 20px;
+  text-align: center;
+  position: relative;
+}
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #FF2D6B, #00D4FF, transparent);
+}
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 0.1em;
+  background: linear-gradient(135deg, #FF2D6B, #00D4FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+.footer p {
+  color: #555;
+  font-size: 0.75rem;
+}
+
+/* ===== MOBILE NAV OVERLAY ===== */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 13, 13, 0.98);
+  z-index: 999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.mobile-nav.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.mobile-nav a {
+  color: #FFFFFF;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  transition: color 0.3s;
+}
+.mobile-nav a:hover { color: #FF2D6B; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .nav { display: none; }
+  .hamburger { display: flex; }
+  .mobile-nav { display: flex; }
+  .header { padding: 14px 20px; }
+
+  .division-grid,
+  .price-grid,
+  .instructor-grid,
+  .access-content {
+    grid-template-columns: 1fr;
+  }
+  .points-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  section { padding: 70px 16px; }
+}
+@media (max-width: 600px) {
+  .hero h1 { font-size: 2rem; }
+  .hero p { font-size: 0.95rem; }
+  .btn-neon { padding: 14px 32px; font-size: 0.9rem; }
+  .division-card { padding: 28px 20px; }
+  .price-table td { padding: 10px 16px; font-size: 0.82rem; }
+  .contact-info { flex-direction: column; gap: 16px !important; align-items: center; }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== NEON GLOW PULSE ===== */
+@keyframes neonPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 45, 107, 0.3), 0 0 20px rgba(255, 45, 107, 0.15); }
+  50% { box-shadow: 0 0 20px rgba(255, 45, 107, 0.5), 0 0 40px rgba(255, 45, 107, 0.25); }
+}
+</style>
+</head>
+<body>
+
+<!-- CONCEPT BANNER -->
+<div class="concept-banner">
+  Design C: Street Vibe - ストリートダンスの世界観を表現したダークテーマ。ネオンカラーが映えるクールなデザイン
+</div>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <a href="#" class="logo">
+    <div>
+      <div class="logo-btm">BTM</div>
+      <div class="logo-full">BEAT THE MIX</div>
+    </div>
+  </a>
+  <nav class="nav">
+    <a href="#top">TOP</a>
+    <a href="#division">KIDS</a>
+    <a href="#division">FUTURE</a>
+    <a href="#price">料金</a>
+    <a href="#access">アクセス</a>
+    <a href="#instructor">インストラクター</a>
+    <a href="#cta" class="nav-cta">体験申込</a>
+  </nav>
+  <div class="hamburger" id="hamburger" onclick="toggleMobileNav()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</header>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#top" onclick="closeMobileNav()">TOP</a>
+  <a href="#division" onclick="closeMobileNav()">KIDS</a>
+  <a href="#division" onclick="closeMobileNav()">FUTURE</a>
+  <a href="#price" onclick="closeMobileNav()">料金</a>
+  <a href="#access" onclick="closeMobileNav()">アクセス</a>
+  <a href="#instructor" onclick="closeMobileNav()">インストラクター</a>
+  <a href="#cta" onclick="closeMobileNav()">体験申込</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-bg"></div>
+  <div class="hero-dots"></div>
+  <div class="hero-content">
+    <div class="hero-neon-line"></div>
+    <h1>
+      <span class="accent-pink">千葉市</span>でずっと、<span class="accent-blue">20年</span>。
+    </h1>
+    <p>大人から子供まで成長できるダンススタジオ</p>
+    <a href="#cta" class="btn-neon btn-neon-filled">体験レッスンに申し込む</a>
+    <div class="hero-neon-line-bottom"></div>
+  </div>
+</section>
+
+<!-- DIVISION: KIDS & FUTURE -->
+<section class="section-darker" id="division">
+  <div class="container">
+    <div class="animate-on-scroll" style="text-align:center; margin-bottom:50px;">
+      <div class="section-label">Division</div>
+      <h2 class="section-title">2つのプログラム</h2>
+      <div class="neon-divider" style="margin:0 auto 16px;"></div>
+      <p class="section-sub" style="margin-bottom:0;">年齢・目的に合わせた最適なクラスをご用意</p>
+    </div>
+    <div class="division-grid">
+      <!-- KIDS -->
+      <div class="division-card animate-on-scroll">
+        <div class="division-icon">&#10084;&#65039;</div>
+        <h3>KIDS</h3>
+        <div class="division-age">4〜18歳</div>
+        <div class="division-desc">
+          ダンスの技術はもちろん、礼儀やチームワーク、<br>
+          表現力など精神的な成長も大切にしています。
+        </div>
+        <ul class="division-classes">
+          <li>
+            <span class="class-dot dot-pink"></span>
+            KIDSクラス <span class="class-age-note">（4〜11歳）</span>
+          </li>
+          <li>
+            <span class="class-dot dot-blue"></span>
+            Teenクラス <span class="class-age-note">（12〜18歳）</span>
+          </li>
+          <li>
+            <span class="class-dot dot-yellow"></span>
+            レベルアップクラス <span class="class-age-note">（オーディション制）</span>
+          </li>
+        </ul>
+      </div>
+      <!-- FUTURE -->
+      <div class="division-card animate-on-scroll">
+        <div class="division-icon">&#11088;</div>
+        <h3>FUTURE</h3>
+        <div class="division-age">40歳以上</div>
+        <div class="division-desc">
+          ストレッチ&ダンスで、いつまでも動ける身体を。<br>
+          健康と美しさを手に入れる、大人のためのクラスです。
+        </div>
+        <ul class="division-classes">
+          <li>
+            <span class="class-dot dot-blue"></span>
+            ストレッチ&ダンスクラス
+          </li>
+          <li>
+            <span class="class-dot dot-pink"></span>
+            個人レッスン
+          </li>
+          <li>
+            <span class="class-dot dot-yellow"></span>
+            出張レッスン
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 POINTS -->
+<section class="section-dark" id="points">
+  <div class="container">
+    <div class="animate-on-scroll" style="text-align:center; margin-bottom:50px;">
+      <div class="section-label">Why BTM?</div>
+      <h2 class="section-title">選ばれる3つの理由</h2>
+      <div class="neon-divider" style="margin:0 auto 16px;"></div>
+    </div>
+    <div class="points-grid">
+      <div class="point-card animate-on-scroll">
+        <div class="point-number">01</div>
+        <h4>楽しく通える好アクセス</h4>
+        <p>千葉市内に7箇所のスタジオを展開。お住まいの近くで、無理なく通い続けられる環境を整えています。</p>
+      </div>
+      <div class="point-card animate-on-scroll">
+        <div class="point-number">02</div>
+        <h4>無駄がない「チケット制」</h4>
+        <p>月謝制ではなくチケット制を採用。自分のペースで通えるから、忙しい方でも無理なく続けられます。</p>
+      </div>
+      <div class="point-card animate-on-scroll">
+        <div class="point-number">03</div>
+        <h4>有資格/専門インストラクター</h4>
+        <p>経験豊富なプロのインストラクターが丁寧に指導。初心者からレベルアップまで安心してお任せください。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICE -->
+<section class="section-darker" id="price">
+  <div class="container">
+    <div class="animate-on-scroll" style="text-align:center; margin-bottom:50px;">
+      <div class="section-label">Price</div>
+      <h2 class="section-title">料金プラン</h2>
+      <div class="neon-divider" style="margin:0 auto 16px;"></div>
+      <p class="section-sub" style="margin-bottom:0;">すべて税込価格です</p>
+    </div>
+    <div class="price-grid">
+      <!-- KIDS PRICE -->
+      <div class="price-block animate-on-scroll">
+        <div class="price-block-header kids">
+          <span class="header-icon">&#10084;&#65039;</span>
+          <h3>KIDS</h3>
+        </div>
+        <table class="price-table">
+          <tr>
+            <td>入会金</td>
+            <td>5,000円</td>
+          </tr>
+          <tr>
+            <td>KIDSクラス（4〜11歳）</td>
+            <td>6,000円<br><small style="color:#AAAAAA;font-weight:400;">4回券</small></td>
+          </tr>
+          <tr>
+            <td>TEENクラス（12〜18歳）</td>
+            <td>6,400円<br><small style="color:#AAAAAA;font-weight:400;">4回券</small></td>
+          </tr>
+          <tr>
+            <td>レベルアップクラス</td>
+            <td>7,200円 / 9,200円<br><small style="color:#AAAAAA;font-weight:400;">4回券</small></td>
+          </tr>
+          <tr>
+            <td>個人レッスン</td>
+            <td>2,200円〜</td>
+          </tr>
+        </table>
+      </div>
+      <!-- FUTURE PRICE -->
+      <div class="price-block animate-on-scroll">
+        <div class="price-block-header future">
+          <span class="header-icon">&#11088;</span>
+          <h3>FUTURE</h3>
+        </div>
+        <table class="price-table">
+          <tr>
+            <td>入会金</td>
+            <td>5,000円</td>
+          </tr>
+          <tr>
+            <td>Dance ticket</td>
+            <td>8,000円<br><small style="color:#AAAAAA;font-weight:400;">4回券</small></td>
+          </tr>
+          <tr>
+            <td>個人Lesson</td>
+            <td>2,200円〜</td>
+          </tr>
+          <tr>
+            <td>出張Lesson</td>
+            <td>10,000円/h〜</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <!-- DISCOUNT -->
+    <div class="discount-badges animate-on-scroll">
+      <div class="discount-badge">掛け持ち割引 10% OFF</div>
+      <div class="discount-badge">家族割引 10% OFF</div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTRUCTOR -->
+<section class="section-dark" id="instructor">
+  <div class="container">
+    <div class="animate-on-scroll" style="text-align:center; margin-bottom:50px;">
+      <div class="section-label">Instructor</div>
+      <h2 class="section-title">インストラクター</h2>
+      <div class="neon-divider" style="margin:0 auto 16px;"></div>
+    </div>
+    <div class="instructor-grid">
+      <!-- JUNJUN -->
+      <div class="instructor-card animate-on-scroll">
+        <div class="instructor-avatar">&#128131;</div>
+        <h4>JUNJUN 先生</h4>
+        <div class="instructor-meta">Dance歴 32年 / 指導歴 22年</div>
+        <ul class="instructor-achievements">
+          <li>BEAT THE MIX 代表・メインインストラクター</li>
+          <li>ストリートダンス全国大会 多数入賞</li>
+          <li>テレビ・CM等メディア出演多数</li>
+          <li>有名アーティストバックダンサー経験</li>
+          <li>キッズダンス指導のパイオニア的存在</li>
+          <li>ダンス教育に関する資格を多数保有</li>
+        </ul>
+      </div>
+      <!-- NANAMI -->
+      <div class="instructor-card animate-on-scroll">
+        <div class="instructor-avatar">&#128131;</div>
+        <h4>NANAMI 先生</h4>
+        <div class="instructor-meta">ダンス歴 20年 / 指導歴 13年</div>
+        <ul class="instructor-achievements">
+          <li>幼少期よりBTMでダンスを始める</li>
+          <li>全国ダンスコンテスト 優勝・入賞多数</li>
+          <li>海外ダンス留学経験あり</li>
+          <li>KIDS・Teenクラスのメイン担当</li>
+          <li>子供の個性を引き出す指導に定評あり</li>
+          <li>振付・演出も手がけるマルチプレイヤー</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESS -->
+<section class="section-darker" id="access">
+  <div class="container">
+    <div class="animate-on-scroll" style="text-align:center; margin-bottom:50px;">
+      <div class="section-label">Access</div>
+      <h2 class="section-title">スタジオ・スケジュール</h2>
+      <div class="neon-divider" style="margin:0 auto 16px;"></div>
+    </div>
+    <div class="access-content">
+      <!-- KIDS ACCESS -->
+      <div class="access-block animate-on-scroll">
+        <h3>
+          <span class="dot-accent" style="background:#FF2D6B; box-shadow:0 0 6px #FF2D6B;"></span>
+          KIDS スケジュール
+        </h3>
+        <ul class="access-list">
+          <li>
+            若葉エリア
+            <span class="access-day">水曜日</span>
+          </li>
+          <li>
+            稲毛エリア
+            <span class="access-day">火曜日</span>
+          </li>
+        </ul>
+        <div class="map-placeholder">MAP - KIDSスタジオ所在地</div>
+      </div>
+      <!-- FUTURE ACCESS -->
+      <div class="access-block animate-on-scroll">
+        <h3>
+          <span class="dot-accent" style="background:#00D4FF; box-shadow:0 0 6px #00D4FF;"></span>
+          FUTURE スケジュール
+        </h3>
+        <ul class="access-list">
+          <li>
+            千葉エリア
+            <span class="access-day">火曜 19:10</span>
+          </li>
+          <li>
+            美浜エリア
+            <span class="access-day">水・金曜 19:10</span>
+          </li>
+          <li>
+            稲毛エリア
+            <span class="access-day">木曜 19:10</span>
+          </li>
+          <li>
+            若葉エリア
+            <span class="access-day">土曜 17:10</span>
+          </li>
+        </ul>
+        <div class="map-placeholder">MAP - FUTUREスタジオ所在地</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="cta-bg"></div>
+  <div class="cta-content">
+    <div class="hero-neon-line" style="margin-bottom:24px;"></div>
+    <h2>踊る楽しさ、ここから。</h2>
+    <p style="color:#AAAAAA; margin-bottom:32px; font-size:0.95rem;">まずは体験レッスンから。お気軽にお問い合わせください。</p>
+    <a href="#" class="btn-neon btn-neon-filled" style="margin-bottom:0;">体験レッスンに申し込む</a>
+    <div class="contact-info">
+      <div class="contact-item">
+        <span class="icon">&#128222;</span>
+        <a href="tel:09018179501">090-1817-9501</a>
+      </div>
+      <div class="contact-item">
+        <span class="icon">&#9993;&#65039;</span>
+        <a href="mailto:beat.the.mix7386@gmail.com">beat.the.mix7386@gmail.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">BTM</div>
+  <p>&copy; 2026 BEAT THE MIX. All rights reserved.</p>
+</footer>
+
+<!-- JS -->
+<script>
+// Header scroll effect
+const header = document.getElementById('header');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 60) {
+    header.classList.add('scrolled');
+  } else {
+    header.classList.remove('scrolled');
+  }
+});
+
+// Mobile nav
+function toggleMobileNav() {
+  const nav = document.getElementById('mobileNav');
+  const hamburger = document.getElementById('hamburger');
+  nav.classList.toggle('open');
+  hamburger.classList.toggle('active');
+}
+function closeMobileNav() {
+  document.getElementById('mobileNav').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('active');
+}
+
+// Scroll animation
+const observerOptions = {
+  threshold: 0.15,
+  rootMargin: '0px 0px -40px 0px'
+};
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.animate-on-scroll').forEach(el => {
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
