@@ -552,23 +552,54 @@ section {
   color: var(--text-body);
 }
 
-/* ===== INSTRUCTOR ===== */
+/* ===== INSTRUCTOR (Spotlight Layout) ===== */
 .instructor {
   background: linear-gradient(180deg, var(--purple-deep) 0%, var(--navy) 100%);
 }
 
+.instructor .section-inner {
+  max-width: 1100px;
+}
+
 .instructor-content {
   display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: clamp(32px, 5vw, 64px);
-  align-items: start;
+  grid-template-columns: 320px 1fr;
+  gap: clamp(40px, 6vw, 80px);
+  align-items: center;
   margin-top: 48px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(212, 168, 83, 0.1);
+  padding: clamp(32px, 4vw, 56px);
+  position: relative;
+  overflow: hidden;
+}
+
+.instructor-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.instructor-content::after {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(212, 168, 83, 0.06) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .instructor-photo {
   position: relative;
-  width: 280px;
-  height: 360px;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
 }
 
@@ -593,8 +624,8 @@ section {
 }
 
 .instructor-photo-icon {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--gold-dim), rgba(212, 168, 83, 0.08));
   border: 1px solid rgba(212, 168, 83, 0.3);
@@ -604,8 +635,8 @@ section {
 }
 
 .instructor-photo-icon svg {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   stroke: var(--gold);
   fill: none;
   stroke-width: 1.2;
@@ -613,31 +644,31 @@ section {
 
 .instructor-photo-label {
   font-family: 'DM Serif Display', serif;
-  font-size: 20px;
+  font-size: 24px;
   color: var(--gold);
-  letter-spacing: 2px;
+  letter-spacing: 3px;
 }
 
 .instructor-info h3 {
   font-family: 'Oswald', sans-serif;
-  font-size: clamp(28px, 4vw, 40px);
+  font-size: clamp(32px, 4.5vw, 48px);
   font-weight: 500;
-  letter-spacing: 4px;
+  letter-spacing: 5px;
   margin-bottom: 8px;
 }
 
 .instructor-info .instructor-role {
   font-family: 'Oswald', sans-serif;
-  font-size: 12px;
-  letter-spacing: 3px;
+  font-size: 13px;
+  letter-spacing: 4px;
   color: var(--gold);
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   text-transform: uppercase;
 }
 
 .instructor-stats {
   display: flex;
-  gap: 32px;
+  gap: 40px;
   margin-bottom: 28px;
   flex-wrap: wrap;
 }
@@ -650,7 +681,7 @@ section {
 
 .instructor-stat .stat-number {
   font-family: 'DM Serif Display', serif;
-  font-size: 32px;
+  font-size: 40px;
   color: var(--gold);
   line-height: 1;
 }
@@ -666,11 +697,11 @@ section {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 10px 20px;
   background: var(--gold-dim);
   border: 1px solid rgba(212, 168, 83, 0.2);
   margin-bottom: 28px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--gold-light);
   letter-spacing: 1px;
 }
@@ -684,10 +715,97 @@ section {
 }
 
 .instructor-bio {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 300;
-  line-height: 2;
+  line-height: 2.2;
   color: var(--text-body);
+}
+
+/* ===== FLOATING TRIAL BANNER ===== */
+.trial-float-banner {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  border: 1px solid rgba(212, 168, 83, 0.35);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 168, 83, 0.08);
+  opacity: 0;
+  transform: translateY(100px);
+  pointer-events: none;
+  transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.trial-float-banner.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.trial-float-banner.hidden {
+  opacity: 0;
+  transform: translateY(100px);
+  pointer-events: none;
+}
+
+.trial-float-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gold-light);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.trial-float-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--gold);
+  color: var(--navy);
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.trial-float-cta:hover {
+  background: var(--gold-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(212, 168, 83, 0.3);
+}
+
+.trial-float-close {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  background: var(--navy);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+  color: var(--gold);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.trial-float-close:hover {
+  background: rgba(212, 168, 83, 0.15);
+  border-color: var(--gold);
 }
 
 /* ===== STUDIOS ===== */
@@ -1294,9 +1412,12 @@ section {
     grid-template-columns: 1fr;
     justify-items: center;
     text-align: center;
+    padding: clamp(24px, 4vw, 40px);
   }
 
-  .instructor-photo { width: 220px; height: 280px; }
+  .instructor-photo {
+    max-width: 240px;
+  }
 
   .instructor-stats { justify-content: center; }
 
@@ -1350,6 +1471,25 @@ section {
   }
 
   .pricing-table td:first-child { width: 50%; }
+
+  /* Floating banner: full-width bar at bottom on mobile */
+  .trial-float-banner {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .trial-float-close {
+    top: -10px;
+    right: 12px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1364,6 +1504,9 @@ section {
   .pricing-table td { padding: 14px 0; }
 
   .pricing-table td:last-child { font-size: 18px; }
+
+  .trial-float-text { font-size: 12px; }
+  .trial-float-cta { font-size: 11px; padding: 7px 14px; }
 }
 </style>
 </head>
@@ -1926,6 +2069,13 @@ section {
   <p class="footer-copy">&copy; 2025 BEAT THE MIX Dance Studio. All rights reserved.</p>
 </footer>
 
+<!-- ===== FLOATING TRIAL BANNER ===== -->
+<div class="trial-float-banner" id="trialFloatBanner">
+  <span class="trial-float-text">体験レッスン無料!</span>
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLSck2gvaKBhbpE8hJqAwyume9r-ghJhlEAOaOUUXefHl5jGflQ/viewform?usp=header" target="_blank" rel="noopener" class="trial-float-cta">申し込む →</a>
+  <button class="trial-float-close" id="trialFloatClose" aria-label="閉じる">&times;</button>
+</div>
+
 <!-- ===== JAVASCRIPT ===== -->
 <script>
 (function() {
@@ -2079,6 +2229,36 @@ section {
       }
     });
   });
+
+  // ===== FLOATING TRIAL BANNER =====
+  (function() {
+    var banner = document.getElementById('trialFloatBanner');
+    var closeBtn = document.getElementById('trialFloatClose');
+    if (!banner || !closeBtn) return;
+
+    // Check if user already closed in this session
+    if (sessionStorage.getItem('trialBannerClosed') === '1') return;
+
+    var bannerShown = false;
+
+    function checkScroll() {
+      if (bannerShown) return;
+      if (window.scrollY > 300) {
+        banner.classList.add('visible');
+        bannerShown = true;
+      }
+    }
+
+    window.addEventListener('scroll', checkScroll, { passive: true });
+    // Also check immediately in case already scrolled past 300
+    checkScroll();
+
+    closeBtn.addEventListener('click', function() {
+      banner.classList.remove('visible');
+      banner.classList.add('hidden');
+      sessionStorage.setItem('trialBannerClosed', '1');
+    });
+  })();
 
 })();
 </script>
