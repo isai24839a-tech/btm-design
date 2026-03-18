@@ -327,6 +327,13 @@ body {
   margin-bottom: 2rem;
 }
 
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .hero-cta {
   display: inline-flex;
   align-items: center;
@@ -360,6 +367,38 @@ body {
 
 .hero-cta:hover svg {
   transform: translateX(4px);
+}
+
+.hero-trial {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: transparent;
+  color: var(--white);
+  border: 2px solid rgba(255,255,255,0.8);
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.hero-trial:hover {
+  background: var(--white);
+  color: var(--coral);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
+
+.hero-trial svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
 }
 
 .hero-scroll-hint {
@@ -1244,6 +1283,34 @@ body {
   letter-spacing: 0.05em;
 }
 
+.contact-trial {
+  margin-top: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.contact-trial-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  color: var(--white);
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(255,107,53,0.3);
+}
+
+.contact-trial-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 40px rgba(255,107,53,0.4);
+}
+
 .contact-note {
   margin-top: 2rem;
   font-size: 0.8rem;
@@ -1388,7 +1455,12 @@ body {
     letter-spacing: 0.08em;
   }
 
-  .hero-cta {
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .hero-cta, .hero-trial {
     padding: 0.8rem 2rem;
     font-size: 0.85rem;
   }
@@ -1477,10 +1549,16 @@ body {
     <div class="hero-eyebrow">BEAT THE MIX DANCE STUDIO</div>
     <h1 class="hero-title">KIDS</h1>
     <p class="hero-subtitle">4〜18歳のダンススタジオ</p>
-    <a href="#about" class="hero-cta">
-      クラスを見る
-      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-    </a>
+    <div class="hero-buttons">
+      <a href="#about" class="hero-cta">
+        クラスを見る
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSck2gvaKBhbpE8hJqAwyume9r-ghJhlEAOaOUUXefHl5jGflQ/viewform?usp=header" target="_blank" rel="noopener" class="hero-trial">
+        体験申し込み
+        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4-4v-2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      </a>
+    </div>
   </div>
   <div class="hero-scroll-hint">
     <span>SCROLL</span>
@@ -1561,44 +1639,13 @@ body {
       <div class="section-label">INSTRUCTORS</div>
       <h2 class="section-title">インストラクター</h2>
       <p class="section-desc">
-        経験豊富な2人の先生が、<br>
+        経験豊富な先生が、<br>
         お子さまの成長を全力でサポートします。
       </p>
     </div>
-    <div class="instructor-grid">
-      <!-- JUNJUN -->
-      <div class="instructor-card fade-in-left delay-1">
-        <div class="instructor-visual">
-          <div class="instructor-visual-pattern"></div>
-          <div class="instructor-silhouette">
-            <svg viewBox="0 0 100 100"><circle cx="50" cy="25" r="16"/><path d="M25 95 C25 60 35 50 50 50 C65 50 75 60 75 95" /><path d="M30 70 L15 55 M70 70 L85 55" stroke-width="5" fill="none"/></svg>
-          </div>
-          <div class="instructor-name-overlay">
-            <h3>JUNJUN</h3>
-            <div class="role">KIDS Division Lead Instructor</div>
-          </div>
-        </div>
-        <div class="instructor-info">
-          <div class="instructor-stats">
-            <div class="instructor-stat">
-              <div class="instructor-stat-number">32</div>
-              <div class="instructor-stat-label">Dance歴 / 年</div>
-            </div>
-            <div class="instructor-stat">
-              <div class="instructor-stat-number">22</div>
-              <div class="instructor-stat-label">指導歴 / 年</div>
-            </div>
-          </div>
-          <ul class="instructor-highlights">
-            <li>義務教育ダンス指導資格 ステージ2 保有</li>
-            <li>映画「サラリーマンNEO」郷ひろみバックダンサーオーディション優勝・共演</li>
-            <li>千葉国体 千葉葛南地区 優勝</li>
-            <li>サンケイリビング新聞社主催Danceコンテスト キッズ部門 優勝</li>
-          </ul>
-        </div>
-      </div>
+    <div class="instructor-grid" style="max-width:500px;margin:0 auto;">
       <!-- NANAMI -->
-      <div class="instructor-card fade-in-right delay-2">
+      <div class="instructor-card fade-in delay-1">
         <div class="instructor-visual">
           <div class="instructor-visual-pattern"></div>
           <div class="instructor-silhouette">
@@ -1811,6 +1858,12 @@ body {
           <div class="contact-text-label">メールでのお問い合わせ</div>
           <div class="contact-text-value">beat.the.mix7386@gmail.com</div>
         </div>
+      </a>
+    </div>
+    <div class="contact-trial fade-in delay-2">
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSck2gvaKBhbpE8hJqAwyume9r-ghJhlEAOaOUUXefHl5jGflQ/viewform?usp=header" target="_blank" rel="noopener" class="contact-trial-btn">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4-4v-2" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        体験レッスンに申し込む
       </a>
     </div>
     <p class="contact-note fade-in delay-2">

@@ -289,6 +289,31 @@ canvas#particles {
   animation: fadeUp 1s 1.2s forwards;
 }
 
+.hero-trial-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 28px;
+  padding: 14px 36px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  text-decoration: none;
+  transition: all 0.4s ease;
+  opacity: 0;
+  animation: fadeUp 1s 1.4s forwards;
+}
+
+.hero-trial-btn:hover {
+  background: var(--gold);
+  color: var(--navy);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(212,168,83,0.3);
+}
+
 .hero-scroll {
   position: absolute;
   bottom: 40px;
@@ -852,6 +877,29 @@ section {
   align-items: center;
 }
 
+.contact-trial-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 14px 36px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  text-decoration: none;
+  transition: all 0.4s ease;
+}
+
+.contact-trial-btn:hover {
+  background: var(--gold);
+  color: var(--navy);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(212,168,83,0.3);
+}
+
 .contact-item {
   display: flex;
   align-items: center;
@@ -1086,6 +1134,10 @@ section {
     <p class="hero-subtitle">40歳以上限定のダンスライフ</p>
     <div class="hero-line"></div>
     <p class="hero-btm">YOUR SECOND STAGE BEGINS HERE</p>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSck2gvaKBhbpE8hJqAwyume9r-ghJhlEAOaOUUXefHl5jGflQ/viewform?usp=header" target="_blank" rel="noopener" class="hero-trial-btn">
+      体験レッスンに申し込む
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+    </a>
   </div>
 
   <div class="hero-scroll">
@@ -1389,6 +1441,13 @@ section {
     <p class="reveal reveal-delay-1" style="color:var(--text-body);font-size:14px;font-weight:300;margin-top:8px;">
       体験レッスンのお申し込み・ご質問など、<br>お気軽にご連絡ください。
     </p>
+
+    <div class="contact-trial reveal reveal-delay-1" style="margin-top:24px;">
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSck2gvaKBhbpE8hJqAwyume9r-ghJhlEAOaOUUXefHl5jGflQ/viewform?usp=header" target="_blank" rel="noopener" class="contact-trial-btn">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4-4v-2" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        体験レッスンに申し込む
+      </a>
+    </div>
 
     <div class="contact-methods">
       <a href="tel:09018179501" class="contact-item reveal reveal-delay-2">
