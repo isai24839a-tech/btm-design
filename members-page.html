@@ -1391,9 +1391,29 @@ const ANNOUNCE_SHEET = 'お知らせ'; // お知らせ用シート名（列: 日
 const PASSWORD = 'btm2025'; // メンバーパスワード
 const APPS_SCRIPT_URL = ''; // Google Apps ScriptのウェブアプリURLをここに入力（セットアップ手順はbooking-setup.htmlを参照）
 const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 自動更新間隔（5分）
+const DEMO_MODE = true; // trueならデモデータで動作（テスト用）。本番ではfalseに変更
 // =========================
 
 let autoRefreshTimer = null;
+
+// ===== DEMO DATA =====
+var demoSlots = [
+  { date: '2026/03/22', studio: '若葉studio', time: '16:00〜17:00', class_name: 'KIDSクラス', max: 8, booked: 3, available: 5 },
+  { date: '2026/03/22', studio: '若葉studio', time: '17:10〜18:10', class_name: 'Teenクラス', max: 6, booked: 4, available: 2 },
+  { date: '2026/03/23', studio: '稲毛studio', time: '16:30〜17:30', class_name: 'KIDSクラス', max: 8, booked: 7, available: 1 },
+  { date: '2026/03/23', studio: '稲毛studio', time: '17:30〜18:30', class_name: 'レベルアップ', max: 5, booked: 5, available: 0 },
+  { date: '2026/03/24', studio: '千葉studio', time: '19:10〜20:10', class_name: 'FUTUREダンス', max: 10, booked: 2, available: 8 },
+  { date: '2026/03/24', studio: '千葉studio', time: '20:20〜21:20', class_name: 'FUTUREストレッチ', max: 10, booked: 6, available: 4 },
+  { date: '2026/03/25', studio: '美浜studio', time: '19:10〜20:10', class_name: 'FUTUREダンス', max: 8, booked: 0, available: 8 },
+  { date: '2026/03/26', studio: '稲毛studio(穴川)', time: '19:10〜20:10', class_name: 'FUTUREダンス', max: 8, booked: 3, available: 5 },
+];
+var demoBookings = JSON.parse(sessionStorage.getItem('btm_demo_bookings') || '[]');
+
+var demoAnnouncements = [
+  { date: '2026/03/18', title: '春の体験レッスンキャンペーン開催！', content: '3月20日〜4月10日まで、体験レッスンが無料！\nお友達と一緒の参加も大歓迎です。\n詳しくはお電話またはメールでお問い合わせください。', importance: '重要' },
+  { date: '2026/03/15', title: '4月スケジュールのお知らせ', content: '4月のレッスンスケジュールを更新しました。\nスケジュールタブからご確認ください。', importance: '' },
+  { date: '2026/03/10', title: 'GW休講のお知らせ', content: '4/29(火)〜5/6(火)はGWのため全スタジオ休講となります。\n5/7(水)より通常通り再開します。', importance: '' },
+];
 
 // ===== PASSWORD GATE =====
 (function initGate() {
@@ -1497,6 +1517,34 @@ function initTabs() {
 function fetchSchedule() {
   var container = document.getElementById('schedule-content');
   var refreshBtn = document.getElementById('refresh-button');
+
+  // Demo mode: show demo schedule
+  if (DEMO_MODE) {
+    var tableHtml = '<div class="schedule-table-wrapper"><table class="schedule-table"><thead><tr>' +
+      '<th>日付</th><th>スタジオ</th><th>時間</th><th>クラス</th><th>ステータス</th></tr></thead><tbody>';
+    var cardsHtml = '<div class="schedule-cards">';
+    demoSlots.forEach(function(s) {
+      var extraBooked = demoBookings.filter(function(b) {
+        return b.date === s.date && b.studio === s.studio && b.time === s.time;
+      }).length;
+      var avail = Math.max(0, s.available - extraBooked);
+      var status = avail === 0 ? '満員' : avail <= 2 ? '残りわずか' : '空きあり';
+      tableHtml += '<tr><td>' + escapeHtml(s.date) + '</td><td>' + escapeHtml(s.studio) +
+        '</td><td>' + escapeHtml(s.time) + '</td><td>' + escapeHtml(s.class_name) +
+        '</td><td>' + renderStatusBadge(status) + '</td></tr>';
+      cardsHtml += '<div class="schedule-card-item"><div class="schedule-card-date">' +
+        escapeHtml(s.date) + '</div>' +
+        '<div class="schedule-card-detail"><span class="schedule-card-label">スタジオ</span><span>' + escapeHtml(s.studio) + '</span></div>' +
+        '<div class="schedule-card-detail"><span class="schedule-card-label">時間</span><span>' + escapeHtml(s.time) + '</span></div>' +
+        '<div class="schedule-card-detail"><span class="schedule-card-label">クラス</span><span>' + escapeHtml(s.class_name) + '</span></div>' +
+        '<div class="schedule-card-detail"><span class="schedule-card-label">ステータス</span>' + renderStatusBadge(status) + '</div></div>';
+    });
+    tableHtml += '</tbody></table></div>';
+    cardsHtml += '</div>';
+    container.innerHTML = tableHtml + cardsHtml;
+    updateTimestamp();
+    return;
+  }
 
   // Check if spreadsheet ID is configured
   if (!SPREADSHEET_ID || SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
@@ -1722,6 +1770,23 @@ function initBooking() {
 function fetchBookingSlots() {
   var container = document.getElementById('booking-content');
 
+  // Demo mode: use local data
+  if (DEMO_MODE) {
+    // Recalculate availability based on demo bookings
+    var slots = demoSlots.map(function(s) {
+      var extraBooked = demoBookings.filter(function(b) {
+        return b.date === s.date && b.studio === s.studio && b.time === s.time;
+      }).length;
+      return {
+        date: s.date, studio: s.studio, time: s.time, class_name: s.class_name,
+        max: s.max, booked: s.booked + extraBooked,
+        available: Math.max(0, s.available - extraBooked)
+      };
+    });
+    renderBookingSlots(slots, container);
+    return;
+  }
+
   if (!APPS_SCRIPT_URL) {
     showBookingSetup(container);
     return;
@@ -1869,6 +1934,24 @@ function submitBooking() {
   btn.disabled = true;
   btn.textContent = '送信中...';
 
+  // Demo mode: save to sessionStorage
+  if (DEMO_MODE) {
+    setTimeout(function() {
+      demoBookings.push({
+        date: currentBookingSlot.date,
+        studio: currentBookingSlot.studio,
+        time: currentBookingSlot.time,
+        class_name: currentBookingSlot.class_name,
+        name: name,
+        phone: phone,
+        bookedAt: new Date().toISOString()
+      });
+      sessionStorage.setItem('btm_demo_bookings', JSON.stringify(demoBookings));
+      showBookingSuccess(name);
+    }, 800);
+    return;
+  }
+
   var params = new URLSearchParams({
     action: 'book',
     date: currentBookingSlot.date || '',
@@ -1953,6 +2036,26 @@ function showBookingSetup(container) {
 // ===== ANNOUNCEMENTS (Google Sheets) =====
 function fetchAnnouncements() {
   var container = document.getElementById('announcements-content');
+
+  // Demo mode
+  if (DEMO_MODE) {
+    var html = '';
+    for (var i = demoAnnouncements.length - 1; i >= 0; i--) {
+      var a = demoAnnouncements[i];
+      var isImportant = a.importance === '重要';
+      var cardClass = isImportant ? 'announce-card important' : 'announce-card';
+      html += '<div class="' + cardClass + '">';
+      html += '<div class="announce-card-header">';
+      html += '<span class="announce-date">' + escapeHtml(a.date) + '</span>';
+      if (isImportant) html += '<span class="announce-badge-important">重要</span>';
+      html += '</div>';
+      html += '<h4>' + escapeHtml(a.title) + '</h4>';
+      html += '<p>' + escapeHtml(a.content) + '</p>';
+      html += '</div>';
+    }
+    container.innerHTML = html;
+    return;
+  }
 
   if (!SPREADSHEET_ID || SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
     container.innerHTML =
