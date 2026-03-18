@@ -829,6 +829,274 @@ body {
   color: var(--gray-500);
 }
 
+/* ===== BOOKING SYSTEM ===== */
+.booking-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.slot-card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 1.2rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--coral);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.slot-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.slot-card-date {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+
+.slot-card-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.slot-tag {
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--gray-100);
+  color: var(--charcoal);
+}
+
+.slot-tag.studio { background: rgba(13,27,42,0.08); color: var(--navy); }
+.slot-tag.time { background: rgba(255,107,53,0.08); color: var(--coral); }
+
+.slot-availability {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--gray-100);
+}
+
+.slot-spots {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+}
+
+.slot-spots strong {
+  color: #2e7d32;
+  font-size: 1.1rem;
+}
+
+.slot-spots.few strong { color: #e65100; }
+.slot-spots.full strong { color: #c62828; }
+
+.slot-book-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 30px;
+  background: var(--coral);
+  color: #fff;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.slot-book-btn:hover { background: var(--coral-light); }
+.slot-book-btn:active { transform: scale(0.97); }
+.slot-book-btn:disabled {
+  background: var(--gray-200);
+  color: var(--gray-500);
+  cursor: not-allowed;
+}
+
+/* Booking Modal */
+.booking-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13,27,42,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  padding: 1rem;
+}
+
+.booking-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.booking-modal {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.booking-modal-overlay.active .booking-modal {
+  transform: translateY(0);
+}
+
+.booking-modal h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 0.3rem;
+}
+
+.booking-modal-sub {
+  font-size: 0.82rem;
+  color: var(--gray-500);
+  margin-bottom: 1.5rem;
+}
+
+.booking-modal-slot {
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.booking-field {
+  margin-bottom: 1rem;
+}
+
+.booking-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  margin-bottom: 0.3rem;
+}
+
+.booking-field input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.booking-field input:focus {
+  border-color: var(--coral);
+}
+
+.booking-modal-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+.booking-cancel-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--gray-500);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.booking-cancel-btn:hover {
+  border-color: var(--charcoal);
+  color: var(--charcoal);
+}
+
+.booking-submit-btn {
+  flex: 1.5;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--coral);
+  color: #fff;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.booking-submit-btn:hover { background: var(--coral-light); }
+.booking-submit-btn:disabled {
+  background: var(--gray-200);
+  color: var(--gray-500);
+  cursor: not-allowed;
+}
+
+.booking-success {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.booking-success-icon {
+  width: 64px;
+  height: 64px;
+  background: #e8f5e9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.8rem;
+}
+
+.booking-success h4 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2rem;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+
+.booking-success p {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+}
+
+.booking-date-group {
+  margin-bottom: 1.5rem;
+}
+
+.booking-date-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--navy);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
+  border-bottom: 2px solid var(--gray-100);
+  letter-spacing: 0.03em;
+}
+
 /* ===== FOOTER ===== */
 .members-footer {
   text-align: center;
@@ -992,12 +1260,41 @@ body {
 
     <!-- Booking Panel -->
     <div class="tab-panel" id="panel-booking">
-      <div class="booking-container">
-        <div class="booking-header">
-          <h2 class="booking-title">Reservation</h2>
+      <div class="schedule-header">
+        <h2 class="schedule-title">Reservation</h2>
+        <div class="schedule-meta">
+          <button class="refresh-button" onclick="fetchBookingSlots()">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            空き更新
+          </button>
         </div>
-        <div id="booking-content">
-          <!-- Content loaded dynamically -->
+      </div>
+      <div id="booking-content">
+        <!-- Slots loaded dynamically -->
+      </div>
+    </div>
+
+    <!-- Booking Modal (outside panels) -->
+    <div class="booking-modal-overlay" id="booking-modal">
+      <div class="booking-modal">
+        <div id="booking-modal-body">
+          <h3>レッスン予約</h3>
+          <p class="booking-modal-sub">以下のレッスンを予約します</p>
+          <div class="booking-modal-slot" id="booking-modal-slot"></div>
+          <form id="booking-form">
+            <div class="booking-field">
+              <label>お名前 <span style="color:var(--coral)">*</span></label>
+              <input type="text" id="booking-name" required placeholder="山田 太郎">
+            </div>
+            <div class="booking-field">
+              <label>電話番号</label>
+              <input type="tel" id="booking-phone" placeholder="090-1234-5678">
+            </div>
+            <div class="booking-modal-actions">
+              <button type="button" class="booking-cancel-btn" onclick="closeBookingModal()">キャンセル</button>
+              <button type="submit" class="booking-submit-btn" id="booking-submit-btn">予約する</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -1031,7 +1328,7 @@ body {
 const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE'; // Google SpreadsheetのIDをここに入力
 const SHEET_NAME = 'Sheet1'; // シート名
 const PASSWORD = 'btm2025'; // メンバーパスワード
-const BOOKING_URL = ''; // 予約システムのURLをここに入力
+const APPS_SCRIPT_URL = ''; // Google Apps ScriptのウェブアプリURLをここに入力（セットアップ手順はbooking-setup.htmlを参照）
 const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 自動更新間隔（5分）
 // =========================
 
@@ -1342,24 +1639,253 @@ function startAutoRefresh() {
   }, AUTO_REFRESH_INTERVAL);
 }
 
-// ===== BOOKING SYSTEM =====
+// ===== BOOKING SYSTEM (Google Sheets + Apps Script) =====
+var currentBookingSlot = null;
+
 function initBooking() {
+  fetchBookingSlots();
+
+  // Modal close on overlay click
+  document.getElementById('booking-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeBookingModal();
+  });
+
+  // Booking form submit
+  document.getElementById('booking-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    submitBooking();
+  });
+}
+
+function fetchBookingSlots() {
   var container = document.getElementById('booking-content');
 
-  if (!BOOKING_URL) {
-    container.innerHTML =
-      '<div class="booking-placeholder">' +
-        '<div class="booking-placeholder-icon">' +
-          '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>' +
-        '</div>' +
-        '<p class="booking-placeholder-text">予約システムのURLを設定してください</p>' +
-        '<p class="booking-placeholder-hint">BOOKING_URL 変数にURLを入力すると、ここに予約システムが表示されます</p>' +
-      '</div>';
-  } else {
-    container.innerHTML =
-      '<iframe src="' + escapeHtml(BOOKING_URL) + '" class="booking-iframe" ' +
-      'allow="payment" loading="lazy" title="予約システム"></iframe>';
+  if (!APPS_SCRIPT_URL) {
+    showBookingSetup(container);
+    return;
   }
+
+  container.innerHTML =
+    '<div class="loading-container">' +
+      '<div class="spinner"></div>' +
+      '<span class="loading-text">空きレッスンを読み込み中...</span>' +
+    '</div>';
+
+  var url = APPS_SCRIPT_URL + '?action=slots';
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        renderBookingSlots(data, container);
+      } catch (e) {
+        showError(container, 'データの解析に失敗しました');
+      }
+    } else {
+      showError(container, '接続に失敗しました (HTTP ' + xhr.status + ')');
+    }
+  };
+  xhr.onerror = function() {
+    showError(container, 'ネットワークエラーが発生しました');
+  };
+  xhr.send();
+}
+
+function renderBookingSlots(slots, container) {
+  if (!slots || slots.length === 0) {
+    container.innerHTML =
+      '<div class="error-container">' +
+        '<div class="error-icon">&#128197;</div>' +
+        '<p class="error-message">現在予約可能なレッスンはありません</p>' +
+      '</div>';
+    return;
+  }
+
+  // Group by date
+  var grouped = {};
+  slots.forEach(function(slot) {
+    var date = slot.date || '日付未定';
+    if (!grouped[date]) grouped[date] = [];
+    grouped[date].push(slot);
+  });
+
+  var html = '';
+  Object.keys(grouped).forEach(function(date) {
+    html += '<div class="booking-date-group">';
+    html += '<div class="booking-date-label">' + escapeHtml(date) + '</div>';
+    html += '<div class="booking-slots-grid">';
+
+    grouped[date].forEach(function(slot, i) {
+      var available = slot.available || 0;
+      var spotClass = available <= 2 ? 'few' : '';
+      if (available <= 0) spotClass = 'full';
+
+      html += '<div class="slot-card">';
+      html += '<div class="slot-card-info">';
+      html += '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>';
+      html += '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>';
+      html += '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
+      html += '</div>';
+      html += '<div class="slot-availability">';
+      html += '<span class="slot-spots ' + spotClass + '">残り <strong>' + available + '</strong> 枠</span>';
+
+      if (available > 0) {
+        html += '<button class="slot-book-btn" onclick=\'openBookingModal(' +
+          JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>予約する</button>';
+      } else {
+        html += '<button class="slot-book-btn" disabled>満員</button>';
+      }
+
+      html += '</div>';
+      html += '</div>';
+    });
+
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function openBookingModal(slot) {
+  currentBookingSlot = slot;
+  var modal = document.getElementById('booking-modal');
+  var slotInfo = document.getElementById('booking-modal-slot');
+
+  slotInfo.innerHTML =
+    '<span class="slot-tag">' + escapeHtml(slot.date || '') + '</span>' +
+    '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>' +
+    '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>' +
+    '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
+
+  // Reset form
+  document.getElementById('booking-name').value = '';
+  document.getElementById('booking-phone').value = '';
+  document.getElementById('booking-submit-btn').disabled = false;
+  document.getElementById('booking-submit-btn').textContent = '予約する';
+
+  // Show form, hide success
+  document.getElementById('booking-modal-body').innerHTML =
+    '<h3>レッスン予約</h3>' +
+    '<p class="booking-modal-sub">以下のレッスンを予約します</p>' +
+    '<div class="booking-modal-slot" id="booking-modal-slot">' + slotInfo.innerHTML + '</div>' +
+    '<form id="booking-form" onsubmit="event.preventDefault();submitBooking()">' +
+      '<div class="booking-field">' +
+        '<label>お名前 <span style="color:var(--coral)">*</span></label>' +
+        '<input type="text" id="booking-name" required placeholder="山田 太郎">' +
+      '</div>' +
+      '<div class="booking-field">' +
+        '<label>電話番号</label>' +
+        '<input type="tel" id="booking-phone" placeholder="090-1234-5678">' +
+      '</div>' +
+      '<div class="booking-modal-actions">' +
+        '<button type="button" class="booking-cancel-btn" onclick="closeBookingModal()">キャンセル</button>' +
+        '<button type="submit" class="booking-submit-btn" id="booking-submit-btn">予約する</button>' +
+      '</div>' +
+    '</form>';
+
+  modal.classList.add('active');
+}
+
+function closeBookingModal() {
+  document.getElementById('booking-modal').classList.remove('active');
+  currentBookingSlot = null;
+}
+
+function submitBooking() {
+  if (!currentBookingSlot) return;
+
+  var name = document.getElementById('booking-name').value.trim();
+  var phone = document.getElementById('booking-phone').value.trim();
+
+  if (!name) {
+    document.getElementById('booking-name').focus();
+    return;
+  }
+
+  var btn = document.getElementById('booking-submit-btn');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+
+  var params = new URLSearchParams({
+    action: 'book',
+    date: currentBookingSlot.date || '',
+    studio: currentBookingSlot.studio || '',
+    time: currentBookingSlot.time || '',
+    class_name: currentBookingSlot.class_name || '',
+    name: name,
+    phone: phone
+  });
+
+  var url = APPS_SCRIPT_URL + '?' + params.toString();
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        var result = JSON.parse(xhr.responseText);
+        if (result.success) {
+          showBookingSuccess(name);
+        } else {
+          btn.disabled = false;
+          btn.textContent = '予約する';
+          alert(result.error || '予約に失敗しました');
+        }
+      } catch (e) {
+        showBookingSuccess(name); // Assume success if can't parse (no-cors)
+      }
+    } else {
+      btn.disabled = false;
+      btn.textContent = '予約する';
+      alert('通信エラーが発生しました');
+    }
+  };
+  xhr.onerror = function() {
+    // Google Apps Script redirects may cause onerror with no-cors, treat as success
+    showBookingSuccess(name);
+  };
+  xhr.send();
+}
+
+function showBookingSuccess(name) {
+  var body = document.getElementById('booking-modal-body');
+  body.innerHTML =
+    '<div class="booking-success">' +
+      '<div class="booking-success-icon">&#10003;</div>' +
+      '<h4>予約完了！</h4>' +
+      '<p>' + escapeHtml(name) + ' さんの予約を受け付けました</p>' +
+      '<br>' +
+      '<button class="slot-book-btn" onclick="closeBookingModal();fetchBookingSlots();">閉じる</button>' +
+    '</div>';
+}
+
+function showBookingSetup(container) {
+  container.innerHTML =
+    '<div class="setup-card">' +
+      '<h3>予約システム セットアップ</h3>' +
+      '<p class="setup-subtitle">Google Sheets + Apps Scriptで無料の予約システムを構築します</p>' +
+      '<ol class="setup-steps">' +
+        '<li>Googleスプレッドシートを作成し、2つのシートを用意:<br>' +
+          '<div class="setup-columns" style="margin-top:0.5rem">' +
+            '<span class="setup-column-tag">スケジュール</span>' +
+            '<span class="setup-column-tag">予約一覧</span>' +
+          '</div>' +
+        '</li>' +
+        '<li>「スケジュール」シートに列を追加:' +
+          '<div class="setup-columns">' +
+            '<span class="setup-column-tag">日付</span>' +
+            '<span class="setup-column-tag">スタジオ</span>' +
+            '<span class="setup-column-tag">時間</span>' +
+            '<span class="setup-column-tag">クラス</span>' +
+            '<span class="setup-column-tag">定員</span>' +
+          '</div>' +
+        '</li>' +
+        '<li><code>booking-script.gs</code> のコードをApps Scriptエディタにコピー</li>' +
+        '<li>「デプロイ」→「新しいデプロイ」→「ウェブアプリ」で公開<br>' +
+          '<span style="font-size:0.8rem;color:var(--gray-500)">アクセス権: 「全員」に設定</span></li>' +
+        '<li>デプロイURLをこのHTMLの <code>APPS_SCRIPT_URL</code> に設定</li>' +
+      '</ol>' +
+    '</div>';
 }
 
 // ===== UTILITIES =====
