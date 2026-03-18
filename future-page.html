@@ -859,6 +859,279 @@ section {
   flex-shrink: 0;
 }
 
+/* ===== FAQ ===== */
+.faq {
+  background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 50%, var(--navy) 100%);
+}
+
+.faq-list {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item {
+  border: 1px solid rgba(212, 168, 83, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.4s ease;
+}
+
+.faq-item:hover {
+  border-color: rgba(212, 168, 83, 0.25);
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  cursor: pointer;
+  gap: 16px;
+  user-select: none;
+}
+
+.faq-question span {
+  font-size: clamp(14px, 1.6vw, 16px);
+  font-weight: 400;
+  color: var(--white-soft);
+  line-height: 1.6;
+}
+
+.faq-icon {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.faq-icon::before,
+.faq-icon::after {
+  content: '';
+  position: absolute;
+  background: var(--gold);
+  transition: transform 0.4s ease;
+}
+
+.faq-icon::before {
+  width: 12px;
+  height: 1px;
+}
+
+.faq-icon::after {
+  width: 1px;
+  height: 12px;
+}
+
+.faq-item.active .faq-icon {
+  border-color: var(--gold);
+  background: rgba(212, 168, 83, 0.1);
+}
+
+.faq-item.active .faq-icon::after {
+  transform: rotate(90deg);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), padding 0.5s ease;
+}
+
+.faq-answer-inner {
+  padding: 0 24px 20px 24px;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 2;
+  color: var(--text-body);
+  border-top: 1px solid rgba(212, 168, 83, 0.08);
+  padding-top: 16px;
+  margin: 0 24px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.faq-item.active .faq-answer {
+  max-height: 300px;
+}
+
+/* ===== VOICES ===== */
+.voices {
+  background: linear-gradient(180deg, var(--navy) 0%, var(--purple-deep) 50%, var(--navy) 100%);
+}
+
+.voices-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.voice-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(212, 168, 83, 0.12);
+  padding: clamp(28px, 3vw, 40px);
+  transition: all 0.4s ease;
+}
+
+.voice-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(212, 168, 83, 0.25);
+  transform: translateY(-4px);
+}
+
+.voice-quote-mark {
+  font-family: 'DM Serif Display', serif;
+  font-size: 56px;
+  color: var(--gold);
+  opacity: 0.25;
+  line-height: 1;
+  margin-bottom: -8px;
+}
+
+.voice-text {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 2;
+  color: var(--text-body);
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.voice-author {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  padding-top: 16px;
+  border-top: 1px solid rgba(212, 168, 83, 0.12);
+}
+
+/* ===== GALLERY ===== */
+.gallery {
+  background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 50%, var(--navy) 100%);
+}
+
+.gallery .section-subtitle {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-body);
+  margin-top: -20px;
+  margin-bottom: 40px;
+}
+
+.gallery-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(212, 168, 83, 0.2);
+  margin-top: 48px;
+  gap: 16px;
+  padding: 40px;
+}
+
+.gallery-placeholder-icon svg {
+  width: 48px;
+  height: 48px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.2;
+  opacity: 0.4;
+}
+
+.gallery-placeholder-text {
+  font-size: 15px;
+  color: var(--white-muted);
+  text-align: center;
+}
+
+.gallery-placeholder-note {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 1px;
+}
+
+.gallery-follow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 32px;
+  padding: 12px 32px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  text-decoration: none;
+  transition: all 0.4s ease;
+}
+
+.gallery-follow-btn:hover {
+  background: var(--gold);
+  color: var(--navy);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(212,168,83,0.3);
+}
+
+.gallery-follow-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* ===== FOOTER SOCIAL ===== */
+.footer-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+
+.footer-social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(212, 168, 83, 0.2);
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.footer-social a:hover {
+  border-color: var(--gold);
+  background: rgba(212, 168, 83, 0.1);
+  transform: translateY(-2px);
+}
+
+.footer-social a svg {
+  width: 16px;
+  height: 16px;
+  fill: var(--gold);
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.footer-social a:hover svg {
+  opacity: 1;
+}
+
 /* ===== CONTACT ===== */
 .contact {
   background: linear-gradient(180deg, var(--navy) 0%, #080F19 100%);
@@ -1036,6 +1309,10 @@ section {
   .pricing-discounts {
     flex-direction: column;
   }
+
+  .voices-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1110,6 +1387,8 @@ section {
     <li><a href="#instructor">Instructor</a></li>
     <li><a href="#studios">Studios</a></li>
     <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#gallery">Gallery</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="future-news.html">News</a></li>
     <li><a href="members-page.html" class="nav-members">Members</a></li>
@@ -1429,6 +1708,162 @@ section {
   <div class="line"></div>
 </div>
 
+<!-- ===== FAQ ===== -->
+<section class="faq" id="faq">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">FAQ</p>
+      <h2 class="section-heading">よくある質問</h2>
+      <div class="gold-line"></div>
+    </div>
+
+    <div class="faq-list">
+      <div class="faq-item reveal reveal-delay-1">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+          <span>何歳から参加できますか？</span>
+          <div class="faq-icon"></div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">40歳以上の方が対象です。男女問わずどなたでも参加できます。</div>
+        </div>
+      </div>
+
+      <div class="faq-item reveal reveal-delay-1">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+          <span>ダンス経験がなくても大丈夫ですか？</span>
+          <div class="faq-icon"></div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">もちろんです。受講者の多くが未経験からスタートしています。ストレッチから始めて、無理なくダンスを楽しめます。</div>
+        </div>
+      </div>
+
+      <div class="faq-item reveal reveal-delay-2">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+          <span>体験レッスンはありますか？</span>
+          <div class="faq-icon"></div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">はい、無料体験レッスンを随時受け付けています。お気軽にお問い合わせください。</div>
+        </div>
+      </div>
+
+      <div class="faq-item reveal reveal-delay-2">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+          <span>どんな服装で参加すればいいですか？</span>
+          <div class="faq-icon"></div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">動きやすい服装であれば何でもOKです。室内シューズ、タオル、飲み物をご持参ください。</div>
+        </div>
+      </div>
+
+      <div class="faq-item reveal reveal-delay-3">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+          <span>チケット制とは？</span>
+          <div class="faq-icon"></div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">月額制ではなく、4回券（8,000円）を購入して都合のいい日に通えるシステムです。</div>
+        </div>
+      </div>
+
+      <div class="faq-item reveal reveal-delay-3">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+          <span>家族がKIDSに通っている場合、割引はありますか？</span>
+          <div class="faq-icon"></div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">はい、家族割引でどちらか1人のチケットが10%OFFになります。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DIVIDER ===== -->
+<div class="elegant-divider reveal">
+  <div class="line"></div>
+  <div class="diamond"></div>
+  <div class="line"></div>
+</div>
+
+<!-- ===== VOICES ===== -->
+<section class="voices" id="voices">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">Voices</p>
+      <h2 class="section-heading">生徒の声</h2>
+      <div class="gold-line"></div>
+    </div>
+
+    <div class="voices-grid">
+      <div class="voice-card reveal reveal-delay-1">
+        <div class="voice-quote-mark">"</div>
+        <p class="voice-text">運動不足が気になっていましたが、ストレッチから始められるので無理なく続けられています。週に一度の楽しみです。</p>
+        <p class="voice-author">FUTURE会員 / 50代女性</p>
+      </div>
+
+      <div class="voice-card reveal reveal-delay-2">
+        <div class="voice-quote-mark">"</div>
+        <p class="voice-text">定年後に始めましたが、先生の丁寧な指導のおかげで毎回楽しく参加しています。仲間もでき、生活に張りが出ました。</p>
+        <p class="voice-author">FUTURE会員 / 60代男性</p>
+      </div>
+
+      <div class="voice-card reveal reveal-delay-3">
+        <div class="voice-quote-mark">"</div>
+        <p class="voice-text">子育てが一段落して自分の時間ができた時に出会いました。体を動かす喜びを改めて感じています。</p>
+        <p class="voice-author">FUTURE会員 / 40代女性</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DIVIDER ===== -->
+<div class="elegant-divider reveal">
+  <div class="line"></div>
+  <div class="diamond"></div>
+  <div class="line"></div>
+</div>
+
+<!-- ===== GALLERY ===== -->
+<section class="gallery" id="gallery">
+  <div class="section-inner" style="text-align:center;">
+    <div class="reveal">
+      <p class="section-label">Gallery</p>
+      <h2 class="section-heading">ギャラリー</h2>
+      <div class="gold-line" style="margin-left:auto;margin-right:auto;"></div>
+    </div>
+    <p class="section-subtitle reveal reveal-delay-1">レッスンの雰囲気をInstagramでチェック</p>
+
+    <div class="gallery-placeholder reveal reveal-delay-2">
+      <div class="gallery-placeholder-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <circle cx="12" cy="12" r="5"/>
+          <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/>
+        </svg>
+      </div>
+      <p class="gallery-placeholder-text">Instagramの投稿がここに表示されます</p>
+      <p class="gallery-placeholder-note">INSTAGRAM_FUTURE_URL を設定してください</p>
+    </div>
+
+    <a href="#INSTAGRAM_FUTURE_URL" target="_blank" rel="noopener" class="gallery-follow-btn reveal reveal-delay-3">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+      </svg>
+      FOLLOW ON INSTAGRAM
+    </a>
+  </div>
+</section>
+
+<!-- ===== DIVIDER ===== -->
+<div class="elegant-divider reveal">
+  <div class="line"></div>
+  <div class="diamond"></div>
+  <div class="line"></div>
+</div>
+
 <!-- ===== CONTACT ===== -->
 <section class="contact" id="contact">
   <div class="section-inner">
@@ -1481,6 +1916,13 @@ section {
 <!-- ===== FOOTER ===== -->
 <footer class="footer">
   <p class="footer-brand">BEAT THE MIX</p>
+  <div class="footer-social">
+    <a href="#INSTAGRAM_FUTURE_URL" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+      </svg>
+    </a>
+  </div>
   <p class="footer-copy">&copy; 2025 BEAT THE MIX Dance Studio. All rights reserved.</p>
 </footer>
 

@@ -1173,6 +1173,328 @@ body {
 }
 
 /* ============================================
+   FAQ SECTION
+   ============================================ */
+.faq-section {
+  background: var(--white);
+}
+
+.faq-list {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faq-item {
+  background: var(--white);
+  border: 2px solid rgba(255, 107, 53, 0.1);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+  border-color: rgba(255, 107, 53, 0.25);
+}
+
+.faq-item.active {
+  border-color: var(--orange);
+  box-shadow: var(--shadow-sm);
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.3rem 1.8rem;
+  cursor: pointer;
+  gap: 1rem;
+  user-select: none;
+  transition: background 0.3s ease;
+}
+
+.faq-question:hover {
+  background: var(--orange-light);
+}
+
+.faq-q-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--dark-text);
+  line-height: 1.7;
+}
+
+.faq-q-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--orange);
+  flex-shrink: 0;
+  line-height: 1.7;
+}
+
+.faq-toggle-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--orange-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.faq-item.active .faq-toggle-icon {
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  transform: rotate(45deg);
+}
+
+.faq-toggle-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--orange);
+  stroke-width: 2.5;
+  fill: none;
+  transition: stroke 0.3s ease;
+}
+
+.faq-item.active .faq-toggle-icon svg {
+  stroke: var(--white);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+  max-height: 300px;
+}
+
+.faq-a-inner {
+  padding: 0 1.8rem 1.5rem 1.8rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.faq-a-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--coral);
+  flex-shrink: 0;
+  line-height: 1.8;
+}
+
+.faq-a-text {
+  font-size: 0.9rem;
+  color: var(--gray-text);
+  line-height: 1.8;
+}
+
+/* ============================================
+   VOICES SECTION
+   ============================================ */
+.voices-section {
+  background: var(--light-bg);
+  position: relative;
+}
+
+.voices-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.voice-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem 2rem;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.4s ease;
+}
+
+.voice-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.voice-quote-mark {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.5rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.voice-text {
+  font-size: 0.9rem;
+  color: var(--dark-text);
+  line-height: 2;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.voice-author {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 107, 53, 0.1);
+}
+
+.voice-author-role {
+  font-size: 0.75rem;
+  color: var(--orange);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.voice-author-name {
+  font-size: 0.8rem;
+  color: var(--gray-text);
+}
+
+/* ============================================
+   GALLERY SECTION
+   ============================================ */
+.gallery-section {
+  background: var(--white);
+  position: relative;
+}
+
+.gallery-placeholder {
+  max-width: 800px;
+  margin: 0 auto 2.5rem;
+  background: var(--light-bg);
+  border: 2px dashed rgba(255, 107, 53, 0.2);
+  border-radius: var(--radius);
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.gallery-placeholder-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.gallery-placeholder-icon svg {
+  width: 30px;
+  height: 30px;
+  stroke: var(--white);
+  stroke-width: 2;
+  fill: none;
+}
+
+.gallery-placeholder-text {
+  font-size: 1rem;
+  color: var(--gray-text);
+  margin-bottom: 0.5rem;
+}
+
+.gallery-placeholder-note {
+  font-size: 0.75rem;
+  color: var(--orange);
+  opacity: 0.7;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.gallery-follow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  color: var(--white);
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(255, 107, 53, 0.2);
+}
+
+.gallery-follow-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 40px rgba(255, 107, 53, 0.35);
+}
+
+.gallery-follow-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--white);
+}
+
+.gallery-follow-wrap {
+  text-align: center;
+}
+
+/* Footer Instagram link */
+.footer-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0.8rem 0;
+}
+
+.footer-social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.footer-social a:hover {
+  background: var(--orange);
+  transform: translateY(-2px);
+}
+
+.footer-social a svg {
+  width: 18px;
+  height: 18px;
+  fill: rgba(255, 255, 255, 0.6);
+  transition: fill 0.3s ease;
+}
+
+.footer-social a:hover svg {
+  fill: var(--white);
+}
+
+/* ============================================
    CONTACT SECTION
    ============================================ */
 .contact-section {
@@ -1421,6 +1743,24 @@ body {
     margin: 0 auto;
   }
 
+  .voices-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .faq-question {
+    padding: 1.1rem 1.3rem;
+  }
+
+  .faq-a-inner {
+    padding: 0 1.3rem 1.3rem 1.3rem;
+  }
+
+  .gallery-placeholder {
+    padding: 3rem 1.5rem;
+  }
+
   .contact-items {
     flex-direction: column;
     gap: 1rem;
@@ -1523,6 +1863,8 @@ body {
     <a href="#instructors" class="nav-link">INSTRUCTORS</a>
     <a href="#studios" class="nav-link">STUDIOS</a>
     <a href="#pricing" class="nav-link">PRICING</a>
+    <a href="#faq" class="nav-link">FAQ</a>
+    <a href="#gallery" class="nav-link">GALLERY</a>
     <a href="#contact" class="nav-link">CONTACT</a>
     <a href="kids-news.html" class="nav-link">NEWS</a>
     <a href="members-page.html" class="nav-link members-link">MEMBERS</a>
@@ -1816,10 +2158,213 @@ body {
   </div>
 </section>
 
-<!-- Wave: Pricing to Contact -->
+<!-- Wave: Pricing to FAQ -->
 <div class="wave-separator">
   <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-    <path d="M0,60 C240,0 480,100 720,40 C960,0 1200,80 1440,30 L1440,0 L0,0 Z" fill="#FFFFFF"/>
+    <path d="M0,60 C240,0 480,100 720,40 C960,0 1200,80 1440,30 L1440,120 L0,120 Z" fill="#FFF9F5"/>
+  </svg>
+</div>
+
+<!-- ===================== FAQ ===================== -->
+<section class="section faq-section" id="faq" style="background: var(--light-bg);">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title">よくある質問</h2>
+      <p class="section-desc">
+        保護者の方からよくいただく<br>ご質問をまとめました。
+      </p>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item fade-in delay-1">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <div class="faq-q-text">
+            <span class="faq-q-label">Q.</span>
+            <span>何歳から通えますか？</span>
+          </div>
+          <div class="faq-toggle-icon">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-a-inner">
+            <span class="faq-a-label">A.</span>
+            <span class="faq-a-text">4歳から通えます。KIDSクラスは4〜11歳、Teenクラスは12〜18歳が対象です。</span>
+          </div>
+        </div>
+      </div>
+      <div class="faq-item fade-in delay-1">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <div class="faq-q-text">
+            <span class="faq-q-label">Q.</span>
+            <span>ダンス経験がなくても大丈夫ですか？</span>
+          </div>
+          <div class="faq-toggle-icon">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-a-inner">
+            <span class="faq-a-label">A.</span>
+            <span class="faq-a-text">もちろん大丈夫です！未経験のお子さまも多く在籍しています。基礎からゆっくり丁寧に指導します。</span>
+          </div>
+        </div>
+      </div>
+      <div class="faq-item fade-in delay-2">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <div class="faq-q-text">
+            <span class="faq-q-label">Q.</span>
+            <span>見学・体験はできますか？</span>
+          </div>
+          <div class="faq-toggle-icon">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-a-inner">
+            <span class="faq-a-label">A.</span>
+            <span class="faq-a-text">はい、いつでも無料体験レッスンを受け付けています。お気軽にお申し込みください。</span>
+          </div>
+        </div>
+      </div>
+      <div class="faq-item fade-in delay-2">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <div class="faq-q-text">
+            <span class="faq-q-label">Q.</span>
+            <span>レッスンに必要な持ち物は？</span>
+          </div>
+          <div class="faq-toggle-icon">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-a-inner">
+            <span class="faq-a-label">A.</span>
+            <span class="faq-a-text">動きやすい服装、室内シューズ、タオル、飲み物をご持参ください。</span>
+          </div>
+        </div>
+      </div>
+      <div class="faq-item fade-in delay-3">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <div class="faq-q-text">
+            <span class="faq-q-label">Q.</span>
+            <span>チケット制とは？</span>
+          </div>
+          <div class="faq-toggle-icon">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-a-inner">
+            <span class="faq-a-label">A.</span>
+            <span class="faq-a-text">月額制ではなく、4回券を購入して好きなタイミングで通えるシステムです。無駄なく通えます。</span>
+          </div>
+        </div>
+      </div>
+      <div class="faq-item fade-in delay-3">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <div class="faq-q-text">
+            <span class="faq-q-label">Q.</span>
+            <span>兄弟割引はありますか？</span>
+          </div>
+          <div class="faq-toggle-icon">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-a-inner">
+            <span class="faq-a-label">A.</span>
+            <span class="faq-a-text">はい、家族割引があります。KIDSまたはFUTUREに家族がいる場合、どちらか1人のチケットが10%OFFになります。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Wave: FAQ to Voices -->
+<div class="wave-separator">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <path d="M0,40 C360,100 720,0 1080,60 C1260,90 1380,40 1440,50 L1440,120 L0,120 Z" fill="#FFFFFF"/>
+  </svg>
+</div>
+
+<!-- ===================== VOICES ===================== -->
+<section class="section voices-section" id="voices" style="background: var(--white);">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="section-label">VOICES</div>
+      <h2 class="section-title">生徒・保護者の声</h2>
+      <p class="section-desc">
+        通ってくださっている生徒さん・<br>保護者の方からの声をご紹介します。
+      </p>
+    </div>
+    <div class="voices-grid">
+      <div class="voice-card fade-in delay-1">
+        <div class="voice-quote-mark">"</div>
+        <p class="voice-text">人見知りだった娘が、今では毎週レッスンを楽しみにしています。先生の優しい指導のおかげです。</p>
+        <div class="voice-author">
+          <span class="voice-author-role">KIDSクラス保護者</span>
+          <span class="voice-author-name">小3女の子のお母さん</span>
+        </div>
+      </div>
+      <div class="voice-card fade-in delay-2">
+        <div class="voice-quote-mark">"</div>
+        <p class="voice-text">発表会でステージに立つ姿を見て、成長に感動しました。自信がついたようで、学校でも積極的になりました。</p>
+        <div class="voice-author">
+          <span class="voice-author-role">KIDSクラス保護者</span>
+          <span class="voice-author-name">小5男の子のお父さん</span>
+        </div>
+      </div>
+      <div class="voice-card fade-in delay-3">
+        <div class="voice-quote-mark">"</div>
+        <p class="voice-text">ダンスだけじゃなく、挨拶や礼儀も教えてくれるので習い事として最高です。</p>
+        <div class="voice-author">
+          <span class="voice-author-role">Teenクラス保護者</span>
+          <span class="voice-author-name">中1女の子のお母さん</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Wave: Voices to Gallery -->
+<div class="wave-separator">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <path d="M0,80 C180,20 360,100 540,60 C720,20 900,90 1080,50 C1260,10 1380,70 1440,40 L1440,120 L0,120 Z" fill="#FFF9F5"/>
+  </svg>
+</div>
+
+<!-- ===================== GALLERY ===================== -->
+<section class="section gallery-section" id="gallery" style="background: var(--light-bg);">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="section-label">GALLERY</div>
+      <h2 class="section-title">ギャラリー</h2>
+      <p class="section-desc">
+        レッスンの様子をInstagramでチェック！
+      </p>
+    </div>
+    <div class="gallery-placeholder fade-in delay-1">
+      <div class="gallery-placeholder-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+      </div>
+      <p class="gallery-placeholder-text">Instagramの投稿がここに表示されます</p>
+      <p class="gallery-placeholder-note">INSTAGRAM_KIDS_URL を設定してください</p>
+    </div>
+    <div class="gallery-follow-wrap fade-in delay-2">
+      <a href="#INSTAGRAM_KIDS_URL" target="_blank" rel="noopener" class="gallery-follow-btn">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        Instagramをフォロー
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Wave: Gallery to Contact -->
+<div class="wave-separator">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <path d="M0,60 C240,0 480,100 720,40 C960,0 1200,80 1440,30 L1440,0 L0,0 Z" fill="#FFF9F5"/>
     <path d="M0,80 C360,30 720,110 1080,50 C1260,20 1380,60 1440,40 L1440,120 L0,120 Z" fill="#FF6B35"/>
   </svg>
 </div>
@@ -1875,6 +2420,11 @@ body {
 <!-- ===================== FOOTER ===================== -->
 <footer class="footer">
   <div class="footer-brand">BEAT THE MIX</div>
+  <div class="footer-social">
+    <a href="#INSTAGRAM_KIDS_URL" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    </a>
+  </div>
   <p>&copy; BEAT THE MIX Dance Studio. All rights reserved.</p>
 </footer>
 
@@ -1969,6 +2519,20 @@ body {
   }, { passive: true });
 
 })();
+
+// --- FAQ Accordion ---
+function toggleFaq(el) {
+  var item = el.parentElement;
+  var wasActive = item.classList.contains('active');
+  // Close all FAQ items
+  document.querySelectorAll('.faq-item').forEach(function(faqItem) {
+    faqItem.classList.remove('active');
+  });
+  // Toggle clicked item
+  if (!wasActive) {
+    item.classList.add('active');
+  }
+}
 </script>
 
 </body>
