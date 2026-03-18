@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEAT THE MIX | Dance Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Noto+Sans+JP:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ========================================
+   RESET & BASE
+   ======================================== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #F5F0EB;
+  --bg-warm: #EDE7E0;
+  --charcoal: #1a1a1a;
+  --coral: #E8654A;
+  --green: #2D4A3E;
+  --text: #1a1a1a;
+  --text-light: #6b6b6b;
+  --text-muted: #999;
+  --white: #fff;
+  --hairline: rgba(26, 26, 26, 0.12);
+  --serif: 'Playfair Display', 'Georgia', serif;
+  --sans: 'DM Sans', 'Noto Sans JP', sans-serif;
+  --jp: 'Noto Sans JP', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--charcoal);
+  font-family: var(--sans);
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========================================
+   CONCEPT BANNER
+   ======================================== */
+.concept-banner {
+  background: var(--charcoal);
+  color: var(--bg);
+  text-align: center;
+  padding: 10px 20px;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+}
+.concept-banner span {
+  color: var(--coral);
+  margin-right: 8px;
+  font-weight: 600;
+}
+
+/* ========================================
+   HEADER / NAVIGATION
+   ======================================== */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 0 40px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(245, 240, 235, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+  transition: transform 0.4s ease;
+}
+
+.site-header.hidden {
+  transform: translateY(-100%);
+}
+
+.header-logo {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--charcoal);
+  text-decoration: none;
+}
+
+.header-nav {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.header-nav a {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.header-nav a:hover {
+  color: var(--coral);
+}
+
+.mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 28px;
+  height: 20px;
+  position: relative;
+}
+.mobile-toggle span {
+  display: block;
+  width: 100%;
+  height: 1.5px;
+  background: var(--charcoal);
+  position: absolute;
+  left: 0;
+  transition: all 0.3s ease;
+}
+.mobile-toggle span:nth-child(1) { top: 0; }
+.mobile-toggle span:nth-child(2) { top: 50%; transform: translateY(-50%); }
+.mobile-toggle span:nth-child(3) { bottom: 0; }
+.mobile-toggle.active span:nth-child(1) { top: 50%; transform: translateY(-50%) rotate(45deg); }
+.mobile-toggle.active span:nth-child(2) { opacity: 0; }
+.mobile-toggle.active span:nth-child(3) { bottom: 50%; transform: translateY(50%) rotate(-45deg); }
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg);
+  z-index: 999;
+  padding: 60px 40px;
+  flex-direction: column;
+  gap: 24px;
+}
+.mobile-menu.active {
+  display: flex;
+}
+.mobile-menu a {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  color: var(--charcoal);
+  text-decoration: none;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* ========================================
+   EDITORIAL SECTION LABELS
+   ======================================== */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.section-label .vol {
+  font-family: var(--serif);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--coral);
+  white-space: nowrap;
+  font-style: italic;
+}
+
+.section-label .line {
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+}
+
+.section-label .name {
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ========================================
+   HERO SECTION
+   ======================================== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  padding-top: 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-left {
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 60px 80px 80px;
+  position: relative;
+}
+
+.hero-left::before {
+  content: 'BTM';
+  position: absolute;
+  top: 50%;
+  left: -40px;
+  transform: translateY(-50%) rotate(-90deg);
+  font-family: var(--serif);
+  font-size: 0.65rem;
+  letter-spacing: 0.4em;
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.hero-heading {
+  margin-bottom: 40px;
+}
+
+.hero-heading .line {
+  display: block;
+  font-family: var(--jp);
+  font-weight: 900;
+  color: var(--charcoal);
+  line-height: 1.1;
+  overflow: hidden;
+}
+
+.hero-heading .line-inner {
+  display: block;
+  transform: translateY(110%);
+  animation: slideUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-heading .line:nth-child(1) { font-size: 3.2rem; }
+.hero-heading .line:nth-child(2) { font-size: 3.6rem; }
+.hero-heading .line:nth-child(3) {
+  font-size: 3rem;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.hero-heading .line:nth-child(1) .line-inner { animation-delay: 0.2s; }
+.hero-heading .line:nth-child(2) .line-inner { animation-delay: 0.35s; }
+.hero-heading .line:nth-child(3) .line-inner { animation-delay: 0.5s; }
+
+.hero-heading .num {
+  font-family: var(--serif);
+  font-size: 9rem;
+  font-weight: 800;
+  line-height: 0.85;
+  color: var(--coral);
+  letter-spacing: -0.04em;
+}
+
+.hero-heading .unit {
+  font-size: 3rem;
+  font-family: var(--jp);
+  font-weight: 900;
+}
+
+.hero-tagline {
+  font-family: var(--jp);
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--text-light);
+  margin-bottom: 40px;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  animation: fadeIn 0.8s ease forwards;
+  animation-delay: 0.7s;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--charcoal);
+  color: var(--white);
+  padding: 16px 36px;
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  opacity: 0;
+  animation: fadeIn 0.8s ease forwards;
+  animation-delay: 0.9s;
+}
+
+.hero-cta:hover {
+  background: var(--coral);
+  gap: 20px;
+}
+
+.hero-cta .arrow {
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--white);
+  position: relative;
+  transition: width 0.3s ease;
+}
+.hero-cta .arrow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid var(--white);
+  border-top: 1px solid var(--white);
+  transform: rotate(45deg);
+}
+
+.hero-right {
+  flex: 0 0 40%;
+  background: var(--coral);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-right::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 40px,
+      rgba(255,255,255,0.03) 40px,
+      rgba(255,255,255,0.03) 80px
+    );
+}
+
+.hero-right-content {
+  text-align: center;
+  color: var(--white);
+  position: relative;
+  z-index: 1;
+  padding: 40px;
+}
+
+.hero-right-content .studio-name {
+  font-family: var(--serif);
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.hero-right-content .studio-sub {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 32px;
+}
+
+.hero-right-content .est {
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  font-style: italic;
+  opacity: 0.6;
+}
+
+.hero-right-deco {
+  position: absolute;
+  font-family: var(--serif);
+  font-size: 18rem;
+  font-weight: 900;
+  color: rgba(255,255,255,0.06);
+  bottom: -40px;
+  right: -20px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.hero-scroll-indicator {
+  position: absolute;
+  bottom: 40px;
+  left: 80px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 1.2s;
+}
+
+.scroll-line {
+  width: 40px;
+  height: 1px;
+  background: var(--text-muted);
+  position: relative;
+  overflow: hidden;
+}
+.scroll-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--coral);
+  animation: scrollPulse 2s ease infinite;
+}
+
+/* ========================================
+   PULL QUOTE
+   ======================================== */
+.pull-quote {
+  padding: 100px 80px;
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+}
+
+.pull-quote .quote-mark {
+  font-family: var(--serif);
+  font-size: 10rem;
+  color: var(--coral);
+  opacity: 0.12;
+  line-height: 0.5;
+  display: block;
+  margin-bottom: -20px;
+}
+
+.pull-quote .quote-text {
+  font-family: var(--jp);
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  letter-spacing: 0.12em;
+  line-height: 2;
+  position: relative;
+}
+
+.pull-quote .quote-attribution {
+  margin-top: 24px;
+  font-family: var(--serif);
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+}
+
+.pull-quote .deco-line {
+  width: 40px;
+  height: 1px;
+  background: var(--coral);
+  margin: 20px auto 0;
+}
+
+/* ========================================
+   DIVISION SECTION
+   ======================================== */
+.division-section {
+  padding: 80px 80px 120px;
+  position: relative;
+}
+
+.division-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  position: relative;
+}
+
+.division-grid::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: var(--hairline);
+}
+
+.division-card {
+  position: relative;
+  padding: 40px;
+}
+
+.division-card .bg-number {
+  position: absolute;
+  top: -30px;
+  font-family: var(--serif);
+  font-size: 14rem;
+  font-weight: 900;
+  color: rgba(26, 26, 26, 0.03);
+  line-height: 1;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.division-card:nth-child(1) .bg-number { left: -20px; }
+.division-card:nth-child(2) .bg-number { right: -20px; }
+
+.division-card .card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.division-card .division-name {
+  font-family: var(--serif);
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+
+.division-card:nth-child(1) .division-name { color: var(--coral); }
+.division-card:nth-child(2) .division-name { color: var(--green); }
+
+.division-card .division-age {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.division-card .division-desc {
+  font-family: var(--jp);
+  font-size: 0.95rem;
+  line-height: 2;
+  color: var(--text-light);
+  margin-bottom: 32px;
+  font-weight: 400;
+}
+
+.division-card .division-desc::before {
+  content: '';
+  display: block;
+  width: 30px;
+  height: 2px;
+  background: currentColor;
+  margin-bottom: 20px;
+  opacity: 0.3;
+}
+
+.class-list {
+  list-style: none;
+}
+
+.class-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hairline);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--jp);
+  font-size: 0.85rem;
+}
+
+.class-list li:last-child {
+  border-bottom: none;
+}
+
+.class-list .class-name {
+  font-weight: 500;
+  color: var(--charcoal);
+}
+
+.class-list .class-age {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* ========================================
+   THREE POINTS — HORIZONTAL SCROLL
+   ======================================== */
+.points-section {
+  padding: 80px 0 120px;
+  position: relative;
+}
+
+.points-section .section-label {
+  padding: 0 80px;
+}
+
+.points-wrapper {
+  position: relative;
+}
+
+.points-track {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0 80px;
+}
+.points-track::-webkit-scrollbar { display: none; }
+
+.point-spread {
+  flex: 0 0 min(480px, 85vw);
+  scroll-snap-align: start;
+  padding: 60px 40px;
+  position: relative;
+  border-right: 1px solid var(--hairline);
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.point-spread:last-child {
+  border-right: none;
+}
+
+.point-spread .point-num {
+  position: absolute;
+  font-family: var(--serif);
+  font-size: 10rem;
+  font-weight: 900;
+  color: rgba(232, 101, 74, 0.06);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.point-spread:nth-child(odd) .point-num { top: 10px; left: 10px; }
+.point-spread:nth-child(even) .point-num { bottom: 10px; right: 10px; }
+
+.point-spread .point-content {
+  position: relative;
+  z-index: 1;
+}
+
+.point-spread:nth-child(even) .point-content {
+  text-align: right;
+  margin-left: auto;
+}
+
+.point-spread .point-index {
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--coral);
+  margin-bottom: 16px;
+  letter-spacing: 0.1em;
+}
+
+.point-spread .point-title {
+  font-family: var(--jp);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.point-spread .point-detail {
+  font-family: var(--jp);
+  font-size: 0.85rem;
+  color: var(--text-light);
+  line-height: 1.9;
+  font-weight: 400;
+}
+
+.point-spread .point-highlight {
+  display: inline-block;
+  margin-top: 16px;
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--coral);
+}
+
+.points-scroll-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 80px 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.points-scroll-hint .hint-line {
+  width: 30px;
+  height: 1px;
+  background: var(--text-muted);
+}
+
+/* ========================================
+   INSTRUCTOR SECTION
+   ======================================== */
+.instructor-section {
+  padding: 80px 80px 120px;
+  position: relative;
+}
+
+.instructor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+}
+
+.instructor-card {
+  position: relative;
+}
+
+.instructor-card .instructor-deco {
+  font-family: var(--serif);
+  font-size: 8rem;
+  font-weight: 900;
+  color: rgba(26, 26, 26, 0.03);
+  position: absolute;
+  top: -30px;
+  right: 0;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.instructor-card .instructor-role {
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 8px;
+}
+
+.instructor-card .instructor-name {
+  font-family: var(--serif);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--charcoal);
+  letter-spacing: 0.05em;
+  margin-bottom: 24px;
+  line-height: 1.1;
+}
+
+.instructor-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.instructor-stats .stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.instructor-stats .stat-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.instructor-stats .stat-value {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+
+.instructor-card .instructor-bio {
+  font-family: var(--jp);
+  font-size: 0.85rem;
+  line-height: 2;
+  color: var(--text-light);
+  font-weight: 400;
+}
+
+.instructor-card .instructor-visual {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, var(--bg-warm), #ddd5cc);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.instructor-card:nth-child(1) .instructor-visual {
+  background: linear-gradient(135deg, var(--coral), #d4553c);
+}
+.instructor-card:nth-child(2) .instructor-visual {
+  background: linear-gradient(135deg, var(--green), #3a6050);
+}
+
+.instructor-visual .visual-text {
+  font-family: var(--serif);
+  font-size: 4rem;
+  font-weight: 900;
+  color: rgba(255,255,255,0.15);
+  letter-spacing: 0.1em;
+}
+
+/* ========================================
+   PRICE SECTION
+   ======================================== */
+.price-section {
+  padding: 80px 80px 120px;
+  position: relative;
+  background: var(--white);
+}
+
+.price-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  margin-bottom: 60px;
+}
+
+.price-column .price-category {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 8px;
+}
+
+.price-column:nth-child(1) .price-category { color: var(--coral); }
+.price-column:nth-child(2) .price-category { color: var(--green); }
+
+.price-column .price-subtitle {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.price-table {
+  width: 100%;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.price-row:first-child {
+  border-top: 1px solid var(--hairline);
+}
+
+.price-item-name {
+  font-family: var(--jp);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--charcoal);
+}
+
+.price-item-detail {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-left: 4px;
+  font-weight: 400;
+}
+
+.price-amount {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--charcoal);
+  white-space: nowrap;
+}
+
+.price-amount .yen {
+  font-family: var(--jp);
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+.price-amount .note {
+  font-family: var(--jp);
+  font-size: 0.65rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  display: block;
+  text-align: right;
+}
+
+.discount-section {
+  background: var(--bg);
+  padding: 40px;
+  text-align: center;
+}
+
+.discount-section .discount-title {
+  font-family: var(--serif);
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--text-muted);
+  letter-spacing: 0.2em;
+  margin-bottom: 20px;
+}
+
+.discount-badges {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.discount-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.discount-badge .badge-name {
+  font-family: var(--jp);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--charcoal);
+}
+
+.discount-badge .badge-value {
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--coral);
+  letter-spacing: -0.02em;
+}
+
+/* ========================================
+   STUDIO LOCATIONS
+   ======================================== */
+.studio-section {
+  padding: 80px 80px 120px;
+}
+
+.studio-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+}
+
+.studio-col .studio-col-title {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 8px;
+}
+
+.studio-col:nth-child(1) .studio-col-title { color: var(--coral); }
+.studio-col:nth-child(2) .studio-col-title { color: var(--green); }
+
+.studio-col .studio-col-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  margin-bottom: 24px;
+}
+
+.studio-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--jp);
+  font-size: 0.85rem;
+}
+
+.studio-item .studio-name {
+  font-weight: 600;
+  color: var(--charcoal);
+}
+
+.studio-item .studio-schedule {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ========================================
+   CONTACT / FOOTER
+   ======================================== */
+.contact-section {
+  padding: 120px 80px;
+  background: var(--charcoal);
+  color: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-section::before {
+  content: 'BTM';
+  position: absolute;
+  bottom: -60px;
+  right: -20px;
+  font-family: var(--serif);
+  font-size: 20rem;
+  font-weight: 900;
+  color: rgba(255,255,255,0.02);
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+
+.contact-inner {
+  max-width: 800px;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-section .section-label .vol {
+  color: var(--coral);
+}
+.contact-section .section-label .line {
+  background: rgba(255,255,255,0.1);
+}
+.contact-section .section-label .name {
+  color: rgba(255,255,255,0.3);
+}
+
+.contact-heading {
+  font-family: var(--serif);
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.contact-sub {
+  font-family: var(--jp);
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 48px;
+  font-weight: 300;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.contact-row {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+}
+
+.contact-row .contact-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.contact-row .contact-value {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  color: var(--white);
+}
+
+.contact-row .contact-value a {
+  color: var(--white);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  transition: border-color 0.3s ease;
+}
+
+.contact-row .contact-value a:hover {
+  border-color: var(--coral);
+}
+
+.contact-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--coral);
+  color: var(--white);
+  padding: 18px 40px;
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.4s ease;
+}
+
+.contact-cta:hover {
+  background: #d4553c;
+  gap: 20px;
+}
+
+.contact-cta .arrow {
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--white);
+  position: relative;
+}
+.contact-cta .arrow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid var(--white);
+  border-top: 1px solid var(--white);
+  transform: rotate(45deg);
+}
+
+.site-footer {
+  background: var(--charcoal);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 40px 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-logo {
+  font-family: var(--serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.4);
+}
+
+.footer-copy {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.1em;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+@keyframes slideUp {
+  to { transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scrollPulse {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* Parallax numbers */
+.parallax-num {
+  transition: transform 0.1s linear;
+  will-change: transform;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 1024px) {
+  .hero-heading .line:nth-child(1) { font-size: 2.4rem; }
+  .hero-heading .line:nth-child(2) { font-size: 2.8rem; }
+  .hero-heading .num { font-size: 7rem; }
+  .hero-heading .unit { font-size: 2.4rem; }
+  .hero-left { padding: 60px 40px 60px 60px; }
+  .hero-right-content .studio-name { font-size: 2.5rem; }
+  .hero-right-deco { font-size: 12rem; }
+
+  .division-section,
+  .instructor-section,
+  .price-section,
+  .studio-section,
+  .contact-section { padding-left: 40px; padding-right: 40px; }
+
+  .pull-quote { padding: 80px 40px; }
+  .points-section .section-label { padding: 0 40px; }
+  .points-track { padding: 0 40px; }
+  .points-scroll-hint { padding: 20px 40px 0; }
+  .site-footer { padding: 40px; }
+}
+
+@media (max-width: 768px) {
+  .header-nav { display: none; }
+  .mobile-toggle { display: block; }
+
+  .hero {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .hero-left {
+    flex: auto;
+    padding: 100px 28px 60px;
+  }
+
+  .hero-left::before { display: none; }
+
+  .hero-heading .line:nth-child(1) { font-size: 2rem; }
+  .hero-heading .line:nth-child(2) { font-size: 2.2rem; }
+  .hero-heading .line:nth-child(3) { font-size: 2rem; }
+  .hero-heading .num { font-size: 5.5rem; }
+  .hero-heading .unit { font-size: 2rem; }
+
+  .hero-right {
+    flex: auto;
+    min-height: 280px;
+  }
+
+  .hero-right-content .studio-name { font-size: 2.2rem; }
+  .hero-right-deco { font-size: 8rem; }
+
+  .hero-scroll-indicator {
+    left: 28px;
+    bottom: auto;
+    position: relative;
+    margin-top: 24px;
+  }
+
+  .pull-quote { padding: 60px 28px; }
+  .pull-quote .quote-mark { font-size: 6rem; }
+  .pull-quote .quote-text { font-size: 1.3rem; }
+
+  .division-section,
+  .instructor-section,
+  .studio-section { padding: 60px 28px 80px; }
+
+  .price-section { padding: 60px 28px 80px; }
+
+  .division-grid {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+  .division-grid::before { display: none; }
+
+  .division-card .bg-number { font-size: 8rem; }
+  .division-card .division-name { font-size: 2.2rem; }
+
+  .points-section .section-label { padding: 0 28px; }
+  .points-track { padding: 0 28px; }
+  .points-scroll-hint { padding: 20px 28px 0; }
+  .point-spread { flex: 0 0 85vw; padding: 40px 24px; min-height: 320px; }
+  .point-spread .point-num { font-size: 6rem; }
+  .point-spread .point-title { font-size: 1.2rem; }
+
+  .instructor-grid {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+  .instructor-card .instructor-name { font-size: 2rem; }
+  .instructor-card .instructor-deco { font-size: 5rem; }
+
+  .price-grid {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+
+  .studio-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .contact-section { padding: 80px 28px; }
+  .contact-heading { font-size: 2rem; }
+  .contact-row { flex-direction: column; gap: 4px; }
+  .contact-row .contact-value { font-size: 1.1rem; }
+
+  .site-footer {
+    padding: 30px 28px;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .discount-badges { flex-direction: column; gap: 20px; }
+  .discount-section { padding: 30px 20px; }
+}
+
+@media (max-width: 480px) {
+  .concept-banner { font-size: 0.6rem; padding: 8px 16px; }
+  .hero-heading .num { font-size: 4.5rem; }
+  .point-spread { flex: 0 0 90vw; }
+}
+</style>
+</head>
+<body>
+
+<!-- Concept Banner -->
+<div class="concept-banner">
+  <span>Design F: Magazine Editorial</span> ハイファッション誌のようなエディトリアル・レイアウト。タイポグラフィと余白の美学
+</div>
+
+<!-- Header -->
+<header class="site-header" id="siteHeader">
+  <a href="#" class="header-logo">BEAT THE MIX</a>
+  <nav class="header-nav">
+    <a href="#division">Division</a>
+    <a href="#points">Features</a>
+    <a href="#instructors">Instructors</a>
+    <a href="#price">Price</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#division" class="mobile-link">Division</a>
+  <a href="#points" class="mobile-link">Features</a>
+  <a href="#instructors" class="mobile-link">Instructors</a>
+  <a href="#price" class="mobile-link">Price</a>
+  <a href="#contact" class="mobile-link">Contact</a>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-heading">
+      <span class="line"><span class="line-inner">千葉市で</span></span>
+      <span class="line"><span class="line-inner">ずっと、</span></span>
+      <span class="line">
+        <span class="line-inner">
+          <span class="num">20</span><span class="unit">年。</span>
+        </span>
+      </span>
+    </div>
+    <p class="hero-tagline">大人から子供まで成長できるダンススタジオ</p>
+    <a href="#contact" class="hero-cta">
+      Contact Us <span class="arrow"></span>
+    </a>
+    <div class="hero-scroll-indicator">
+      <div class="scroll-line"></div>
+      Scroll to explore
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-right-content">
+      <div class="studio-name">BEAT<br>THE MIX</div>
+      <div class="studio-sub">Dance Studio</div>
+      <div class="est">Est. Chiba City</div>
+    </div>
+    <div class="hero-right-deco parallax-num">B</div>
+  </div>
+</section>
+
+<!-- Pull Quote -->
+<section class="pull-quote reveal">
+  <span class="quote-mark">&ldquo;</span>
+  <p class="quote-text">全ての人に、踊る楽しさと健康を。</p>
+  <p class="quote-attribution">&mdash; BEAT THE MIX</p>
+  <div class="deco-line"></div>
+</section>
+
+<!-- Division -->
+<section class="division-section" id="division">
+  <div class="section-label reveal">
+    <span class="vol">Vol.01</span>
+    <span class="line"></span>
+    <span class="name">Division</span>
+  </div>
+
+  <div class="division-grid">
+    <div class="division-card reveal">
+      <div class="bg-number parallax-num">01</div>
+      <div class="card-content">
+        <h3 class="division-name">KIDS</h3>
+        <p class="division-age">Age 4 &mdash; 18</p>
+        <p class="division-desc">ダンスの技術だけでなく、礼儀やチームワーク、自己表現力など精神的な成長もサポート。</p>
+        <ul class="class-list">
+          <li>
+            <span class="class-name">KIDSクラス</span>
+            <span class="class-age">4-11歳</span>
+          </li>
+          <li>
+            <span class="class-name">Teenクラス</span>
+            <span class="class-age">12-18歳</span>
+          </li>
+          <li>
+            <span class="class-name">レベルアップクラス</span>
+            <span class="class-age">選抜制</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="division-card reveal reveal-delay-2">
+      <div class="bg-number parallax-num">02</div>
+      <div class="card-content">
+        <h3 class="division-name">FUTURE</h3>
+        <p class="division-age">Age 40+</p>
+        <p class="division-desc">ストレッチからダンスまで、体と生活スタイルに合わせたダンスライフを実現。男女問わず未経験の方も安心。</p>
+        <ul class="class-list">
+          <li>
+            <span class="class-name">ダンスクラス</span>
+            <span class="class-age">グループ</span>
+          </li>
+          <li>
+            <span class="class-name">個人レッスン</span>
+            <span class="class-age">プライベート</span>
+          </li>
+          <li>
+            <span class="class-name">出張レッスン</span>
+            <span class="class-age">オンサイト</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 Points -->
+<section class="points-section" id="points">
+  <div class="section-label reveal">
+    <span class="vol">Vol.02</span>
+    <span class="line"></span>
+    <span class="name">Features</span>
+  </div>
+
+  <div class="points-wrapper">
+    <div class="points-track">
+      <!-- Point 01 -->
+      <div class="point-spread reveal">
+        <div class="point-num parallax-num">01</div>
+        <div class="point-content">
+          <div class="point-index">Point 01</div>
+          <h3 class="point-title">楽しく通える<br>好アクセス</h3>
+          <p class="point-detail">千葉市内に7箇所のスタジオを展開。お住まいやお仕事先の近くで、無理なく通い続けられる環境を整えています。</p>
+          <span class="point-highlight">7 Studios</span>
+        </div>
+      </div>
+
+      <!-- Point 02 -->
+      <div class="point-spread reveal reveal-delay-1">
+        <div class="point-num parallax-num">02</div>
+        <div class="point-content">
+          <div class="point-index">Point 02</div>
+          <h3 class="point-title">無駄がない<br>「チケット制」</h3>
+          <p class="point-detail">月謝制ではなくチケット制を採用。自分のペースで通えるから、忙しい月も安心。経済的にも無駄がありません。</p>
+          <span class="point-highlight">Ticket System</span>
+        </div>
+      </div>
+
+      <!-- Point 03 -->
+      <div class="point-spread reveal reveal-delay-2">
+        <div class="point-num parallax-num">03</div>
+        <div class="point-content">
+          <div class="point-index">Point 03</div>
+          <h3 class="point-title">有資格/専門<br>インストラクター</h3>
+          <p class="point-detail">経験豊富で資格を持つ専門インストラクターが指導。安全で質の高いレッスンを提供しています。</p>
+          <span class="point-highlight">Professional</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="points-scroll-hint">
+    <span class="hint-line"></span>
+    Swipe to explore
+  </div>
+</section>
+
+<!-- Pull Quote 2 -->
+<section class="pull-quote reveal" style="background: var(--white);">
+  <span class="quote-mark" style="color: var(--green);">&ldquo;</span>
+  <p class="quote-text" style="font-size: 1.4rem; max-width: 600px; margin: 0 auto;">千葉市で20年。地域に根ざし、<br>全世代のダンスライフを支え続けています。</p>
+  <div class="deco-line" style="background: var(--green);"></div>
+</section>
+
+<!-- Instructors -->
+<section class="instructor-section" id="instructors">
+  <div class="section-label reveal">
+    <span class="vol">Vol.03</span>
+    <span class="line"></span>
+    <span class="name">Instructors</span>
+  </div>
+
+  <div class="instructor-grid">
+    <!-- JUNJUN -->
+    <div class="instructor-card reveal">
+      <div class="instructor-deco parallax-num">JJ</div>
+      <div class="instructor-visual">
+        <span class="visual-text">JUNJUN</span>
+      </div>
+      <div class="instructor-role">Main Instructor</div>
+      <h3 class="instructor-name">JUNJUN</h3>
+      <div class="instructor-stats">
+        <div class="stat">
+          <span class="stat-label">Dance</span>
+          <span class="stat-value">32 yrs</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Teaching</span>
+          <span class="stat-value">22 yrs</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Role</span>
+          <span class="stat-value">Main</span>
+        </div>
+      </div>
+      <p class="instructor-bio">Dance歴32年、指導歴22年のメインインストラクター。KIDS・FUTUREの両部門を担当し、一人ひとりに寄り添った丁寧な指導で多くの生徒から信頼を集めています。</p>
+    </div>
+
+    <!-- NANAMI -->
+    <div class="instructor-card reveal reveal-delay-2">
+      <div class="instructor-deco parallax-num">NM</div>
+      <div class="instructor-visual">
+        <span class="visual-text">NANAMI</span>
+      </div>
+      <div class="instructor-role">Instructor</div>
+      <h3 class="instructor-name">NANAMI</h3>
+      <div class="instructor-stats">
+        <div class="stat">
+          <span class="stat-label">Dance</span>
+          <span class="stat-value">20 yrs</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Teaching</span>
+          <span class="stat-value">13 yrs</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Role</span>
+          <span class="stat-value">Instructor</span>
+        </div>
+      </div>
+      <p class="instructor-bio">ダンス歴20年、指導歴13年。豊富な経験を活かし、初心者から上級者まで幅広いレベルの生徒を指導。明るく楽しいレッスンが魅力です。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Price -->
+<section class="price-section" id="price">
+  <div class="section-label reveal">
+    <span class="vol">Vol.04</span>
+    <span class="line"></span>
+    <span class="name">Price</span>
+  </div>
+
+  <div class="price-grid">
+    <!-- KIDS Price -->
+    <div class="price-column reveal">
+      <h3 class="price-category">KIDS</h3>
+      <p class="price-subtitle">Division Price List</p>
+      <div class="price-table">
+        <div class="price-row">
+          <span class="price-item-name">入会金</span>
+          <span class="price-amount">5,000<span class="yen">円</span></span>
+        </div>
+        <div class="price-row">
+          <span class="price-item-name">KIDSクラス <span class="price-item-detail">4回券</span></span>
+          <span class="price-amount">6,000<span class="yen">円</span></span>
+        </div>
+        <div class="price-row">
+          <span class="price-item-name">TEENクラス <span class="price-item-detail">4回券</span></span>
+          <span class="price-amount">6,400<span class="yen">円</span></span>
+        </div>
+        <div class="price-row">
+          <span class="price-item-name">レベルアップ <span class="price-item-detail">4回</span></span>
+          <span class="price-amount">7,200<span class="yen">円~</span><span class="note">9,200円</span></span>
+        </div>
+        <div class="price-row">
+          <span class="price-item-name">個人レッスン</span>
+          <span class="price-amount">2,200<span class="yen">円~</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FUTURE Price -->
+    <div class="price-column reveal reveal-delay-2">
+      <h3 class="price-category">FUTURE</h3>
+      <p class="price-subtitle">Division Price List</p>
+      <div class="price-table">
+        <div class="price-row">
+          <span class="price-item-name">入会金</span>
+          <span class="price-amount">5,000<span class="yen">円</span></span>
+        </div>
+        <div class="price-row">
+          <span class="price-item-name">Danceチケット <span class="price-item-detail">4回券</span></span>
+          <span class="price-amount">8,000<span class="yen">円</span></span>
+        </div>
+        <div class="price-row">
+          <span class="price-item-name">個人レッスン</span>
+          <span class="price-amount">2,200<span class="yen">円~</span></span>
+        </div>
+        <div class="price-row">
+          <span class="price-item-name">出張レッスン <span class="price-item-detail">/h</span></span>
+          <span class="price-amount">10,000<span class="yen">円~</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="discount-section reveal">
+    <p class="discount-title">Special Discounts</p>
+    <div class="discount-badges">
+      <div class="discount-badge">
+        <span class="badge-name">掛け持ち割引</span>
+        <span class="badge-value">10%OFF</span>
+      </div>
+      <div class="discount-badge">
+        <span class="badge-name">家族割引</span>
+        <span class="badge-value">10%OFF</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Studios -->
+<section class="studio-section" id="studios">
+  <div class="section-label reveal">
+    <span class="vol">Vol.05</span>
+    <span class="line"></span>
+    <span class="name">Studios</span>
+  </div>
+
+  <div class="studio-grid">
+    <div class="studio-col reveal">
+      <h3 class="studio-col-title">KIDS Studios</h3>
+      <p class="studio-col-sub">レッスンスケジュール</p>
+      <div class="studio-item">
+        <span class="studio-name">若葉スタジオ</span>
+        <span class="studio-schedule">水曜</span>
+      </div>
+      <div class="studio-item">
+        <span class="studio-name">稲毛スタジオ</span>
+        <span class="studio-schedule">火曜</span>
+      </div>
+    </div>
+
+    <div class="studio-col reveal reveal-delay-2">
+      <h3 class="studio-col-title">FUTURE Studios</h3>
+      <p class="studio-col-sub">レッスンスケジュール</p>
+      <div class="studio-item">
+        <span class="studio-name">千葉スタジオ</span>
+        <span class="studio-schedule">火曜 19:10~</span>
+      </div>
+      <div class="studio-item">
+        <span class="studio-name">美浜スタジオ</span>
+        <span class="studio-schedule">水・金 19:10~</span>
+      </div>
+      <div class="studio-item">
+        <span class="studio-name">稲毛スタジオ</span>
+        <span class="studio-schedule">木曜 19:10~</span>
+      </div>
+      <div class="studio-item">
+        <span class="studio-name">若葉スタジオ</span>
+        <span class="studio-schedule">土曜 17:10~</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact-section" id="contact">
+  <div class="contact-inner">
+    <div class="section-label reveal">
+      <span class="vol">Vol.06</span>
+      <span class="line"></span>
+      <span class="name">Contact</span>
+    </div>
+
+    <h2 class="contact-heading reveal">Get in<br>Touch</h2>
+    <p class="contact-sub reveal reveal-delay-1">体験レッスン・ご入会のお問い合わせはお気軽にどうぞ。</p>
+
+    <div class="contact-info">
+      <div class="contact-row reveal reveal-delay-2">
+        <span class="contact-label">Phone</span>
+        <span class="contact-value"><a href="tel:09018179501">090-1817-9501</a></span>
+      </div>
+      <div class="contact-row reveal reveal-delay-3">
+        <span class="contact-label">Email</span>
+        <span class="contact-value"><a href="mailto:beat.the.mix7386@gmail.com">beat.the.mix7386@gmail.com</a></span>
+      </div>
+    </div>
+
+    <a href="tel:09018179501" class="contact-cta reveal reveal-delay-4">
+      Call Now <span class="arrow"></span>
+    </a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <span class="footer-logo">BEAT THE MIX</span>
+  <span class="footer-copy">&copy; BEAT THE MIX Dance Studio. All rights reserved.</span>
+</footer>
+
+<script>
+(function() {
+  'use strict';
+
+  // =============================================
+  // Scroll-triggered reveal (Intersection Observer)
+  // =============================================
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.12,
+    rootMargin: '0px 0px -40px 0px'
+  });
+
+  revealEls.forEach(function(el) {
+    revealObserver.observe(el);
+  });
+
+  // =============================================
+  // Header hide/show on scroll
+  // =============================================
+  var lastScrollY = 0;
+  var header = document.getElementById('siteHeader');
+  var ticking = false;
+
+  function updateHeader() {
+    var currentScrollY = window.pageYOffset;
+    if (currentScrollY > lastScrollY && currentScrollY > 120) {
+      header.classList.add('hidden');
+    } else {
+      header.classList.remove('hidden');
+    }
+    lastScrollY = currentScrollY;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      window.requestAnimationFrame(updateHeader);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // =============================================
+  // Mobile menu toggle
+  // =============================================
+  var toggle = document.getElementById('mobileToggle');
+  var mobileMenu = document.getElementById('mobileMenu');
+
+  toggle.addEventListener('click', function() {
+    toggle.classList.toggle('active');
+    mobileMenu.classList.toggle('active');
+    document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+  });
+
+  // Close mobile menu on link click
+  var mobileLinks = mobileMenu.querySelectorAll('a');
+  mobileLinks.forEach(function(link) {
+    link.addEventListener('click', function() {
+      toggle.classList.remove('active');
+      mobileMenu.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+  });
+
+  // =============================================
+  // Parallax on decorative numbers
+  // =============================================
+  var parallaxEls = document.querySelectorAll('.parallax-num');
+
+  function updateParallax() {
+    var scrollY = window.pageYOffset;
+    var viewH = window.innerHeight;
+
+    parallaxEls.forEach(function(el) {
+      var rect = el.getBoundingClientRect();
+      var elCenter = rect.top + rect.height / 2;
+      var distFromCenter = (elCenter - viewH / 2) / viewH;
+      var offset = distFromCenter * -30;
+      el.style.transform = 'translateY(' + offset + 'px)';
+    });
+  }
+
+  var parallaxTicking = false;
+  window.addEventListener('scroll', function() {
+    if (!parallaxTicking) {
+      window.requestAnimationFrame(function() {
+        updateParallax();
+        parallaxTicking = false;
+      });
+      parallaxTicking = true;
+    }
+  }, { passive: true });
+
+  // =============================================
+  // Smooth scroll for anchor links
+  // =============================================
+  document.querySelectorAll('a[href^="#"]').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      var target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        var offset = header.offsetHeight + 10;
+        var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      }
+    });
+  });
+
+})();
+</script>
+
+</body>
+</html>

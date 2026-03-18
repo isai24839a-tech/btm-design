@@ -27,9 +27,38 @@ body {
   color: #86868b;
   font-size: 0.95rem;
 }
+.section-label {
+  max-width: 1200px;
+  margin: 40px auto 16px;
+  padding: 0 20px;
+}
+.section-label h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #86868b;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label h2::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e5e5e5;
+}
+.new-badge {
+  background: #FF2D6B;
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
 .grid {
   max-width: 1200px;
-  margin: 40px auto;
+  margin: 0 auto 40px;
   padding: 0 20px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -79,6 +108,9 @@ body {
 .badge-a { background: #FFF0E8; color: #FF6B35; }
 .badge-b { background: #E8F5F1; color: #16C79A; }
 .badge-c { background: #FFE8EE; color: #FF2D6B; }
+.badge-d { background: #F5F0E0; color: #C9A84C; }
+.badge-e { background: #EDE8F5; color: #764ba2; }
+.badge-f { background: #F0EBE5; color: #E8654A; }
 .card-body h2 {
   font-size: 1.15rem;
   font-weight: 700;
@@ -139,7 +171,58 @@ body {
 
 <div class="header">
   <h1>BEAT THE MIX 新HP デザイン案</h1>
-  <p>3つのデザイン案を作成しました。クリックして全画面で確認できます。</p>
+  <p>6つのデザイン案を作成しました。クリックして全画面で確認できます。</p>
+</div>
+
+<!-- NEW DESIGNS -->
+<div class="section-label">
+  <h2><span class="new-badge">NEW</span> v2 - おしゃれ強化デザイン</h2>
+</div>
+
+<div class="grid">
+  <!-- Design D -->
+  <a href="design-d-cinematic.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-d-cinematic.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-d">DESIGN D</span>
+      <h2>Cinematic Gold</h2>
+      <p>ラグジュアリーなシネマティック・スタイル。ブラック×ゴールドの重厚な世界観。文字アニメーションとパララックス効果。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+
+  <!-- Design E -->
+  <a href="design-e-glass.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-e-glass.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-e">DESIGN E</span>
+      <h2>Glassmorphism Aurora</h2>
+      <p>オーロラのような幻想的背景にすりガラスカード。3Dティルト、シマーボタンなど最新トレンド全開。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+
+  <!-- Design F -->
+  <a href="design-f-editorial.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-f-editorial.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-f">DESIGN F</span>
+      <h2>Magazine Editorial</h2>
+      <p>ハイファッション誌のようなエディトリアル・レイアウト。タイポグラフィと余白の美学。非対称グリッド。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+</div>
+
+<!-- ORIGINAL DESIGNS -->
+<div class="section-label">
+  <h2>v1 - 初期デザイン</h2>
 </div>
 
 <div class="grid">
@@ -152,7 +235,7 @@ body {
       <span class="card-badge badge-a">DESIGN A</span>
       <h2>Energy Pop</h2>
       <p>現サイトのオレンジ基調を進化させた、エネルギッシュで明るいデザイン。親しみやすく、活気が伝わるスタイル。</p>
-      <span class="card-link">全画面で見る →</span>
+      <span class="card-link">全画面で見る &rarr;</span>
     </div>
   </a>
 
@@ -165,7 +248,7 @@ body {
       <span class="card-badge badge-b">DESIGN B</span>
       <h2>Clean Modern</h2>
       <p>洗練されたミニマルデザイン。余白を活かした上品で信頼感のあるスタイル。大人向けの印象。</p>
-      <span class="card-link">全画面で見る →</span>
+      <span class="card-link">全画面で見る &rarr;</span>
     </div>
   </a>
 
@@ -178,7 +261,7 @@ body {
       <span class="card-badge badge-c">DESIGN C</span>
       <h2>Street Vibe</h2>
       <p>ストリートダンスの世界観を表現したダークテーマ。ネオンカラーが映えるクールなデザイン。</p>
-      <span class="card-link">全画面で見る →</span>
+      <span class="card-link">全画面で見る &rarr;</span>
     </div>
   </a>
 </div>
@@ -199,7 +282,7 @@ body {
       </tr>
       <tr>
         <td>予約システム</td>
-        <td><strong>STORES予約</strong>（旧Coubic）無料プラン<span class="rec"> ← おすすめ</span></td>
+        <td><strong>STORES予約</strong>（旧Coubic）無料プラン<span class="rec"> &larr; おすすめ</span></td>
         <td>0円</td>
       </tr>
       <tr>
