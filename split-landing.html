@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEAT THE MIX | Dance Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --kids-start: #FF6B35;
+  --kids-mid: #FF4D6D;
+  --kids-end: #FFD23F;
+  --future-start: #0D1B2A;
+  --future-mid: #1B2D4F;
+  --future-end: #2D1B69;
+  --future-gold: #D4A853;
+  --white: #ffffff;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Noto Sans JP', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === SPLIT CONTAINER === */
+.split-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* === EACH SIDE === */
+.split-side {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: flex 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--white);
+}
+
+.split-side::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+}
+
+/* Hover: expand active side */
+.split-container:hover .split-side { flex: 0.7; }
+.split-container .split-side:hover { flex: 1.6; }
+
+/* === KIDS SIDE === */
+.side-kids {
+  background: linear-gradient(135deg, var(--kids-start) 0%, var(--kids-mid) 50%, var(--kids-start) 100%);
+  background-size: 200% 200%;
+  animation: kidsGradient 8s ease infinite;
+}
+
+.side-kids::before {
+  background: radial-gradient(ellipse at center, rgba(255,210,63,0.25) 0%, transparent 70%);
+}
+
+.side-kids:hover::before { opacity: 1; }
+
+@keyframes kidsGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* === FUTURE SIDE === */
+.side-future {
+  background: linear-gradient(135deg, var(--future-start) 0%, var(--future-mid) 50%, var(--future-end) 100%);
+  background-size: 200% 200%;
+  animation: futureGradient 10s ease infinite;
+}
+
+.side-future::before {
+  background: radial-gradient(ellipse at center, rgba(212,168,83,0.15) 0%, transparent 70%);
+}
+
+.side-future:hover::before { opacity: 1; }
+
+@keyframes futureGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* === DIVIDER LINE === */
+.split-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: rgba(255,255,255,0.15);
+  z-index: 5;
+  transition: left 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+/* === CONTENT === */
+.side-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+  transform: translateY(0);
+  transition: transform 0.5s ease;
+}
+
+.split-side:hover .side-content {
+  transform: translateY(-10px);
+}
+
+.side-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  margin-bottom: 0.3em;
+  text-shadow: 0 4px 30px rgba(0,0,0,0.3);
+}
+
+.side-age {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  opacity: 0.85;
+  margin-bottom: 1em;
+  border: 1px solid rgba(255,255,255,0.3);
+  display: inline-block;
+  padding: 0.3em 1.2em;
+  border-radius: 50px;
+}
+
+.side-tagline {
+  font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+  font-weight: 300;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: all 0.5s ease 0.1s;
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+}
+
+.split-side:hover .side-tagline {
+  opacity: 0.9;
+  transform: translateY(0);
+}
+
+.side-arrow {
+  margin-top: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease 0.2s;
+}
+
+.split-side:hover .side-arrow {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.side-arrow svg {
+  width: 48px;
+  height: 48px;
+  stroke: var(--white);
+  stroke-width: 1.5;
+  fill: none;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+  animation: arrowBounce 2s ease-in-out infinite;
+}
+
+@keyframes arrowBounce {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(8px); }
+}
+
+/* === CENTER LOGO === */
+.center-logo {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  text-align: center;
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+
+.center-logo .logo-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(0.65rem, 1.2vw, 0.85rem);
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  color: var(--white);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  opacity: 0.5;
+}
+
+/* === TOP BAR === */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2.5rem;
+  pointer-events: none;
+}
+
+.top-bar a { pointer-events: auto; }
+
+.brand-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--white);
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.brand-sub {
+  font-size: 0.6rem;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  opacity: 0.6;
+  display: block;
+}
+
+.top-right {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.top-link {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  font-weight: 400;
+  color: var(--white);
+  opacity: 0.7;
+  transition: opacity 0.3s;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.top-link:hover { opacity: 1; }
+
+/* === BOTTOM BAR === */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 2.5rem;
+  pointer-events: none;
+}
+
+.bottom-tagline {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+  letter-spacing: 0.1em;
+  color: var(--white);
+  opacity: 0.4;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+/* === FLOATING SHAPES (KIDS) === */
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.side-kids .shape-1 {
+  width: 200px; height: 200px;
+  background: var(--kids-end);
+  top: 10%; left: 10%;
+  animation: float1 12s ease-in-out infinite;
+}
+.side-kids .shape-2 {
+  width: 120px; height: 120px;
+  background: var(--white);
+  bottom: 20%; right: 15%;
+  animation: float2 10s ease-in-out infinite;
+}
+.side-kids .shape-3 {
+  width: 80px; height: 80px;
+  background: var(--kids-mid);
+  top: 60%; left: 20%;
+  animation: float3 8s ease-in-out infinite;
+}
+
+/* === FLOATING PARTICLES (FUTURE) === */
+.particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  background: var(--future-gold);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  animation: sparkle 4s ease-in-out infinite;
+}
+
+.side-future .particle:nth-child(1) { top: 15%; left: 20%; animation-delay: 0s; }
+.side-future .particle:nth-child(2) { top: 30%; left: 60%; animation-delay: 0.7s; }
+.side-future .particle:nth-child(3) { top: 55%; left: 35%; animation-delay: 1.4s; }
+.side-future .particle:nth-child(4) { top: 70%; left: 70%; animation-delay: 2.1s; }
+.side-future .particle:nth-child(5) { top: 85%; left: 25%; animation-delay: 2.8s; }
+.side-future .particle:nth-child(6) { top: 25%; left: 80%; animation-delay: 0.3s; }
+.side-future .particle:nth-child(7) { top: 45%; left: 50%; animation-delay: 1.8s; }
+.side-future .particle:nth-child(8) { top: 75%; left: 45%; animation-delay: 3.2s; }
+
+@keyframes float1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+@keyframes float2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-25px, -30px); }
+}
+@keyframes float3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(20px, -15px) rotate(180deg); }
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 0.6; transform: scale(1.5); }
+}
+
+/* === LOAD ANIMATION === */
+.split-side .side-content {
+  opacity: 0;
+  animation: fadeSlideUp 1s ease forwards;
+}
+.side-kids .side-content { animation-delay: 0.3s; }
+.side-future .side-content { animation-delay: 0.5s; }
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .split-container {
+    flex-direction: column;
+  }
+
+  .split-container::after {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+  }
+
+  .split-container:hover .split-side { flex: 1; }
+  .split-container .split-side:hover { flex: 1; }
+
+  .side-tagline { opacity: 0.8 !important; transform: none !important; }
+  .side-arrow { opacity: 1 !important; transform: none !important; }
+  .side-arrow svg { width: 36px; height: 36px; }
+
+  .center-logo { display: none; }
+
+  .top-bar { padding: 1rem 1.5rem; }
+  .bottom-bar { display: none; }
+
+  .side-content { padding: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .side-label { font-size: 2.8rem; }
+  .side-age { font-size: 0.8rem; padding: 0.2em 0.8em; }
+  .top-right { gap: 0.8rem; }
+  .top-link { font-size: 0.65rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="brand-name">
+    BEAT THE MIX
+    <span class="brand-sub">DANCE STUDIO</span>
+  </div>
+  <div class="top-right">
+    <a href="members-page.html" class="top-link">MEMBERS</a>
+    <a href="mailto:beat.the.mix7386@gmail.com" class="top-link">CONTACT</a>
+  </div>
+</div>
+
+<!-- CENTER LOGO -->
+<div class="center-logo">
+  <span class="logo-text">B T M</span>
+</div>
+
+<!-- SPLIT -->
+<div class="split-container">
+
+  <!-- KIDS SIDE -->
+  <a href="kids-page.html" class="split-side side-kids">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="side-content">
+      <div class="side-label">KIDS</div>
+      <div class="side-age">4 - 18 years</div>
+      <p class="side-tagline">
+        ダンスの楽しさを、ここから。<br>
+        技術だけじゃない、心も育つ場所。
+      </p>
+      <div class="side-arrow">
+        <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22"/><path d="M18 24h14M28 18l6 6-6 6"/></svg>
+      </div>
+    </div>
+  </a>
+
+  <!-- FUTURE SIDE -->
+  <a href="future-page.html" class="split-side side-future">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="side-content">
+      <div class="side-label">FUTURE</div>
+      <div class="side-age">40+</div>
+      <p class="side-tagline">
+        あなたのダンスライフを。<br>
+        身体と心に、新しいリズムを。
+      </p>
+      <div class="side-arrow">
+        <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22"/><path d="M18 24h14M28 18l6 6-6 6"/></svg>
+      </div>
+    </div>
+  </a>
+
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <span class="bottom-tagline">Since 2005 &mdash; 千葉市でずっと、20年。</span>
+</div>
+
+</body>
+</html>

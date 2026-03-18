@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FUTURE | BEAT THE MIX Dance Studio</title>
+<meta name="description" content="BEAT THE MIX FUTURE - 40歳以上限定のダンスライフ。千葉市のダンススタジオ。ストレッチからダンスまで、あなたの体と生活スタイルに合わせたプログラム。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Oswald:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --navy: #0D1B2A;
+  --navy-light: #162A3E;
+  --purple: #2D1B69;
+  --purple-deep: #1A0F3F;
+  --gold: #D4A853;
+  --gold-light: #E8C877;
+  --gold-dim: rgba(212, 168, 83, 0.15);
+  --white: #FFFFFF;
+  --white-soft: rgba(255, 255, 255, 0.85);
+  --white-muted: rgba(255, 255, 255, 0.55);
+  --text-body: rgba(255, 255, 255, 0.8);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--navy);
+  color: var(--white);
+  overflow-x: hidden;
+  line-height: 1.8;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--navy); }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+/* ===== NAVIGATION ===== */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(20px, 4vw, 48px);
+  height: 64px;
+  background: rgba(13, 27, 42, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(212, 168, 83, 0.12);
+  transition: background 0.4s ease;
+}
+
+.nav.scrolled {
+  background: rgba(13, 27, 42, 0.92);
+  border-bottom-color: rgba(212, 168, 83, 0.25);
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold);
+  text-decoration: none;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 1px;
+  transition: opacity 0.3s;
+}
+
+.nav-back:hover { opacity: 0.7; }
+
+.nav-back svg { transition: transform 0.3s; }
+.nav-back:hover svg { transform: translateX(-3px); }
+
+.nav-brand {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 3px;
+  color: var(--white);
+}
+
+.nav-brand span {
+  color: var(--gold);
+  font-weight: 300;
+  margin-left: 8px;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--white-muted);
+  text-decoration: none;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: color 0.3s;
+  position: relative;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--gold);
+  transition: width 0.3s;
+}
+
+.nav-links a:hover { color: var(--gold); }
+.nav-links a:hover::after { width: 100%; }
+
+.nav-members {
+  padding: 6px 18px;
+  border: 1px solid var(--gold);
+  color: var(--gold) !important;
+  font-size: 11px !important;
+  letter-spacing: 2px;
+  transition: all 0.3s !important;
+}
+
+.nav-members:hover {
+  background: var(--gold);
+  color: var(--navy) !important;
+}
+
+.nav-members::after { display: none !important; }
+
+/* Mobile menu */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+}
+
+.nav-hamburger span {
+  display: block;
+  width: 24px;
+  height: 1.5px;
+  background: var(--gold);
+  transition: all 0.3s;
+}
+
+.nav-hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(4px, 5px); }
+.nav-hamburger.active span:nth-child(2) { opacity: 0; }
+.nav-hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(4px, -5px); }
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 700px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--navy) 0%, var(--purple-deep) 40%, var(--purple) 70%, var(--navy) 100%);
+}
+
+.hero-bg-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image:
+    radial-gradient(circle at 20% 50%, var(--gold) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, var(--gold) 1px, transparent 1px),
+    radial-gradient(circle at 60% 80%, var(--gold) 1px, transparent 1px);
+  background-size: 80px 80px, 120px 120px, 100px 100px;
+}
+
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(13, 27, 42, 0.6) 100%);
+  pointer-events: none;
+}
+
+canvas#particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 24px;
+}
+
+.hero-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(11px, 1.2vw, 14px);
+  font-weight: 300;
+  letter-spacing: 6px;
+  color: var(--gold);
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 1s 0.3s forwards;
+}
+
+.hero-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(72px, 12vw, 160px);
+  font-weight: 400;
+  letter-spacing: 12px;
+  line-height: 1;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 40%, #C49A3C 70%, var(--gold-light) 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeUp 1s 0.5s forwards, goldShimmer 6s ease infinite;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+@keyframes goldShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.hero-subtitle {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: clamp(14px, 1.8vw, 20px);
+  font-weight: 300;
+  letter-spacing: 4px;
+  color: var(--white-soft);
+  margin-bottom: 12px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 1s 0.8s forwards;
+}
+
+.hero-line {
+  width: 60px;
+  height: 1px;
+  background: var(--gold);
+  margin: 28px auto;
+  opacity: 0;
+  animation: fadeUp 1s 1s forwards;
+}
+
+.hero-btm {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(10px, 1vw, 13px);
+  font-weight: 300;
+  letter-spacing: 5px;
+  color: var(--white-muted);
+  opacity: 0;
+  animation: fadeUp 1s 1.2s forwards;
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  animation: fadeUp 1s 1.5s forwards;
+}
+
+.hero-scroll span {
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--white-muted);
+}
+
+.hero-scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: scrollPulse 2s ease infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 1; transform: scaleY(1); }
+  50% { opacity: 0.3; transform: scaleY(0.6); }
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== SECTION COMMON ===== */
+section {
+  position: relative;
+  padding: clamp(80px, 10vw, 120px) clamp(20px, 5vw, 48px);
+}
+
+.section-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 5px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.section-heading {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 500;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.gold-line {
+  width: 40px;
+  height: 1px;
+  background: var(--gold);
+  margin-bottom: 40px;
+}
+
+/* Reveal animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.15s; }
+.reveal-delay-2 { transition-delay: 0.3s; }
+.reveal-delay-3 { transition-delay: 0.45s; }
+.reveal-delay-4 { transition-delay: 0.6s; }
+
+/* ===== WAVE DIVIDER ===== */
+.wave-divider {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.wave-divider svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ===== CONCEPT SECTION ===== */
+.concept {
+  background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 100%);
+}
+
+.concept-main {
+  font-size: clamp(16px, 2vw, 20px);
+  font-weight: 300;
+  line-height: 2.2;
+  color: var(--white-soft);
+  margin-bottom: 48px;
+  max-width: 700px;
+}
+
+.concept-quote {
+  position: relative;
+  padding: 32px 0 32px 32px;
+  border-left: 2px solid var(--gold);
+  margin-top: 48px;
+}
+
+.concept-quote-icon {
+  position: absolute;
+  top: -8px;
+  left: -12px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 64px;
+  color: var(--gold);
+  opacity: 0.2;
+  line-height: 1;
+}
+
+.concept-quote p {
+  font-size: clamp(15px, 1.6vw, 18px);
+  font-weight: 400;
+  line-height: 2;
+  color: var(--white-soft);
+  font-style: italic;
+}
+
+.concept-quote-author {
+  margin-top: 16px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--gold);
+}
+
+/* ===== PROGRAMS ===== */
+.programs {
+  background: linear-gradient(180deg, var(--navy-light) 0%, var(--purple-deep) 100%);
+}
+
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  margin-top: 48px;
+}
+
+.program-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(212, 168, 83, 0.15);
+  border-radius: 2px;
+  padding: clamp(32px, 4vw, 48px);
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+}
+
+.program-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.program-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(212, 168, 83, 0.3);
+  transform: translateY(-4px);
+}
+
+.program-card:hover::before { opacity: 1; }
+
+.program-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  border-radius: 50%;
+}
+
+.program-icon svg {
+  width: 28px;
+  height: 28px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.program-card h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 500;
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+
+.program-card .program-sub {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.program-card p {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 2;
+  color: var(--text-body);
+}
+
+/* ===== INSTRUCTOR ===== */
+.instructor {
+  background: linear-gradient(180deg, var(--purple-deep) 0%, var(--navy) 100%);
+}
+
+.instructor-content {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: clamp(32px, 5vw, 64px);
+  align-items: start;
+  margin-top: 48px;
+}
+
+.instructor-photo {
+  position: relative;
+  width: 280px;
+  height: 360px;
+  overflow: hidden;
+}
+
+.instructor-photo-inner {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--purple) 0%, var(--navy-light) 50%, var(--purple-deep) 100%);
+  border: 1px solid rgba(212, 168, 83, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+}
+
+.instructor-photo-inner::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(212, 168, 83, 0.1);
+}
+
+.instructor-photo-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-dim), rgba(212, 168, 83, 0.08));
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.instructor-photo-icon svg {
+  width: 36px;
+  height: 36px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.2;
+}
+
+.instructor-photo-label {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+
+.instructor-info h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 500;
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+}
+
+.instructor-info .instructor-role {
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  margin-bottom: 24px;
+  text-transform: uppercase;
+}
+
+.instructor-stats {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.instructor-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.instructor-stat .stat-number {
+  font-family: 'DM Serif Display', serif;
+  font-size: 32px;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.instructor-stat .stat-unit {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--white-muted);
+}
+
+.instructor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(212, 168, 83, 0.2);
+  margin-bottom: 28px;
+  font-size: 12px;
+  color: var(--gold-light);
+  letter-spacing: 1px;
+}
+
+.instructor-badge svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.instructor-bio {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 2;
+  color: var(--text-body);
+}
+
+/* ===== STUDIOS ===== */
+.studios {
+  background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 50%, var(--navy) 100%);
+}
+
+.studios-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.studio-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(212, 168, 83, 0.1);
+  padding: clamp(24px, 3vw, 36px);
+  transition: all 0.4s ease;
+  overflow: hidden;
+}
+
+.studio-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.studio-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(212, 168, 83, 0.25);
+}
+
+.studio-card:hover::after { opacity: 1; }
+
+.studio-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(18px, 2.5vw, 22px);
+  font-weight: 500;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.studio-area {
+  font-size: 12px;
+  color: var(--white-muted);
+  margin-bottom: 16px;
+}
+
+.studio-schedule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.studio-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 14px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(212, 168, 83, 0.25);
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: var(--gold-light);
+}
+
+.studio-time {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  color: var(--white-soft);
+}
+
+/* ===== PRICING ===== */
+.pricing {
+  background: linear-gradient(180deg, var(--navy) 0%, var(--purple-deep) 50%, var(--navy) 100%);
+}
+
+.pricing-table {
+  margin-top: 48px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pricing-table tr {
+  border-bottom: 1px solid rgba(212, 168, 83, 0.08);
+  transition: background 0.3s;
+}
+
+.pricing-table tr:hover {
+  background: rgba(212, 168, 83, 0.04);
+}
+
+.pricing-table td {
+  padding: 20px 0;
+  vertical-align: middle;
+}
+
+.pricing-table td:first-child {
+  font-size: clamp(14px, 1.6vw, 16px);
+  font-weight: 400;
+  color: var(--white-soft);
+  width: 55%;
+}
+
+.pricing-table td:last-child {
+  text-align: right;
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(20px, 2.5vw, 28px);
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+.pricing-table .price-note {
+  display: block;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 11px;
+  color: var(--white-muted);
+  margin-top: 4px;
+  font-weight: 300;
+}
+
+.pricing-table .price-sub {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+  color: var(--white-muted);
+  font-weight: 300;
+}
+
+.pricing-discounts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.discount-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(212, 168, 83, 0.06);
+  border: 1px solid rgba(212, 168, 83, 0.18);
+  font-size: 13px;
+  color: var(--gold-light);
+  transition: all 0.3s;
+}
+
+.discount-tag:hover {
+  background: rgba(212, 168, 83, 0.12);
+  border-color: rgba(212, 168, 83, 0.35);
+}
+
+.discount-tag svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.5;
+  flex-shrink: 0;
+}
+
+/* ===== CONTACT ===== */
+.contact {
+  background: linear-gradient(180deg, var(--navy) 0%, #080F19 100%);
+  text-align: center;
+}
+
+.contact .section-inner {
+  max-width: 600px;
+}
+
+.contact-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 48px;
+  align-items: center;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 32px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(212, 168, 83, 0.12);
+  min-width: 320px;
+  text-decoration: none;
+  color: var(--white);
+  transition: all 0.4s;
+}
+
+.contact-item:hover {
+  background: rgba(212, 168, 83, 0.06);
+  border-color: rgba(212, 168, 83, 0.3);
+  transform: translateY(-2px);
+}
+
+.contact-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(212, 168, 83, 0.25);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.contact-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.contact-detail {
+  text-align: left;
+}
+
+.contact-detail .contact-type {
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.contact-detail .contact-value {
+  font-family: 'Oswald', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: var(--white-soft);
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background: #060C16;
+  padding: 32px 24px;
+  text-align: center;
+  border-top: 1px solid rgba(212, 168, 83, 0.08);
+}
+
+.footer-brand {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: var(--white-muted);
+  margin-bottom: 8px;
+}
+
+.footer-copy {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 1px;
+}
+
+/* ===== WAVE DIVIDERS ===== */
+.divider-section {
+  position: relative;
+  height: 80px;
+  overflow: hidden;
+}
+
+.elegant-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px 0;
+}
+
+.elegant-divider .line {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.elegant-divider .diamond {
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  opacity: 0.6;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .programs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .instructor-content {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .instructor-photo { width: 220px; height: 280px; }
+
+  .instructor-stats { justify-content: center; }
+
+  .instructor-badge { margin-left: auto; margin-right: auto; }
+
+  .studios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-discounts {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(13, 27, 42, 0.97);
+    backdrop-filter: blur(20px);
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    z-index: 999;
+  }
+
+  .nav-links.open a {
+    font-size: 16px;
+    color: var(--white-soft);
+  }
+
+  .nav-hamburger { display: flex; }
+
+  .hero { min-height: 600px; }
+
+  .contact-item {
+    min-width: auto;
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .pricing-table td:first-child { width: 50%; }
+}
+
+@media (max-width: 480px) {
+  .hero-title { letter-spacing: 6px; }
+
+  .studio-schedule {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .pricing-table td { padding: 14px 0; }
+
+  .pricing-table td:last-child { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="nav" id="nav">
+  <div class="nav-left">
+    <a href="split-landing.html" class="nav-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      TOP
+    </a>
+    <div class="nav-brand">BTM<span>FUTURE</span></div>
+  </div>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#concept">Concept</a></li>
+    <li><a href="#programs">Programs</a></li>
+    <li><a href="#instructor">Instructor</a></li>
+    <li><a href="#studios">Studios</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="members-page.html" class="nav-members">Members</a></li>
+  </ul>
+
+  <div class="nav-hamburger" id="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-vignette"></div>
+  <canvas id="particles"></canvas>
+
+  <div class="hero-content">
+    <p class="hero-label">BEAT THE MIX DANCE STUDIO</p>
+    <h1 class="hero-title">FUTURE</h1>
+    <p class="hero-subtitle">40歳以上限定のダンスライフ</p>
+    <div class="hero-line"></div>
+    <p class="hero-btm">YOUR SECOND STAGE BEGINS HERE</p>
+  </div>
+
+  <div class="hero-scroll">
+    <span>SCROLL</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+<!-- ===== WAVE DIVIDER ===== -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="#162A3E" opacity="0.5"/>
+    <path d="M0,50 C320,20 640,70 960,40 C1200,15 1360,55 1440,50 L1440,80 L0,80 Z" fill="#162A3E"/>
+  </svg>
+</div>
+
+<!-- ===== CONCEPT ===== -->
+<section class="concept" id="concept">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">Concept</p>
+      <h2 class="section-heading">あなたが輝く場所</h2>
+      <div class="gold-line"></div>
+    </div>
+
+    <p class="concept-main reveal reveal-delay-1">
+      ストレッチからdanceまで、あなたの体と生活スタイルに合わせたダンスライフを実現。<br>
+      男女問わず未経験の方も安心してご参加いただけます。
+    </p>
+
+    <div class="concept-quote reveal reveal-delay-2">
+      <div class="concept-quote-icon">"</div>
+      <p>
+        子供のパパ・ママさん、ご主人の奥さん。<br>
+        そんな誰かを支える方が、<br>
+        自分自身で輝く場所です。
+      </p>
+      <p class="concept-quote-author">-- JUNJUN</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DIVIDER ===== -->
+<div class="elegant-divider reveal">
+  <div class="line"></div>
+  <div class="diamond"></div>
+  <div class="line"></div>
+</div>
+
+<!-- ===== PROGRAMS ===== -->
+<section class="programs" id="programs">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">Programs</p>
+      <h2 class="section-heading">プログラム</h2>
+      <div class="gold-line"></div>
+    </div>
+
+    <div class="programs-grid">
+      <!-- Stretch -->
+      <div class="program-card reveal reveal-delay-1">
+        <div class="program-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="4" r="2"/>
+            <path d="M15 9l4-1m-10 0L5 8m7-2v6m0 0l-3 6m3-6l3 6"/>
+            <path d="M8 14c-2 1-3 3-3 5" stroke-linecap="round"/>
+            <path d="M16 14c2 1 3 3 3 5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>ストレッチ</h3>
+        <p class="program-sub">Stretch Program</p>
+        <p>
+          ゆっくり身体を伸ばし、無理のないトレーニングから始めます。身体の可動域を広げてリズムをとることで、日常生活にも変化が生まれます。
+        </p>
+      </div>
+
+      <!-- Dance -->
+      <div class="program-card reveal reveal-delay-2">
+        <div class="program-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="4" r="2"/>
+            <path d="M14 6c-1 2-3 4-5 5l2 4 4-2 1 5h2l-1-6 3-2c1-1 1-3 0-4"/>
+            <path d="M6 18c0-2 1-4 3-5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>ダンス</h3>
+        <p class="program-sub">Dance Program</p>
+        <p>
+          未経験でも取り組みやすい丁寧な指導で、楽しみながら美しさと健康な身体を手に入れることができます。あなたのペースで踊る喜びを。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WAVE DIVIDER ===== -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,30 Q360,60 720,30 T1440,30 L1440,60 L0,60 Z" fill="var(--purple-deep)" opacity="0.3"/>
+    <path d="M0,40 Q360,10 720,40 T1440,35 L1440,60 L0,60 Z" fill="var(--purple-deep)" opacity="0.6"/>
+  </svg>
+</div>
+
+<!-- ===== INSTRUCTOR ===== -->
+<section class="instructor" id="instructor">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">Instructor</p>
+      <h2 class="section-heading">インストラクター</h2>
+      <div class="gold-line"></div>
+    </div>
+
+    <div class="instructor-content">
+      <div class="instructor-photo reveal reveal-delay-1">
+        <div class="instructor-photo-inner">
+          <div class="instructor-photo-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="instructor-photo-label">JUNJUN</span>
+        </div>
+      </div>
+
+      <div class="instructor-info reveal reveal-delay-2">
+        <h3>JUNJUN</h3>
+        <p class="instructor-role">Head Instructor / FUTURE Director</p>
+
+        <div class="instructor-stats">
+          <div class="instructor-stat">
+            <span class="stat-number">32</span>
+            <span class="stat-unit">YEARS / DANCE</span>
+          </div>
+          <div class="instructor-stat">
+            <span class="stat-number">22</span>
+            <span class="stat-unit">YEARS / TEACHING</span>
+          </div>
+        </div>
+
+        <div class="instructor-badge">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4z"/>
+          </svg>
+          義務教育ダンス指導資格 ステージ2 保有
+        </div>
+
+        <p class="instructor-bio">
+          Dance歴32年、指導歴22年の経験を活かし、FUTUREクラスでは年齢や経験に関わらず、すべての方が楽しめるレッスンを提供しています。あなたのペースに寄り添いながら、ダンスを通じた新しいライフスタイルをサポートします。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DIVIDER ===== -->
+<div class="elegant-divider reveal">
+  <div class="line"></div>
+  <div class="diamond"></div>
+  <div class="line"></div>
+</div>
+
+<!-- ===== STUDIOS ===== -->
+<section class="studios" id="studios">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">Studios</p>
+      <h2 class="section-heading">スタジオ・スケジュール</h2>
+      <div class="gold-line"></div>
+    </div>
+
+    <div class="studios-grid">
+      <div class="studio-card reveal reveal-delay-1">
+        <p class="studio-name">千葉 Studio</p>
+        <p class="studio-area">千葉市中央区</p>
+        <div class="studio-schedule">
+          <span class="studio-day">火曜</span>
+          <span class="studio-time">19:10〜</span>
+        </div>
+      </div>
+
+      <div class="studio-card reveal reveal-delay-2">
+        <p class="studio-name">美浜 Studio</p>
+        <p class="studio-area">千葉市美浜区</p>
+        <div class="studio-schedule">
+          <span class="studio-day">水曜</span>
+          <span class="studio-day">金曜</span>
+          <span class="studio-time">19:10〜</span>
+        </div>
+      </div>
+
+      <div class="studio-card reveal reveal-delay-3">
+        <p class="studio-name">稲毛 Studio</p>
+        <p class="studio-area">千葉市稲毛区（穴川）</p>
+        <div class="studio-schedule">
+          <span class="studio-day">木曜</span>
+          <span class="studio-time">19:10〜</span>
+        </div>
+      </div>
+
+      <div class="studio-card reveal reveal-delay-4">
+        <p class="studio-name">若葉 Studio</p>
+        <p class="studio-area">千葉市若葉区</p>
+        <div class="studio-schedule">
+          <span class="studio-day">土曜</span>
+          <span class="studio-time">17:10〜</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WAVE DIVIDER ===== -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,20 C480,60 960,0 1440,30 L1440,60 L0,60 Z" fill="var(--purple-deep)" opacity="0.4"/>
+    <path d="M0,35 C480,10 960,50 1440,25 L1440,60 L0,60 Z" fill="var(--navy)" opacity="0.6"/>
+  </svg>
+</div>
+
+<!-- ===== PRICING ===== -->
+<section class="pricing" id="pricing">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">Pricing</p>
+      <h2 class="section-heading">料金</h2>
+      <div class="gold-line"></div>
+    </div>
+
+    <table class="pricing-table">
+      <tr class="reveal reveal-delay-1">
+        <td>入会金</td>
+        <td>5,000<span class="price-sub"> 円</span></td>
+      </tr>
+      <tr class="reveal reveal-delay-1">
+        <td>
+          Dance チケット
+          <span class="price-note">4回券</span>
+        </td>
+        <td>8,000<span class="price-sub"> 円</span></td>
+      </tr>
+      <tr class="reveal reveal-delay-2">
+        <td>
+          個人 Lesson（会員）
+          <span class="price-note">3人制</span>
+        </td>
+        <td>2,200<span class="price-sub"> 円〜</span></td>
+      </tr>
+      <tr class="reveal reveal-delay-2">
+        <td>
+          出張 Lesson（会員外）
+          <span class="price-note">1時間あたり</span>
+        </td>
+        <td>10,000<span class="price-sub"> 円/h〜</span></td>
+      </tr>
+    </table>
+
+    <div class="pricing-discounts reveal reveal-delay-3">
+      <div class="discount-tag">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+          <circle cx="7" cy="7" r="1" fill="currentColor"/>
+        </svg>
+        掛け持ち割引 10%OFF
+      </div>
+      <div class="discount-tag">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+        </svg>
+        家族割引 10%OFF
+      </div>
+      <div class="discount-tag">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M2 10h20"/>
+        </svg>
+        ち〜バリュ〜カード 入会金10%OFF
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DIVIDER ===== -->
+<div class="elegant-divider reveal">
+  <div class="line"></div>
+  <div class="diamond"></div>
+  <div class="line"></div>
+</div>
+
+<!-- ===== CONTACT ===== -->
+<section class="contact" id="contact">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">Contact</p>
+      <h2 class="section-heading">お問い合わせ</h2>
+      <div class="gold-line" style="margin-left:auto;margin-right:auto;"></div>
+    </div>
+
+    <p class="reveal reveal-delay-1" style="color:var(--text-body);font-size:14px;font-weight:300;margin-top:8px;">
+      体験レッスンのお申し込み・ご質問など、<br>お気軽にご連絡ください。
+    </p>
+
+    <div class="contact-methods">
+      <a href="tel:09018179501" class="contact-item reveal reveal-delay-2">
+        <div class="contact-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+          </svg>
+        </div>
+        <div class="contact-detail">
+          <p class="contact-type">Telephone</p>
+          <p class="contact-value">090-1817-9501</p>
+        </div>
+      </a>
+
+      <a href="mailto:beat.the.mix7386@gmail.com" class="contact-item reveal reveal-delay-3">
+        <div class="contact-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M22 4l-10 8L2 4"/>
+          </svg>
+        </div>
+        <div class="contact-detail">
+          <p class="contact-type">Email</p>
+          <p class="contact-value">beat.the.mix7386@gmail.com</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <p class="footer-brand">BEAT THE MIX</p>
+  <p class="footer-copy">&copy; 2025 BEAT THE MIX Dance Studio. All rights reserved.</p>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+(function() {
+  'use strict';
+
+  // ===== GOLD PARTICLE SYSTEM =====
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let animId;
+  let w, h;
+
+  function resizeCanvas() {
+    const hero = canvas.parentElement;
+    w = canvas.width = hero.offsetWidth;
+    h = canvas.height = hero.offsetHeight;
+  }
+
+  class Particle {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * w;
+      this.y = Math.random() * h;
+      this.size = Math.random() * 2 + 0.5;
+      this.speedX = (Math.random() - 0.5) * 0.3;
+      this.speedY = Math.random() * -0.4 - 0.1;
+      this.opacity = Math.random() * 0.5 + 0.1;
+      this.fadeSpeed = Math.random() * 0.003 + 0.001;
+      this.phase = Math.random() * Math.PI * 2;
+      this.wobble = Math.random() * 0.5 + 0.2;
+    }
+    update() {
+      this.x += this.speedX + Math.sin(this.phase) * this.wobble * 0.02;
+      this.y += this.speedY;
+      this.phase += 0.02;
+      this.opacity += Math.sin(this.phase * 2) * this.fadeSpeed;
+      if (this.opacity <= 0 || this.y < -10 || this.x < -10 || this.x > w + 10) {
+        this.reset();
+        this.y = h + 10;
+        this.opacity = 0;
+      }
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(212, 168, 83, ${Math.max(0, Math.min(this.opacity, 0.6))})`;
+      ctx.fill();
+    }
+  }
+
+  function initParticles() {
+    resizeCanvas();
+    const count = Math.min(Math.floor(w * h / 15000), 60);
+    particles = [];
+    for (let i = 0; i < count; i++) {
+      particles.push(new Particle());
+    }
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+    animId = requestAnimationFrame(animateParticles);
+  }
+
+  // Pause particles when hero not visible
+  const heroEl = document.getElementById('hero');
+  const particleObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        if (!animId) animateParticles();
+      } else {
+        cancelAnimationFrame(animId);
+        animId = null;
+      }
+    });
+  }, { threshold: 0.1 });
+
+  initParticles();
+  animateParticles();
+  particleObserver.observe(heroEl);
+
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    initParticles();
+  });
+
+  // ===== SCROLL REVEAL (IntersectionObserver) =====
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.15,
+    rootMargin: '0px 0px -40px 0px'
+  });
+
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  // ===== NAV SCROLL EFFECT =====
+  const nav = document.getElementById('nav');
+  let lastScroll = 0;
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    if (scrollY > 60) {
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
+    lastScroll = scrollY;
+  }, { passive: true });
+
+  // ===== MOBILE MENU =====
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navLinks.classList.toggle('open');
+    document.body.style.overflow = navLinks.classList.contains('open') ? 'hidden' : '';
+  });
+
+  // Close mobile menu on link click
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('active');
+      navLinks.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+
+  // ===== SMOOTH SCROLL for nav links =====
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        const offset = 80;
+        const y = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
