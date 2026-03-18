@@ -1079,48 +1079,68 @@ section {
   max-height: 300px;
 }
 
-/* ===== VOICES ===== */
+/* ===== VOICES CAROUSEL ===== */
 .voices {
   background: linear-gradient(180deg, var(--navy) 0%, var(--purple-deep) 50%, var(--navy) 100%);
 }
 
-.voices-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+.voices .section-subtitle {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--white-muted);
+  margin-top: -12px;
+  margin-bottom: 8px;
+}
+
+.voices-carousel-wrap {
+  position: relative;
   margin-top: 48px;
 }
 
+.voices-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  gap: 24px;
+  padding: 8px 4px 24px;
+  scrollbar-width: none;
+}
+
+.voices-carousel::-webkit-scrollbar { display: none; }
+
 .voice-card {
-  position: relative;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(212, 168, 83, 0.12);
+  flex: 0 0 calc(50% - 12px);
+  min-width: 300px;
+  scroll-snap-align: start;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(212, 168, 83, 0.1);
+  border-left: 3px solid var(--gold);
   padding: clamp(28px, 3vw, 40px);
   transition: all 0.4s ease;
+  position: relative;
 }
 
 .voice-card:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   border-color: rgba(212, 168, 83, 0.25);
+  border-left-color: var(--gold-light);
   transform: translateY(-4px);
 }
 
-.voice-quote-mark {
-  font-family: 'DM Serif Display', serif;
-  font-size: 56px;
+.voice-stars {
+  font-size: 16px;
   color: var(--gold);
-  opacity: 0.25;
-  line-height: 1;
-  margin-bottom: -8px;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
 }
 
 .voice-text {
   font-size: 14px;
   font-weight: 300;
   line-height: 2;
-  color: var(--text-body);
+  color: var(--white-soft);
   margin-bottom: 20px;
-  font-style: italic;
 }
 
 .voice-author {
@@ -1129,7 +1149,68 @@ section {
   letter-spacing: 2px;
   color: var(--gold);
   padding-top: 16px;
-  border-top: 1px solid rgba(212, 168, 83, 0.12);
+  border-top: 1px solid rgba(212, 168, 83, 0.1);
+}
+
+/* Carousel navigation arrows */
+.voices-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: rgba(13, 27, 42, 0.8);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.3s ease;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.voices-nav:hover {
+  background: rgba(212, 168, 83, 0.15);
+  border-color: var(--gold);
+}
+
+.voices-nav svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+
+.voices-nav--prev { left: -20px; }
+.voices-nav--next { right: -20px; }
+
+/* Dot indicators */
+.voices-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.voices-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(212, 168, 83, 0.2);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.voices-dot.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  transform: scale(1.2);
 }
 
 /* ===== GALLERY ===== */
@@ -1431,9 +1512,13 @@ section {
     flex-direction: column;
   }
 
-  .voices-grid {
-    grid-template-columns: 1fr;
+  .voice-card {
+    flex: 0 0 calc(50% - 12px);
+    min-width: 280px;
   }
+
+  .voices-nav--prev { left: -8px; }
+  .voices-nav--next { right: -8px; }
 }
 
 @media (max-width: 768px) {
@@ -1463,6 +1548,13 @@ section {
   .nav-hamburger { display: flex; }
 
   .hero { min-height: 600px; }
+
+  .voice-card {
+    flex: 0 0 calc(100% - 8px);
+    min-width: 0;
+  }
+
+  .voices-nav { display: none; }
 
   .contact-item {
     min-width: auto;
@@ -1948,26 +2040,56 @@ section {
       <p class="section-label">Voices</p>
       <h2 class="section-heading">生徒の声</h2>
       <div class="gold-line"></div>
+      <p class="section-subtitle">口コミサイトより</p>
     </div>
 
-    <div class="voices-grid">
-      <div class="voice-card reveal reveal-delay-1">
-        <div class="voice-quote-mark">"</div>
-        <p class="voice-text">運動不足が気になっていましたが、ストレッチから始められるので無理なく続けられています。週に一度の楽しみです。</p>
-        <p class="voice-author">FUTURE会員 / 50代女性</p>
+    <div class="voices-carousel-wrap reveal reveal-delay-1">
+      <button class="voices-nav voices-nav--prev" aria-label="前へ">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="voices-nav voices-nav--next" aria-label="次へ">
+        <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <div class="voices-carousel" id="voicesCarousel">
+        <div class="voice-card">
+          <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="voice-text">ダンス初心者の私でも楽しく通うことが出来ていてすごく良いです！チケット制なのでとても助かります。先生方が熱心に、親切に教えて頂けます。</p>
+          <p class="voice-author">FUTURE会員</p>
+        </div>
+
+        <div class="voice-card">
+          <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="voice-text">初心者からスタートの私ですが、毎週とても楽しくダンスさせてもらっています。教えて下さる先生がとても明るくて、熱心に教えてくれます。</p>
+          <p class="voice-author">FUTURE会員</p>
+        </div>
+
+        <div class="voice-card">
+          <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="voice-text">ネットで見つけてから気になっていたので、思い切って体験レッスンに申し込みました！レッスン場所も多数あり、一番近い所を選んで通えるのも嬉しいポイントです。</p>
+          <p class="voice-author">ラベンダーさん</p>
+        </div>
+
+        <div class="voice-card">
+          <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+          <p class="voice-text">先生がゆっくり丁寧に教えてくださるので安心です。チケット制で欠席でも料金が発生しないことや、格安でレッスンを受けられるのが嬉しいです。</p>
+          <p class="voice-author">体験レッスン参加者</p>
+        </div>
+
+        <div class="voice-card">
+          <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="voice-text">以前通わせてもらっていました。明るい雰囲気で、とてもよかったです。先生も丁寧に教えてくれます。どなたでも入りやすい雰囲気です。</p>
+          <p class="voice-author">元会員</p>
+        </div>
+
+        <div class="voice-card">
+          <div class="voice-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+          <p class="voice-text">友達に誘われ体験レッスンに行って来ました。初めてでも親切にわかりやすく教えてくださいました。アットホームな雰囲気で通いやすいです。</p>
+          <p class="voice-author">体験レッスン参加者</p>
+        </div>
       </div>
 
-      <div class="voice-card reveal reveal-delay-2">
-        <div class="voice-quote-mark">"</div>
-        <p class="voice-text">定年後に始めましたが、先生の丁寧な指導のおかげで毎回楽しく参加しています。仲間もでき、生活に張りが出ました。</p>
-        <p class="voice-author">FUTURE会員 / 60代男性</p>
-      </div>
-
-      <div class="voice-card reveal reveal-delay-3">
-        <div class="voice-quote-mark">"</div>
-        <p class="voice-text">子育てが一段落して自分の時間ができた時に出会いました。体を動かす喜びを改めて感じています。</p>
-        <p class="voice-author">FUTURE会員 / 40代女性</p>
-      </div>
+      <div class="voices-dots" id="voicesDots"></div>
     </div>
   </div>
 </section>
@@ -2239,6 +2361,149 @@ section {
       }
     });
   });
+
+  // ===== VOICES CAROUSEL =====
+  (function() {
+    var carousel = document.getElementById('voicesCarousel');
+    var dotsContainer = document.getElementById('voicesDots');
+    var prevBtn = document.querySelector('.voices-nav--prev');
+    var nextBtn = document.querySelector('.voices-nav--next');
+    if (!carousel || !dotsContainer) return;
+
+    var cards = carousel.querySelectorAll('.voice-card');
+    var totalCards = cards.length;
+    var autoScrollInterval = null;
+    var currentIndex = 0;
+
+    // Calculate how many cards are visible at once
+    function getVisibleCount() {
+      if (window.innerWidth <= 768) return 1;
+      var cardWidth = cards[0].offsetWidth + 24; // 24 = gap
+      return Math.round(carousel.offsetWidth / cardWidth) || 2;
+    }
+
+    // Calculate number of "pages" (dot positions)
+    function getPageCount() {
+      var visible = getVisibleCount();
+      return Math.max(1, totalCards - visible + 1);
+    }
+
+    // Build dot indicators
+    function buildDots() {
+      dotsContainer.innerHTML = '';
+      var pageCount = getPageCount();
+      for (var i = 0; i < pageCount; i++) {
+        var dot = document.createElement('button');
+        dot.className = 'voices-dot' + (i === currentIndex ? ' active' : '');
+        dot.setAttribute('aria-label', '口コミ ' + (i + 1));
+        dot.dataset.index = i;
+        dot.addEventListener('click', function() {
+          goTo(parseInt(this.dataset.index));
+          resetAutoScroll();
+        });
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    // Update active dot
+    function updateDots() {
+      var dots = dotsContainer.querySelectorAll('.voices-dot');
+      dots.forEach(function(d, i) {
+        d.classList.toggle('active', i === currentIndex);
+      });
+    }
+
+    // Scroll to a specific card index
+    function goTo(index) {
+      var pageCount = getPageCount();
+      currentIndex = ((index % pageCount) + pageCount) % pageCount;
+      var card = cards[currentIndex];
+      if (card) {
+        carousel.scrollTo({
+          left: card.offsetLeft - carousel.offsetLeft,
+          behavior: 'smooth'
+        });
+      }
+      updateDots();
+    }
+
+    // Auto-scroll
+    function startAutoScroll() {
+      autoScrollInterval = setInterval(function() {
+        goTo(currentIndex + 1);
+      }, 5000);
+    }
+
+    function resetAutoScroll() {
+      clearInterval(autoScrollInterval);
+      startAutoScroll();
+    }
+
+    // Detect current scroll position and update dots
+    function onScroll() {
+      var scrollLeft = carousel.scrollLeft;
+      var closest = 0;
+      var closestDist = Infinity;
+      for (var i = 0; i < cards.length; i++) {
+        var dist = Math.abs(cards[i].offsetLeft - carousel.offsetLeft - scrollLeft);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closest = i;
+        }
+      }
+      var pageCount = getPageCount();
+      if (closest !== currentIndex && closest < pageCount) {
+        currentIndex = closest;
+        updateDots();
+      }
+    }
+
+    // Navigation buttons
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function() {
+        goTo(currentIndex - 1);
+        resetAutoScroll();
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function() {
+        goTo(currentIndex + 1);
+        resetAutoScroll();
+      });
+    }
+
+    // Scroll event (manual swipe detection)
+    var scrollTimeout;
+    carousel.addEventListener('scroll', function() {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(onScroll, 100);
+    }, { passive: true });
+
+    // Pause auto-scroll on hover
+    carousel.addEventListener('mouseenter', function() {
+      clearInterval(autoScrollInterval);
+    });
+    carousel.addEventListener('mouseleave', function() {
+      startAutoScroll();
+    });
+
+    // Pause auto-scroll on touch
+    carousel.addEventListener('touchstart', function() {
+      clearInterval(autoScrollInterval);
+    }, { passive: true });
+    carousel.addEventListener('touchend', function() {
+      resetAutoScroll();
+    }, { passive: true });
+
+    // Init
+    buildDots();
+    startAutoScroll();
+
+    // Rebuild on resize
+    window.addEventListener('resize', function() {
+      buildDots();
+    });
+  })();
 
   // ===== FLOATING TRIAL BANNER =====
   (function() {

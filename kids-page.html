@@ -1286,78 +1286,164 @@ body {
 }
 
 /* ============================================
-   VOICES SECTION
+   VOICES SECTION — Carousel
    ============================================ */
 .voices-section {
-  background: var(--light-bg);
+  background: var(--white);
   position: relative;
+  overflow: hidden;
 }
 
-.voices-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  max-width: 1000px;
+.voices-subtitle {
+  font-size: 0.9rem;
+  color: var(--gray-text);
+  margin-top: 0.3rem;
+  letter-spacing: 0.02em;
+}
+
+.voices-carousel-wrapper {
+  position: relative;
+  max-width: 1100px;
   margin: 0 auto;
+  padding: 0 3rem;
+}
+
+.voices-track {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 1rem 0 2rem;
+}
+
+.voices-track::-webkit-scrollbar {
+  display: none;
 }
 
 .voice-card {
+  flex: 0 0 calc(33.333% - 1rem);
+  min-width: 280px;
   background: var(--white);
   border-radius: var(--radius);
-  padding: 2.5rem 2rem 2rem;
+  padding: 2rem 1.8rem 1.8rem;
   position: relative;
   box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--orange);
+  scroll-snap-align: start;
   transition: all 0.4s ease;
 }
 
 .voice-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
 
-.voice-quote-mark {
-  position: absolute;
-  top: 1.2rem;
-  left: 1.5rem;
-  font-family: 'Oswald', sans-serif;
-  font-size: 4rem;
-  font-weight: 800;
-  line-height: 1;
-  background: linear-gradient(135deg, var(--orange), var(--coral));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  opacity: 0.2;
-  pointer-events: none;
+.voice-stars {
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+  color: var(--orange);
+  letter-spacing: 2px;
 }
 
 .voice-text {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--dark-text);
-  line-height: 2;
-  margin-bottom: 1.5rem;
+  line-height: 1.9;
+  margin-bottom: 1.2rem;
   position: relative;
   z-index: 1;
 }
 
 .voice-author {
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  align-items: center;
+  gap: 0.5rem;
   padding-top: 1rem;
   border-top: 1px solid rgba(255, 107, 53, 0.1);
 }
 
-.voice-author-role {
-  font-size: 0.75rem;
+.voice-author-dash {
   color: var(--orange);
-  font-weight: 500;
-  letter-spacing: 0.03em;
+  font-weight: 700;
 }
 
 .voice-author-name {
   font-size: 0.8rem;
   color: var(--gray-text);
+  font-weight: 500;
+}
+
+/* Arrow buttons */
+.voices-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--orange);
+  background: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+}
+
+.voices-arrow:hover {
+  background: var(--orange);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.voices-arrow:hover svg {
+  stroke: var(--white);
+}
+
+.voices-arrow svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--orange);
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.voices-arrow-prev {
+  left: 0;
+}
+
+.voices-arrow-next {
+  right: 0;
+}
+
+/* Dot indicators */
+.voices-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.voices-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 107, 53, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.voices-dot.active {
+  background: var(--orange);
+  transform: scale(1.2);
 }
 
 /* ============================================
@@ -1662,6 +1748,11 @@ body {
     max-width: 550px;
     margin: 0 auto;
   }
+
+  /* Voices carousel: 2 cards on tablet */
+  .voice-card {
+    flex: 0 0 calc(50% - 0.75rem);
+  }
 }
 
 @media (max-width: 768px) {
@@ -1728,10 +1819,21 @@ body {
     margin: 0 auto;
   }
 
-  .voices-grid {
-    grid-template-columns: 1fr;
-    max-width: 500px;
-    margin: 0 auto;
+  /* Voices carousel: 1 card on mobile */
+  .voice-card {
+    flex: 0 0 85%;
+    min-width: 260px;
+  }
+  .voices-carousel-wrapper {
+    padding: 0 2.5rem;
+  }
+  .voices-arrow {
+    width: 36px;
+    height: 36px;
+  }
+  .voices-arrow svg {
+    width: 16px;
+    height: 16px;
   }
 
   .faq-question {
@@ -2402,40 +2504,95 @@ body {
 </div>
 
 <!-- ===================== VOICES ===================== -->
-<section class="section voices-section" id="voices" style="background: var(--white);">
+<section class="section voices-section" id="voices">
   <div class="container">
     <div class="section-header fade-in">
       <div class="section-label">VOICES</div>
       <h2 class="section-title">生徒・保護者の声</h2>
-      <p class="section-desc">
-        通ってくださっている生徒さん・<br>保護者の方からの声をご紹介します。
-      </p>
+      <p class="voices-subtitle">エキテンの口コミより</p>
     </div>
-    <div class="voices-grid">
-      <div class="voice-card fade-in delay-1">
-        <div class="voice-quote-mark">"</div>
-        <p class="voice-text">人見知りだった娘が、今では毎週レッスンを楽しみにしています。先生の優しい指導のおかげです。</p>
-        <div class="voice-author">
-          <span class="voice-author-role">KIDSクラス保護者</span>
-          <span class="voice-author-name">小3女の子のお母さん</span>
+
+    <div class="voices-carousel-wrapper fade-in delay-1">
+      <!-- Prev arrow -->
+      <button class="voices-arrow voices-arrow-prev" id="voicesPrev" aria-label="前へ">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+
+      <!-- Track -->
+      <div class="voices-track" id="voicesTrack">
+        <div class="voice-card">
+          <div class="voice-stars">★★★★★</div>
+          <p class="voice-text">先生はとても優しくて、何度もレッスンを繰り返して頂けた為、初めてでも少し踊ることが出来てとても良かったです。マナーもきちんとしていて気持ちの良いスクールです。</p>
+          <div class="voice-author">
+            <span class="voice-author-dash">--</span>
+            <span class="voice-author-name">体験レッスン参加者</span>
+          </div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-stars">★★★★★</div>
+          <p class="voice-text">挨拶や礼儀、人として大切な事を身につけるにもとても良い。目標を持って頑張るって素晴らしいと思いました。</p>
+          <div class="voice-author">
+            <span class="voice-author-dash">--</span>
+            <span class="voice-author-name">KIDSクラス保護者</span>
+          </div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-stars">★★★★★</div>
+          <p class="voice-text">生徒さんはみんな礼儀正しく、挨拶もしっかりしていたので、ダンスを習いながら礼儀も身に付けられる素敵なスタジオだと感じました。</p>
+          <div class="voice-author">
+            <span class="voice-author-dash">--</span>
+            <span class="voice-author-name">MAIMI さん ★5</span>
+          </div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-stars">★★★★★</div>
+          <p class="voice-text">先生の丁寧な指導や一人一人がやる気になるコミュニケーションのおかげでダンスが楽しくて仕方ないです。ダンスだけでなく礼儀の面でも日に日に成長しています。</p>
+          <div class="voice-author">
+            <span class="voice-author-dash">--</span>
+            <span class="voice-author-name">3年目の会員</span>
+          </div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-stars">★★★★★</div>
+          <p class="voice-text">人見知りの子でしたが、先生だけでなく生徒さんやお母さん達も笑顔で挨拶してくれ、緊張がとけました。やりたい！と言ってくれました。</p>
+          <div class="voice-author">
+            <span class="voice-author-dash">--</span>
+            <span class="voice-author-name">体験レッスン参加 保護者</span>
+          </div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-stars">★★★★☆</div>
+          <p class="voice-text">ダンスは勿論の事、礼儀や生徒の自主性を育む素晴らしい教室です。向上心も養える指導をされていて子供の精神力も鍛えられます。</p>
+          <div class="voice-author">
+            <span class="voice-author-dash">--</span>
+            <span class="voice-author-name">KIDSクラス保護者 ★4.5</span>
+          </div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-stars">★★★★★</div>
+          <p class="voice-text">5歳の娘なんですが、体験してすぐに溶け込んでました。値段も他の教室に比べるとすごく安いし、なにより本格的でした！</p>
+          <div class="voice-author">
+            <span class="voice-author-dash">--</span>
+            <span class="voice-author-name">体験レッスン参加 保護者</span>
+          </div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-stars">★★★★★</div>
+          <p class="voice-text">とても丁寧に指導してくれて、成長した部分も褒めてくれるので楽しく取り組めます！</p>
+          <div class="voice-author">
+            <span class="voice-author-dash">--</span>
+            <span class="voice-author-name">KIDSクラス会員</span>
+          </div>
         </div>
       </div>
-      <div class="voice-card fade-in delay-2">
-        <div class="voice-quote-mark">"</div>
-        <p class="voice-text">発表会でステージに立つ姿を見て、成長に感動しました。自信がついたようで、学校でも積極的になりました。</p>
-        <div class="voice-author">
-          <span class="voice-author-role">KIDSクラス保護者</span>
-          <span class="voice-author-name">小5男の子のお父さん</span>
-        </div>
-      </div>
-      <div class="voice-card fade-in delay-3">
-        <div class="voice-quote-mark">"</div>
-        <p class="voice-text">ダンスだけじゃなく、挨拶や礼儀も教えてくれるので習い事として最高です。</p>
-        <div class="voice-author">
-          <span class="voice-author-role">Teenクラス保護者</span>
-          <span class="voice-author-name">中1女の子のお母さん</span>
-        </div>
-      </div>
+
+      <!-- Next arrow -->
+      <button class="voices-arrow voices-arrow-next" id="voicesNext" aria-label="次へ">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <!-- Dot indicators -->
+      <div class="voices-dots" id="voicesDots"></div>
     </div>
   </div>
 </section>
@@ -2645,6 +2802,148 @@ function toggleFaq(el) {
     item.classList.add('active');
   }
 }
+
+// --- Voices Carousel ---
+(function() {
+  var track = document.getElementById('voicesTrack');
+  var prevBtn = document.getElementById('voicesPrev');
+  var nextBtn = document.getElementById('voicesNext');
+  var dotsContainer = document.getElementById('voicesDots');
+  if (!track || !prevBtn || !nextBtn || !dotsContainer) return;
+
+  var cards = track.querySelectorAll('.voice-card');
+  var totalCards = cards.length;
+  var currentIndex = 0;
+  var autoScrollTimer = null;
+  var autoScrollInterval = 4000;
+
+  // Determine how many cards are visible
+  function getVisibleCount() {
+    var w = window.innerWidth;
+    if (w <= 768) return 1;
+    if (w <= 1024) return 2;
+    return 3;
+  }
+
+  // Total number of "pages" (dot positions)
+  function getMaxIndex() {
+    return Math.max(0, totalCards - getVisibleCount());
+  }
+
+  // Build dot indicators
+  function buildDots() {
+    dotsContainer.innerHTML = '';
+    var maxIdx = getMaxIndex();
+    for (var i = 0; i <= maxIdx; i++) {
+      var dot = document.createElement('button');
+      dot.className = 'voices-dot' + (i === currentIndex ? ' active' : '');
+      dot.setAttribute('aria-label', (i + 1) + '番目へ');
+      dot.dataset.index = i;
+      dot.addEventListener('click', function() {
+        goTo(parseInt(this.dataset.index));
+        restartAutoScroll();
+      });
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  // Scroll to a specific card index
+  function goTo(index) {
+    var maxIdx = getMaxIndex();
+    if (index < 0) index = maxIdx;
+    if (index > maxIdx) index = 0;
+    currentIndex = index;
+
+    var card = cards[currentIndex];
+    if (card) {
+      track.scrollTo({
+        left: card.offsetLeft - track.offsetLeft,
+        behavior: 'smooth'
+      });
+    }
+    updateDots();
+  }
+
+  function updateDots() {
+    var dots = dotsContainer.querySelectorAll('.voices-dot');
+    dots.forEach(function(dot, i) {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  // Detect scroll position and update currentIndex + dots
+  function onTrackScroll() {
+    var scrollLeft = track.scrollLeft;
+    var cardWidth = cards[0].offsetWidth + parseFloat(getComputedStyle(track).gap || '24');
+    var newIndex = Math.round(scrollLeft / cardWidth);
+    var maxIdx = getMaxIndex();
+    newIndex = Math.min(newIndex, maxIdx);
+    if (newIndex !== currentIndex) {
+      currentIndex = newIndex;
+      updateDots();
+    }
+  }
+
+  // Arrow click handlers
+  prevBtn.addEventListener('click', function() {
+    goTo(currentIndex - 1);
+    restartAutoScroll();
+  });
+
+  nextBtn.addEventListener('click', function() {
+    goTo(currentIndex + 1);
+    restartAutoScroll();
+  });
+
+  // Track scroll sync
+  var scrollTimeout;
+  track.addEventListener('scroll', function() {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(onTrackScroll, 100);
+  }, { passive: true });
+
+  // Pause auto-scroll on hover/touch
+  track.addEventListener('mouseenter', function() {
+    clearInterval(autoScrollTimer);
+  });
+  track.addEventListener('mouseleave', function() {
+    startAutoScroll();
+  });
+  track.addEventListener('touchstart', function() {
+    clearInterval(autoScrollTimer);
+  }, { passive: true });
+  track.addEventListener('touchend', function() {
+    restartAutoScroll();
+  }, { passive: true });
+
+  // Auto-scroll
+  function startAutoScroll() {
+    clearInterval(autoScrollTimer);
+    autoScrollTimer = setInterval(function() {
+      goTo(currentIndex + 1);
+    }, autoScrollInterval);
+  }
+
+  function restartAutoScroll() {
+    clearInterval(autoScrollTimer);
+    startAutoScroll();
+  }
+
+  // Rebuild dots on resize
+  var resizeTimeout;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+      var maxIdx = getMaxIndex();
+      if (currentIndex > maxIdx) currentIndex = maxIdx;
+      buildDots();
+    }, 200);
+  });
+
+  // Init
+  buildDots();
+  startAutoScroll();
+})();
 </script>
 
 <!-- ===================== FLOATING TRIAL BANNER ===================== -->
