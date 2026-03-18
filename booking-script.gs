@@ -4,7 +4,7 @@
  * セットアップ手順:
  * 1. Google Spreadsheetを作成
  * 2. シート名「スケジュール」を作り、1行目に: 日付 | スタジオ | 時間 | クラス | 定員
- * 3. シート名「予約一覧」を作り、1行目に: 日付 | スタジオ | 時間 | クラス | お名前 | 電話番号 | 予約日時
+ * 3. シート名「予約一覧」を作り、1行目に: 日付 | スタジオ | 時間 | クラス | お名前 | 電話番号 | メール | 予約日時
  * 4. スプレッドシートの「拡張機能」→「Apps Script」を開く
  * 5. このファイルの内容を全てコピーしてエディタに貼り付け
  * 6. 「デプロイ」→「新しいデプロイ」→ 種類「ウェブアプリ」
@@ -111,6 +111,7 @@ function bookSlot(params) {
   var className = params.class_name || '';
   var name = params.name || '';
   var phone = params.phone || '';
+  var email = params.email || '';
 
   if (!name) {
     return jsonResponse({ success: false, error: 'お名前を入力してください' });
@@ -161,11 +162,15 @@ function bookSlot(params) {
     className,
     name,
     phone,
+    email,
     new Date()
   ]);
 
-  // Send email notification
-  sendBookingNotification(date, studio, time, className, name, phone);
+  // Send email notifications
+  sendBookingNotification(date, studio, time, className, name, phone, email);
+  if (email) {
+    sendBookingConfirmation(email, date, studio, time, className, name);
+  }
 
   return jsonResponse({ success: true, message: '予約が完了しました' });
 }
@@ -173,7 +178,7 @@ function bookSlot(params) {
 /**
  * 予約通知メールを送信
  */
-function sendBookingNotification(date, studio, time, className, name, phone) {
+function sendBookingNotification(date, studio, time, className, name, phone, email) {
   try {
     var subject = '【BTM予約】' + name + 'さん — ' + date + ' ' + className;
     var body = '新しい予約が入りました\n\n'
@@ -184,6 +189,7 @@ function sendBookingNotification(date, studio, time, className, name, phone) {
       + 'クラス: ' + className + '\n'
       + 'お名前: ' + name + '\n'
       + '電話番号: ' + (phone || '未入力') + '\n'
+      + 'メール: ' + (email || '未入力') + '\n'
       + '予約日時: ' + Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm') + '\n'
       + '━━━━━━━━━━━━━━━━━━━━\n\n'
       + 'スプレッドシートで確認:\n'
@@ -192,6 +198,32 @@ function sendBookingNotification(date, studio, time, className, name, phone) {
   } catch (e) {
     // メール送信失敗しても予約自体は成功させる
     Logger.log('メール送信エラー: ' + e.message);
+  }
+}
+
+/**
+ * 予約者に確認メールを送信
+ */
+function sendBookingConfirmation(email, date, studio, time, className, name) {
+  try {
+    var subject = '【BEAT THE MIX】予約確認 — ' + date + ' ' + className;
+    var body = name + ' 様\n\n'
+      + 'ご予約ありがとうございます。\n'
+      + '以下の内容で予約を受け付けました。\n\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n'
+      + '日付: ' + date + '\n'
+      + 'スタジオ: ' + studio + '\n'
+      + '時間: ' + time + '\n'
+      + 'クラス: ' + className + '\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n\n'
+      + 'キャンセル・変更のご連絡:\n'
+      + '電話: 090-1817-9501\n'
+      + 'メール: beat.the.mix7386@gmail.com\n\n'
+      + '当日お会いできることを楽しみにしています！\n\n'
+      + 'BEAT THE MIX ダンススタジオ';
+    GmailApp.sendEmail(email, subject, body);
+  } catch (e) {
+    Logger.log('確認メール送信エラー: ' + e.message);
   }
 }
 

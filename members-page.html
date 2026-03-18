@@ -1488,6 +1488,11 @@ body {
               <label>電話番号</label>
               <input type="tel" id="booking-phone" placeholder="090-1234-5678">
             </div>
+            <div class="booking-field">
+              <label>メールアドレス</label>
+              <input type="email" id="booking-email" placeholder="example@gmail.com">
+              <span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">予約確認メールをお送りします</span>
+            </div>
             <div class="booking-modal-actions">
               <button type="button" class="booking-cancel-btn" onclick="closeBookingModal()">キャンセル</button>
               <button type="submit" class="booking-submit-btn" id="booking-submit-btn">予約する</button>
@@ -2080,6 +2085,7 @@ function submitBooking() {
 
   var name = document.getElementById('booking-name').value.trim();
   var phone = document.getElementById('booking-phone').value.trim();
+  var email = document.getElementById('booking-email').value.trim();
 
   if (!name) {
     document.getElementById('booking-name').focus();
@@ -2115,7 +2121,8 @@ function submitBooking() {
     time: currentBookingSlot.time || '',
     class_name: currentBookingSlot.class_name || '',
     name: name,
-    phone: phone
+    phone: phone,
+    email: email
   });
 
   var url = APPS_SCRIPT_URL + '?' + params.toString();
