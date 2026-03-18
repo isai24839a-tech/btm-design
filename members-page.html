@@ -830,6 +830,144 @@ body {
 }
 
 /* Announcement Cards (Google Sheets powered) */
+/* ===== BOOKING LIST ===== */
+.bklist-date-group {
+  margin-bottom: 1.5rem;
+}
+
+.bklist-date-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--navy);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.bklist-date-header svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--coral);
+  stroke-width: 2;
+  fill: none;
+  flex-shrink: 0;
+}
+
+.bklist-slot {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.5rem;
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--coral);
+}
+
+.bklist-slot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.bklist-slot-info {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--charcoal);
+}
+
+.bklist-slot-info span {
+  color: var(--gray-500);
+  font-weight: 400;
+  margin-left: 0.3rem;
+}
+
+.bklist-slot-count {
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.bklist-slot-count.full {
+  background: #ffe0e0;
+  color: #c0392b;
+}
+
+.bklist-slot-count.has-space {
+  background: #e0f5e0;
+  color: #27ae60;
+}
+
+.bklist-member {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0;
+  font-size: 0.88rem;
+}
+
+.bklist-member + .bklist-member {
+  border-top: 1px dashed var(--gray-200);
+}
+
+.bklist-member-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bklist-member-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--gray-500);
+  stroke-width: 2;
+  fill: none;
+}
+
+.bklist-member-name {
+  font-weight: 500;
+  color: var(--charcoal);
+}
+
+.bklist-member-time {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-left: auto;
+}
+
+.bklist-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--gray-500);
+  font-size: 0.95rem;
+}
+
+.bklist-empty svg {
+  width: 48px;
+  height: 48px;
+  stroke: var(--gray-300);
+  stroke-width: 1.5;
+  fill: none;
+  display: block;
+  margin: 0 auto 1rem;
+}
+
 .announce-card {
   background: #fff;
   border-radius: var(--radius-md);
@@ -1293,6 +1431,7 @@ body {
       <div class="tab-slider" id="tab-slider"></div>
       <button class="tab-button active" data-tab="schedule">スケジュール</button>
       <button class="tab-button" data-tab="booking">予約</button>
+      <button class="tab-button" data-tab="bookinglist">予約一覧</button>
       <button class="tab-button" data-tab="announcements">お知らせ</button>
     </div>
   </div>
@@ -1355,6 +1494,22 @@ body {
             </div>
           </form>
         </div>
+      </div>
+    </div>
+
+    <!-- Booking List Panel -->
+    <div class="tab-panel" id="panel-bookinglist">
+      <div class="schedule-header">
+        <h2 class="schedule-title">Booking List</h2>
+        <div class="schedule-meta">
+          <button class="refresh-button" onclick="fetchBookingList()">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            更新
+          </button>
+        </div>
+      </div>
+      <div id="bookinglist-content">
+        <!-- Loaded dynamically -->
       </div>
     </div>
 
@@ -1467,6 +1622,7 @@ function showMainContent() {
   initTabs();
   initBooking();
   fetchSchedule();
+  fetchBookingList();
   fetchAnnouncements();
   startAutoRefresh();
 }
@@ -2000,7 +2156,7 @@ function showBookingSuccess(name) {
       '<h4>予約完了！</h4>' +
       '<p>' + escapeHtml(name) + ' さんの予約を受け付けました</p>' +
       '<br>' +
-      '<button class="slot-book-btn" onclick="closeBookingModal();fetchBookingSlots();">閉じる</button>' +
+      '<button class="slot-book-btn" onclick="closeBookingModal();fetchBookingSlots();fetchBookingList();fetchSchedule();">閉じる</button>' +
     '</div>';
 }
 
@@ -2034,6 +2190,151 @@ function showBookingSetup(container) {
 }
 
 // ===== ANNOUNCEMENTS (Google Sheets) =====
+// ===== BOOKING LIST =====
+function fetchBookingList() {
+  var container = document.getElementById('bookinglist-content');
+
+  // Demo mode
+  if (DEMO_MODE) {
+    // Build demo booking list from demoSlots + demoBookings
+    var demoList = [];
+    var dateMap = {};
+
+    // Add pre-set bookings from demo slots
+    demoSlots.forEach(function(s) {
+      if (!dateMap[s.date]) dateMap[s.date] = {};
+      var slotKey = s.studio + '|' + s.time + '|' + s.class_name;
+      if (!dateMap[s.date][slotKey]) {
+        dateMap[s.date][slotKey] = {
+          studio: s.studio, time: s.time, class_name: s.class_name,
+          max: s.max, members: []
+        };
+      }
+      // Add fake pre-booked members
+      for (var i = 0; i < s.booked; i++) {
+        var names = ['田中さくら','鈴木はると','佐藤ゆい','山田れん','高橋あおい','伊藤そら','渡辺ひなた','中村みお'];
+        dateMap[s.date][slotKey].members.push({
+          name: names[i % names.length],
+          phone: '',
+          booked_at: '03/18 10:' + (10 + i * 5)
+        });
+      }
+    });
+
+    // Add session bookings
+    demoBookings.forEach(function(b) {
+      if (!dateMap[b.date]) dateMap[b.date] = {};
+      var slotKey = b.studio + '|' + b.time + '|' + b.class_name;
+      if (!dateMap[b.date][slotKey]) {
+        var slot = demoSlots.find(function(s) {
+          return s.date === b.date && s.studio === b.studio && s.time === b.time;
+        });
+        dateMap[b.date][slotKey] = {
+          studio: b.studio, time: b.time, class_name: b.class_name,
+          max: slot ? slot.max : 10, members: []
+        };
+      }
+      dateMap[b.date][slotKey].members.push({
+        name: b.name,
+        phone: b.phone || '',
+        booked_at: new Date(b.bookedAt).toLocaleString('ja-JP', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})
+      });
+    });
+
+    var dates = Object.keys(dateMap).sort();
+    var result = dates.map(function(d) {
+      var slots = Object.keys(dateMap[d]).map(function(k) { return dateMap[d][k]; });
+      return { date: d, slots: slots };
+    });
+
+    renderBookingList(result, container);
+    return;
+  }
+
+  if (!APPS_SCRIPT_URL) {
+    container.innerHTML = '<div class="bklist-empty">' +
+      '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' +
+      '<p>APPS_SCRIPT_URL を設定すると予約一覧が表示されます</p></div>';
+    return;
+  }
+
+  container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--gray-500);">読み込み中...</div>';
+
+  fetch(APPS_SCRIPT_URL + '?action=list')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) {
+        container.innerHTML = '<div class="bklist-empty"><p>' + escapeHtml(data.error) + '</p></div>';
+        return;
+      }
+      renderBookingList(data, container);
+    })
+    .catch(function(err) {
+      container.innerHTML = '<div class="bklist-empty"><p>読み込みエラー: ' + escapeHtml(err.message) + '</p></div>';
+    });
+}
+
+function renderBookingList(data, container) {
+  if (!data || data.length === 0) {
+    container.innerHTML = '<div class="bklist-empty">' +
+      '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' +
+      '<p>予約はまだありません</p></div>';
+    return;
+  }
+
+  var html = '';
+  var today = new Date();
+  today.setHours(0,0,0,0);
+
+  data.forEach(function(dateGroup) {
+    // Parse date for day of week
+    var parts = dateGroup.date.split('/');
+    var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+    var days = ['日','月','火','水','木','金','土'];
+    var dayStr = days[dateObj.getDay()];
+    var isPast = dateObj < today;
+
+    html += '<div class="bklist-date-group"' + (isPast ? ' style="opacity:0.5"' : '') + '>';
+    html += '<div class="bklist-date-header">';
+    html += '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+    html += escapeHtml(dateGroup.date) + '（' + dayStr + '）';
+    if (isPast) html += ' <span style="font-size:0.75rem;opacity:0.7;margin-left:0.5rem">終了</span>';
+    html += '</div>';
+
+    dateGroup.slots.forEach(function(slot) {
+      var count = slot.members.length;
+      var max = slot.max || 10;
+      var isFull = count >= max;
+      var countClass = isFull ? 'full' : 'has-space';
+
+      html += '<div class="bklist-slot">';
+      html += '<div class="bklist-slot-header">';
+      html += '<div class="bklist-slot-info">' + escapeHtml(slot.class_name) +
+        '<span>' + escapeHtml(slot.studio) + ' / ' + escapeHtml(slot.time) + '</span></div>';
+      html += '<div class="bklist-slot-count ' + countClass + '">' + count + ' / ' + max + '名</div>';
+      html += '</div>';
+
+      if (count === 0) {
+        html += '<div style="color:var(--gray-500);font-size:0.85rem;padding:0.3rem 0;">予約者なし</div>';
+      } else {
+        slot.members.forEach(function(m) {
+          html += '<div class="bklist-member">';
+          html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+          html += '<span class="bklist-member-name">' + escapeHtml(m.name) + '</span>';
+          if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
+          html += '</div>';
+        });
+      }
+
+      html += '</div>';
+    });
+
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
 function fetchAnnouncements() {
   var container = document.getElementById('announcements-content');
 
