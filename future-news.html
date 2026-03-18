@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FUTURE NEWS | BEAT THE MIX Dance Studio</title>
+<meta name="description" content="BEAT THE MIX FUTURE - 最新のお知らせ・イベント情報。40歳以上限定のダンスライフ。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Oswald:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --navy: #0D1B2A;
+  --navy-light: #162A3E;
+  --purple: #2D1B69;
+  --purple-deep: #1A0F3F;
+  --gold: #D4A853;
+  --gold-light: #E8C877;
+  --gold-dim: rgba(212, 168, 83, 0.15);
+  --white: #FFFFFF;
+  --white-soft: rgba(255, 255, 255, 0.85);
+  --white-muted: rgba(255, 255, 255, 0.55);
+  --text-body: rgba(255, 255, 255, 0.8);
+  --card-bg: #121828;
+  --card-bg-hover: #181e30;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--navy);
+  color: var(--white);
+  overflow-x: hidden;
+  line-height: 1.8;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--navy); }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+/* ===== NAVIGATION ===== */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(20px, 4vw, 48px);
+  height: 64px;
+  background: rgba(13, 27, 42, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(212, 168, 83, 0.12);
+  transition: background 0.4s ease;
+}
+
+.nav.scrolled {
+  background: rgba(13, 27, 42, 0.95);
+  border-bottom-color: rgba(212, 168, 83, 0.25);
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold);
+  text-decoration: none;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 1px;
+  transition: opacity 0.3s;
+}
+
+.nav-back:hover { opacity: 0.7; }
+.nav-back svg { transition: transform 0.3s; }
+.nav-back:hover svg { transform: translateX(-3px); }
+
+.nav-brand {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 3px;
+  color: var(--white);
+}
+
+.nav-brand span {
+  color: var(--gold);
+  font-weight: 300;
+  margin-left: 8px;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-badge {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--navy);
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  padding: 4px 16px;
+  line-height: 1;
+}
+
+/* ===== PARTICLE CANVAS ===== */
+canvas#particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+  position: relative;
+  z-index: 1;
+  padding: clamp(120px, 15vw, 180px) clamp(20px, 5vw, 48px) clamp(48px, 8vw, 80px);
+  text-align: center;
+  overflow: hidden;
+}
+
+.page-header-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, var(--navy) 0%, var(--purple-deep) 50%, var(--purple) 100%);
+  z-index: -2;
+}
+
+.page-header-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image:
+    radial-gradient(circle at 20% 50%, var(--gold) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, var(--gold) 1px, transparent 1px),
+    radial-gradient(circle at 60% 80%, var(--gold) 1px, transparent 1px);
+  background-size: 80px 80px, 120px 120px, 100px 100px;
+  z-index: -1;
+}
+
+.page-header-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(13, 27, 42, 0.7) 100%);
+  z-index: -1;
+}
+
+.page-header-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(10px, 1.2vw, 13px);
+  font-weight: 300;
+  letter-spacing: 6px;
+  color: var(--gold);
+  margin-bottom: 16px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 1s 0.2s forwards;
+}
+
+.page-header-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(48px, 10vw, 100px);
+  font-weight: 400;
+  letter-spacing: 8px;
+  line-height: 1;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 40%, #C49A3C 70%, var(--gold-light) 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeUp 1s 0.4s forwards, goldShimmer 6s ease infinite;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+@keyframes goldShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.page-header-line {
+  width: 60px;
+  height: 1px;
+  background: var(--gold);
+  margin: 0 auto 20px;
+  opacity: 0;
+  animation: fadeUp 1s 0.6s forwards;
+}
+
+.page-header-sub {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: clamp(13px, 1.6vw, 16px);
+  font-weight: 300;
+  letter-spacing: 3px;
+  color: var(--white-muted);
+  opacity: 0;
+  animation: fadeUp 1s 0.8s forwards;
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  position: relative;
+  z-index: 1;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 48px) clamp(60px, 8vw, 100px);
+}
+
+/* ===== LOADING SPINNER ===== */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  gap: 24px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(212, 168, 83, 0.15);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--white-muted);
+  text-transform: uppercase;
+}
+
+/* ===== SETUP MESSAGE ===== */
+.setup-message {
+  text-align: center;
+  padding: clamp(48px, 6vw, 80px) clamp(20px, 4vw, 40px);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(212, 168, 83, 0.12);
+  margin: 40px 0;
+}
+
+.setup-message-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 24px;
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.setup-message-icon svg {
+  width: 28px;
+  height: 28px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.setup-message h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+  color: var(--white-soft);
+}
+
+.setup-message p {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 2;
+  color: var(--white-muted);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.setup-message code {
+  display: inline-block;
+  background: rgba(212, 168, 83, 0.08);
+  border: 1px solid rgba(212, 168, 83, 0.15);
+  padding: 2px 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--gold-light);
+  margin: 4px 2px;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.empty-state-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  border: 1px solid rgba(212, 168, 83, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(212, 168, 83, 0.04);
+}
+
+.empty-state-icon svg {
+  width: 32px;
+  height: 32px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.2;
+  opacity: 0.6;
+}
+
+.empty-state h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  color: var(--white-muted);
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 300;
+}
+
+/* ===== NEWS CARD ===== */
+.news-card {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid rgba(212, 168, 83, 0.08);
+  padding: clamp(28px, 4vw, 44px);
+  margin-bottom: 2px;
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.news-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.news-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.news-card:hover {
+  background: var(--card-bg-hover);
+  border-color: rgba(212, 168, 83, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), 0 0 60px rgba(212, 168, 83, 0.04);
+}
+
+.news-card:hover::before { opacity: 1; }
+
+.news-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.news-date {
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: var(--gold);
+}
+
+.news-category {
+  display: inline-block;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  padding: 3px 12px;
+  line-height: 1.4;
+}
+
+.news-category.cat-event {
+  background: linear-gradient(135deg, var(--gold), #C49A3C);
+  color: var(--navy);
+}
+
+.news-category.cat-info {
+  background: rgba(45, 27, 105, 0.8);
+  border: 1px solid rgba(212, 168, 83, 0.2);
+  color: var(--white-soft);
+}
+
+.news-category.cat-lesson {
+  background: rgba(18, 78, 74, 0.7);
+  border: 1px solid rgba(80, 200, 180, 0.2);
+  color: rgba(180, 240, 220, 0.9);
+}
+
+.news-category.cat-other {
+  background: rgba(60, 60, 70, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--white-muted);
+}
+
+.news-title {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: clamp(17px, 2.2vw, 22px);
+  font-weight: 700;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  color: var(--white);
+  letter-spacing: 0.5px;
+}
+
+.news-body {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 2;
+  color: var(--text-body);
+  white-space: pre-line;
+}
+
+.news-image {
+  width: 100%;
+  margin-top: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(212, 168, 83, 0.08);
+}
+
+.news-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.news-card:hover .news-image img {
+  transform: scale(1.02);
+}
+
+/* ===== DIVIDER BETWEEN CARDS ===== */
+.card-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 28px 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.card-divider.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-divider .div-line {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 168, 83, 0.3), transparent);
+}
+
+.card-divider .div-dot {
+  width: 4px;
+  height: 4px;
+  background: var(--gold);
+  border-radius: 50%;
+  opacity: 0.4;
+}
+
+/* ===== BACK TO TOP ===== */
+.back-to-top {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 999;
+  width: 48px;
+  height: 48px;
+  background: rgba(13, 27, 42, 0.9);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: all 0.4s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.back-to-top.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.back-to-top svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 2;
+  transition: stroke 0.3s;
+}
+
+.back-to-top:hover svg {
+  stroke: var(--navy);
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  position: relative;
+  z-index: 1;
+  background: #060C16;
+  padding: 32px 24px;
+  text-align: center;
+  border-top: 1px solid rgba(212, 168, 83, 0.08);
+}
+
+.footer-brand {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: var(--white-muted);
+  margin-bottom: 8px;
+}
+
+.footer-copy {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 1px;
+}
+
+/* ===== ERROR STATE ===== */
+.error-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.error-state h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.error-state p {
+  font-size: 13px;
+  color: var(--white-muted);
+  font-weight: 300;
+  line-height: 1.8;
+}
+
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding: 10px 28px;
+  background: transparent;
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  color: var(--gold);
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.retry-btn:hover {
+  background: var(--gold);
+  color: var(--navy);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .nav-brand { display: none; }
+
+  .page-header {
+    padding-top: 110px;
+    padding-bottom: 40px;
+  }
+
+  .page-header-title {
+    letter-spacing: 4px;
+  }
+
+  .news-card {
+    padding: clamp(20px, 5vw, 28px);
+  }
+
+  .news-card-header {
+    gap: 10px;
+  }
+
+  .back-to-top {
+    bottom: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header-title {
+    letter-spacing: 2px;
+    font-size: 40px;
+  }
+
+  .news-title {
+    font-size: 16px;
+  }
+
+  .news-body {
+    font-size: 13px;
+    line-height: 1.9;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="nav" id="nav">
+  <div class="nav-left">
+    <a href="split-landing.html" class="nav-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      TOP
+    </a>
+    <div class="nav-brand">BEAT THE MIX<span>FUTURE</span></div>
+  </div>
+
+  <div class="nav-right">
+    <div class="nav-badge">NEWS</div>
+  </div>
+</nav>
+
+<!-- ===== PARTICLE CANVAS ===== -->
+<canvas id="particles"></canvas>
+
+<!-- ===== PAGE HEADER ===== -->
+<header class="page-header">
+  <div class="page-header-bg"></div>
+  <div class="page-header-pattern"></div>
+  <div class="page-header-vignette"></div>
+  <p class="page-header-label">BEAT THE MIX DANCE STUDIO</p>
+  <h1 class="page-header-title">FUTURE NEWS</h1>
+  <div class="page-header-line"></div>
+  <p class="page-header-sub">最新のお知らせ・イベント情報</p>
+</header>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="main-content" id="newsContainer">
+  <!-- Loading state shown by default -->
+  <div class="loading" id="loadingState">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading News...</p>
+  </div>
+</main>
+
+<!-- ===== BACK TO TOP ===== -->
+<button class="back-to-top" id="backToTop" aria-label="ページの先頭に戻る">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 15l-6-6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <p class="footer-brand">BEAT THE MIX FUTURE</p>
+  <p class="footer-copy">&copy; 2025 BEAT THE MIX Dance Studio. All rights reserved.</p>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+(function() {
+  'use strict';
+
+  // ===== CONFIGURATION =====
+  const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE';
+  const NEWS_SHEET = 'FUTUREニュース'; // Sheet name
+  // =========================
+
+  // ===== GOLD PARTICLE SYSTEM =====
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let animId;
+  let w, h;
+
+  function resizeCanvas() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+
+  class Particle {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * w;
+      this.y = Math.random() * h;
+      this.size = Math.random() * 1.8 + 0.3;
+      this.speedX = (Math.random() - 0.5) * 0.2;
+      this.speedY = Math.random() * -0.3 - 0.05;
+      this.opacity = Math.random() * 0.35 + 0.05;
+      this.fadeSpeed = Math.random() * 0.002 + 0.001;
+      this.phase = Math.random() * Math.PI * 2;
+      this.wobble = Math.random() * 0.4 + 0.1;
+    }
+    update() {
+      this.x += this.speedX + Math.sin(this.phase) * this.wobble * 0.015;
+      this.y += this.speedY;
+      this.phase += 0.015;
+      this.opacity += Math.sin(this.phase * 2) * this.fadeSpeed;
+      if (this.opacity <= 0 || this.y < -10 || this.x < -10 || this.x > w + 10) {
+        this.reset();
+        this.y = h + 10;
+        this.opacity = 0;
+      }
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(212, 168, 83, ' + Math.max(0, Math.min(this.opacity, 0.4)) + ')';
+      ctx.fill();
+    }
+  }
+
+  function initParticles() {
+    resizeCanvas();
+    var count = Math.min(Math.floor(w * h / 25000), 40);
+    particles = [];
+    for (var i = 0; i < count; i++) {
+      particles.push(new Particle());
+    }
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(function(p) {
+      p.update();
+      p.draw();
+    });
+    animId = requestAnimationFrame(animateParticles);
+  }
+
+  initParticles();
+  animateParticles();
+
+  var resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      resizeCanvas();
+      initParticles();
+    }, 200);
+  });
+
+  // Pause when tab not visible
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      cancelAnimationFrame(animId);
+      animId = null;
+    } else {
+      if (!animId) animateParticles();
+    }
+  });
+
+  // ===== NAV SCROLL =====
+  var nav = document.getElementById('nav');
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 60) {
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
+  }, { passive: true });
+
+  // ===== BACK TO TOP =====
+  var backToTop = document.getElementById('backToTop');
+
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 500) {
+      backToTop.classList.add('show');
+    } else {
+      backToTop.classList.remove('show');
+    }
+  }, { passive: true });
+
+  backToTop.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ===== CATEGORY HELPERS =====
+  function getCategoryClass(category) {
+    if (!category) return '';
+    var cat = category.trim();
+    if (cat === 'イベント') return 'cat-event';
+    if (cat === 'お知らせ') return 'cat-info';
+    if (cat === 'レッスン') return 'cat-lesson';
+    return 'cat-other';
+  }
+
+  // ===== DATE FORMATTING =====
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    // Try to parse various date formats
+    var d = new Date(dateStr);
+    if (isNaN(d.getTime())) {
+      // Try Japanese-style: 2025/1/15 or 2025-01-15
+      return dateStr;
+    }
+    var year = d.getFullYear();
+    var month = d.getMonth() + 1;
+    var day = d.getDate();
+    return year + '.' + (month < 10 ? '0' : '') + month + '.' + (day < 10 ? '0' : '') + day;
+  }
+
+  // ===== SCROLL REVEAL FOR CARDS =====
+  function observeCards() {
+    var items = document.querySelectorAll('.news-card, .card-divider');
+    if (!items.length) return;
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          // Stagger delay based on index
+          var delay = 0;
+          var el = entry.target;
+          var cards = document.querySelectorAll('.news-card, .card-divider');
+          for (var i = 0; i < cards.length; i++) {
+            if (cards[i] === el) {
+              delay = (i % 3) * 100;
+              break;
+            }
+          }
+          setTimeout(function() {
+            el.classList.add('visible');
+          }, delay);
+          observer.unobserve(el);
+        }
+      });
+    }, {
+      threshold: 0.08,
+      rootMargin: '0px 0px -30px 0px'
+    });
+
+    items.forEach(function(item) {
+      observer.observe(item);
+    });
+  }
+
+  // ===== RENDER NEWS =====
+  function renderNews(posts) {
+    var container = document.getElementById('newsContainer');
+
+    if (!posts || posts.length === 0) {
+      container.innerHTML =
+        '<div class="empty-state">' +
+          '<div class="empty-state-icon">' +
+            '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+              '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>' +
+              '<polyline points="14 2 14 8 20 8"/>' +
+              '<line x1="16" y1="13" x2="8" y2="13"/>' +
+              '<line x1="16" y1="17" x2="8" y2="17"/>' +
+              '<polyline points="10 9 9 9 8 9"/>' +
+            '</svg>' +
+          '</div>' +
+          '<h3>NO NEWS YET</h3>' +
+          '<p>現在、お知らせはありません</p>' +
+        '</div>';
+      return;
+    }
+
+    // Sort newest first by date
+    posts.sort(function(a, b) {
+      var da = new Date(a.date);
+      var db = new Date(b.date);
+      if (isNaN(da.getTime()) || isNaN(db.getTime())) {
+        return (b.date || '').localeCompare(a.date || '');
+      }
+      return db - da;
+    });
+
+    var html = '';
+    posts.forEach(function(post, index) {
+      // Divider between cards
+      if (index > 0) {
+        html +=
+          '<div class="card-divider">' +
+            '<div class="div-line"></div>' +
+            '<div class="div-dot"></div>' +
+            '<div class="div-line"></div>' +
+          '</div>';
+      }
+
+      // Category badge
+      var categoryHtml = '';
+      if (post.category && post.category.trim()) {
+        var catClass = getCategoryClass(post.category);
+        categoryHtml = '<span class="news-category ' + catClass + '">' + escapeHtml(post.category.trim()) + '</span>';
+      }
+
+      // Image
+      var imageHtml = '';
+      if (post.imageUrl && post.imageUrl.trim()) {
+        imageHtml =
+          '<div class="news-image">' +
+            '<img src="' + escapeHtml(post.imageUrl.trim()) + '" alt="' + escapeHtml(post.title || '') + '" loading="lazy" onerror="this.parentElement.style.display=\'none\'">' +
+          '</div>';
+      }
+
+      // Content with line break support
+      var content = post.content || '';
+
+      html +=
+        '<article class="news-card">' +
+          '<div class="news-card-header">' +
+            '<time class="news-date">' + escapeHtml(formatDate(post.date)) + '</time>' +
+            categoryHtml +
+          '</div>' +
+          '<h2 class="news-title">' + escapeHtml(post.title || '') + '</h2>' +
+          '<div class="news-body">' + escapeHtml(content) + '</div>' +
+          imageHtml +
+        '</article>';
+    });
+
+    container.innerHTML = html;
+
+    // Trigger scroll reveal
+    requestAnimationFrame(function() {
+      observeCards();
+    });
+  }
+
+  // ===== ESCAPE HTML =====
+  function escapeHtml(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ===== SHOW SETUP MESSAGE =====
+  function showSetup() {
+    var container = document.getElementById('newsContainer');
+    container.innerHTML =
+      '<div class="setup-message">' +
+        '<div class="setup-message-icon">' +
+          '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+            '<path d="M12 20h9"/>' +
+            '<path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>' +
+          '</svg>' +
+        '</div>' +
+        '<h3>SETUP REQUIRED</h3>' +
+        '<p>Google Spreadsheet と連携するには、HTMLファイル内の設定を変更してください。</p>' +
+        '<p style="margin-top:16px;">' +
+          '<code>SPREADSHEET_ID</code> にスプレッドシートのIDを設定<br>' +
+          'シート名: <code>' + escapeHtml(NEWS_SHEET) + '</code><br><br>' +
+          '列構成: <code>日付</code> | <code>タイトル</code> | <code>内容</code> | <code>カテゴリ</code> | <code>画像URL</code>' +
+        '</p>' +
+      '</div>';
+  }
+
+  // ===== SHOW ERROR =====
+  function showError(msg) {
+    var container = document.getElementById('newsContainer');
+    container.innerHTML =
+      '<div class="error-state">' +
+        '<h3>LOADING ERROR</h3>' +
+        '<p>' + escapeHtml(msg || 'データの読み込みに失敗しました') + '</p>' +
+        '<button class="retry-btn" onclick="location.reload()">RETRY</button>' +
+      '</div>';
+  }
+
+  // ===== FETCH FROM GOOGLE SHEETS =====
+  function fetchNews() {
+    if (SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
+      showSetup();
+      return;
+    }
+
+    var encodedSheet = encodeURIComponent(NEWS_SHEET);
+    var url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID +
+              '/gviz/tq?tqx=out:json&sheet=' + encodedSheet;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.timeout = 15000;
+
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        try {
+          // Parse JSONP response: strip prefix and suffix
+          var text = xhr.responseText;
+          var startIdx = text.indexOf('{');
+          var endIdx = text.lastIndexOf('}');
+          if (startIdx === -1 || endIdx === -1) {
+            throw new Error('Invalid response format');
+          }
+          var json = JSON.parse(text.substring(startIdx, endIdx + 1));
+
+          if (!json.table || !json.table.rows) {
+            renderNews([]);
+            return;
+          }
+
+          var rows = json.table.rows;
+          var posts = [];
+
+          rows.forEach(function(row) {
+            if (!row.c || row.c.length < 2) return;
+
+            var getValue = function(cell) {
+              if (!cell) return '';
+              if (cell.f) return cell.f; // formatted value
+              if (cell.v !== null && cell.v !== undefined) return String(cell.v);
+              return '';
+            };
+
+            var date = getValue(row.c[0]);
+            var title = getValue(row.c[1]);
+
+            // Skip rows without at least date and title
+            if (!date && !title) return;
+
+            posts.push({
+              date: date,
+              title: title,
+              content: row.c.length > 2 ? getValue(row.c[2]) : '',
+              category: row.c.length > 3 ? getValue(row.c[3]) : '',
+              imageUrl: row.c.length > 4 ? getValue(row.c[4]) : ''
+            });
+          });
+
+          renderNews(posts);
+
+        } catch (e) {
+          console.error('Parse error:', e);
+          showError('データの解析に失敗しました。スプレッドシートの共有設定を確認してください。');
+        }
+      } else {
+        showError('データの取得に失敗しました (HTTP ' + xhr.status + ')');
+      }
+    };
+
+    xhr.onerror = function() {
+      showError('ネットワークエラーが発生しました。インターネット接続を確認してください。');
+    };
+
+    xhr.ontimeout = function() {
+      showError('接続がタイムアウトしました。もう一度お試しください。');
+    };
+
+    xhr.send();
+  }
+
+  // ===== INIT =====
+  fetchNews();
+
+})();
+</script>
+</body>
+</html>
