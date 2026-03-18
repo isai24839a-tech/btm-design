@@ -6,35 +6,74 @@
 - 作業ディレクトリ: `C:\Users\shirasaki910\Desktop\dance-studio\`
 
 ## 現在のステータス
-**Phase**: デザイン案レビュー待ち（v3追加済み・全9案完成）
+**Phase**: サイト構造完成 — Cloudflare Pages + Google Sheets構成
+
+## 技術方針（2026-03-18 変更）
+- **ホスティング**: Cloudflare Pages（無料）← WordPress.com廃止
+- **予約システム**: Google Sheets + Apps Script（無料）← 月3万円の外部アプリ廃止
+- **コンテンツ管理**: Google Spreadsheet（家族がスマホで編集するだけ）
+- **合計月額: 0円**
+
+## サイト構成
+```
+split-landing.html (トップ)
+├── kids-page.html (KIDSサイト) ── kids-news.html (KIDSブログ)
+├── future-page.html (FUTUREサイト) ── future-news.html (FUTUREブログ)
+└── members-page.html (会員専用)
+     ├── スケジュール (Google Sheets自動表示)
+     ├── 予約 (Google Apps Script)
+     └── お知らせ (Google Sheets自動表示)
+```
+
+## Google Spreadsheet構成（1つのスプレッドシートで全管理）
+| シート名 | 用途 | 列構成 |
+|---------|------|--------|
+| スケジュール | 予約枠管理 | 日付/スタジオ/時間/クラス/定員 |
+| 予約一覧 | 予約データ自動記録 | 日付/スタジオ/時間/クラス/お名前/電話番号/予約日時 |
+| お知らせ | 会員向け通知 | 日付/タイトル/内容/重要度 |
+| KIDSニュース | KIDSブログ | 日付/タイトル/内容/カテゴリ/画像URL |
+| FUTUREニュース | FUTUREブログ | 日付/タイトル/内容/カテゴリ/画像URL |
 
 ## 完了済み
 - [x] 既存サイト(tibadance.com)からPuppeteerで全ページ情報取得
 - [x] サイト情報まとめ (`site-info.md`)
-- [x] デザイン案A: Energy Pop (`design-a-energy.html`) — オレンジ基調、エネルギッシュ
-- [x] デザイン案B: Clean Modern (`design-b-modern.html`) — ミニマル、上品
-- [x] デザイン案C: Street Vibe (`design-c-dark.html`) — ダークテーマ、ネオン
-- [x] デザイン案D: Cinematic Gold (`design-d-cinematic.html`) — 黒×ゴールド、パララックス、文字アニメーション
-- [x] デザイン案E: Glassmorphism Aurora (`design-e-glass.html`) — オーロラ背景、すりガラス、3Dティルト
-- [x] デザイン案F: Magazine Editorial (`design-f-editorial.html`) — 雑誌風レイアウト、非対称グリッド、タイポグラフィ
-- [x] デザイン案G: Studio Premium (`design-g-premium.html`) — NOA/En Dance Studio風、11セクション、ギャラリー、カウンターアニメーション
-- [x] デザイン案H: Split Dynamic (`design-h-dynamic.html`) — EXPG/STEEZY風、スプリットレイアウト、水平スクロール、マーキー
-- [x] デザイン案I: Warm Creative (`design-i-warm.html`) — クリーム×コーラル、有機ブロブ形状、SVGウェーブ、12セクション
-- [x] 比較ページ (`index.html`) — 全9案を3段表示（v3 NEW / v2 / v1）
-- [x] GitHub Pages公開: https://isai24839a-tech.github.io/btm-design/
-- [x] WordPress.comプラン分析 (`wp-plan-analysis.md`)
+- [x] デザイン案9案完成 (A〜I) + 比較ページ
+- [x] GitHub Pages公開
+- [x] **スプリットランディングページ** (`split-landing.html`) — KIDS/FUTURE振り分け、ホバーで拡大
+- [x] **KIDSページ** (`kids-page.html`) — オレンジ/コーラル、7セクション、スクロールアニメーション
+- [x] **FUTUREページ** (`future-page.html`) — ネイビー/ゴールド、8セクション、ゴールドパーティクル
+- [x] **会員ページ** (`members-page.html`) — パスワード認証、3タブ(スケジュール/予約/お知らせ)
+- [x] **予約システム** (`booking-script.gs`) — Google Apps Script、満員チェック/重複防止
+- [x] **KIDSニュース** (`kids-news.html`) — Google Sheets連携ブログ、カテゴリバッジ
+- [x] **FUTUREニュース** (`future-news.html`) — ダーク×ゴールドのマガジン風ブログ
+- [x] **お知らせ機能** — 会員ページ内、Google Sheets連携、重要バッジ対応
 
 ## 次にやること
-- [ ] ユーザーがデザイン方向性を決定
-- [ ] 決定したデザインをWordPressテーマに変換
-- [ ] 予約システム（STORES予約推奨）のセットアップ
-- [ ] 会員管理機能の実装
-- [ ] WordPress.com Personalプラン契約 & デプロイ
+- [ ] Google Spreadsheetを作成してシート5つ作る
+- [ ] Google Apps Scriptをデプロイ（booking-script.gs）
+- [ ] SPREADSHEET_ID / APPS_SCRIPT_URL を各HTMLに設定
+- [ ] Cloudflare Pagesにデプロイ（独自ドメイン設定）
+- [ ] 実データでの動作確認テスト
+- [ ] 既存tibadance.comからの移行
 
-## 技術方針
-- WordPress.com Personal ($4/月・2年払い) でHP
-- STORES予約（無料プラン）で予約＋会員管理
-- 合計月額: 約500円
+## ファイル構成
+```
+C:\Users\shirasaki910\Desktop\dance-studio\
+├── split-landing.html     # ★トップ: KIDS/FUTURE振り分け
+├── kids-page.html          # KIDSメインサイト
+├── future-page.html        # FUTUREメインサイト
+├── kids-news.html          # KIDSニュース/ブログ
+├── future-news.html        # FUTUREニュース/ブログ
+├── members-page.html       # 会員専用(パスワード認証)
+├── booking-script.gs       # 予約システム用Apps Scriptコード
+├── index.html              # デザイン比較ページ（全9案一覧）
+├── design-[a-i]-*.html     # デザイン案A〜I
+├── site-info.md            # 既存サイト情報
+├── wp-plan-analysis.md     # WPプラン分析（参考）
+├── project-memo.md         # このファイル
+├── scrape.js / scrape2.js  # スクレイピングスクリプト
+└── scraped/                # 取得データ
+```
 
 ## スタジオ基本情報
 - 名前: BEAT THE MIX (BTM)
@@ -44,27 +83,8 @@
 - インストラクター: JUNJUN先生(Dance歴32年)、NANAMI先生(ダンス歴20年)
 - 連絡先: 090-1817-9501 / beat.the.mix7386@gmail.com
 
-## ファイル構成
-```
-C:\Users\shirasaki910\Desktop\dance-studio\
-├── index.html              # デザイン比較ページ（6案一覧）
-├── design-a-energy.html    # Design A: Energy Pop
-├── design-b-modern.html    # Design B: Clean Modern
-├── design-c-dark.html      # Design C: Street Vibe
-├── design-d-cinematic.html # Design D: Cinematic Gold (v2)
-├── design-e-glass.html     # Design E: Glassmorphism Aurora (v2)
-├── design-f-editorial.html # Design F: Magazine Editorial (v2)
-├── design-g-premium.html   # Design G: Studio Premium (v3)
-├── design-h-dynamic.html   # Design H: Split Dynamic (v3)
-├── design-i-warm.html      # Design I: Warm Creative (v3)
-├── site-info.md            # 既存サイトから取得した全情報
-├── wp-plan-analysis.md     # WPプラン＆予約システム分析
-├── project-memo.md         # このファイル（PJ進捗メモ）
-├── scrape.js / scrape2.js  # スクレイピングスクリプト
-├── scraped/                # 取得したテキスト・HTML・スクリーンショット
-├── node_modules/           # Puppeteer等
-└── package.json
-```
+## 会員ページ設定
+- パスワード: `btm2025`（members-page.html内のPASSWORD変数で変更可）
 
 ## 注意事項
 - 個人PJのためDropbox/claude_memory(GitHub同期)には保存しない
