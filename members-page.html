@@ -374,81 +374,245 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== SCHEDULE TAB ===== */
-.schedule-header {
+/* ===== CATEGORY TOGGLE (KIDS / FUTURE) ===== */
+.category-toggle {
+  display: flex;
+  gap: 0;
+  background: var(--gray-100);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: 1.5rem;
+  max-width: 320px;
+}
+
+.category-btn {
+  flex: 1;
+  padding: 10px 1.5rem;
+  border: none;
+  background: transparent;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--gray-500);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.3s ease;
+}
+
+.category-btn:hover {
+  color: var(--charcoal);
+}
+
+.category-btn.active[data-category="kids"] {
+  background: var(--coral);
+  color: #fff;
+}
+
+.category-btn.active[data-category="future"] {
+  background: var(--navy);
+  color: #fff;
+}
+
+/* ===== CALENDAR ===== */
+.calendar-container {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.calendar-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--gray-100);
 }
 
-.schedule-title {
+.calendar-nav-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--gray-200);
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: var(--charcoal);
+  font-size: 0.85rem;
+}
+
+.calendar-nav-btn:hover {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+
+.calendar-nav-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.calendar-month-label {
   font-family: 'Oswald', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--navy);
   letter-spacing: 0.05em;
 }
 
-.schedule-meta {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--gray-100);
 }
 
-.last-updated {
+.calendar-weekday {
+  text-align: center;
   font-size: 0.75rem;
+  font-weight: 500;
   color: var(--gray-500);
+  padding: 0.25rem 0;
 }
 
-.refresh-button {
+.calendar-weekday:nth-child(6) { color: #2979FF; }
+.calendar-weekday:nth-child(7) { color: var(--coral); }
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0.5rem 0.75rem 0.75rem;
+  gap: 2px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
-  padding: 6px 14px;
-  border: 1px solid var(--gray-200);
-  border-radius: 20px;
-  background: #fff;
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 0.78rem;
-  color: var(--gray-500);
+  justify-content: center;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.2s ease;
+  position: relative;
+  min-height: 44px;
+  gap: 2px;
 }
 
-.refresh-button:hover {
-  border-color: var(--coral);
-  color: var(--coral);
+.calendar-day:hover:not(.empty):not(.other-month) {
+  background: var(--gray-100);
 }
 
-.refresh-button svg {
-  width: 14px;
-  height: 14px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: transform 0.3s ease;
+.calendar-day.empty {
+  cursor: default;
 }
 
-.refresh-button:hover svg {
-  transform: rotate(180deg);
+.calendar-day.other-month {
+  opacity: 0.25;
+  cursor: default;
 }
 
-.refresh-button.spinning svg {
-  animation: spin 0.8s linear infinite;
+.day-number {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  line-height: 1;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Saturday/Sunday colors (grid maintains position via empty cells) */
+.calendar-day:nth-child(7n+6) .day-number { color: #2979FF; }
+.calendar-day:nth-child(7n) .day-number { color: var(--coral); }
+
+.calendar-day.today {
+  background: rgba(255, 107, 53, 0.08);
 }
 
-/* Loading Spinner */
+.calendar-day.today .day-number {
+  font-weight: 700;
+}
+
+.calendar-day.selected {
+  background: var(--coral);
+}
+
+.calendar-day.selected .day-number {
+  color: #fff !important;
+}
+
+.category-future .calendar-day.selected {
+  background: var(--navy);
+}
+
+/* Lesson day background highlight */
+.calendar-day.has-lessons {
+  background: rgba(255, 107, 53, 0.1);
+}
+
+.category-future .calendar-day.has-lessons {
+  background: rgba(13, 27, 42, 0.08);
+}
+
+.calendar-day.has-lessons.today {
+  background: rgba(255, 107, 53, 0.2);
+}
+
+.category-future .calendar-day.has-lessons.today {
+  background: rgba(13, 27, 42, 0.15);
+}
+
+.day-dot {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--coral);
+}
+
+.category-future .day-dot {
+  background: var(--navy);
+}
+
+.calendar-day.selected .day-dot {
+  background: rgba(255,255,255,0.7);
+}
+
+/* ===== DAY LESSONS ===== */
+.day-lessons-header {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--gray-100);
+  letter-spacing: 0.03em;
+}
+
+.day-lessons-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--gray-500);
+  font-size: 0.9rem;
+  background: #fff;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.day-lessons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+/* ===== LOADING / ERROR ===== */
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -467,12 +631,52 @@ body {
   animation: spin 0.8s linear infinite;
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .loading-text {
   font-size: 0.85rem;
   color: var(--gray-500);
 }
 
-/* Setup Instructions */
+.error-container {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.error-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+.error-message {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+  margin-bottom: 1rem;
+}
+
+.error-retry {
+  padding: 10px 24px;
+  border: 2px solid var(--coral);
+  border-radius: 30px;
+  background: transparent;
+  color: var(--coral);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.error-retry:hover {
+  background: var(--coral);
+  color: #fff;
+}
+
+/* ===== SETUP INSTRUCTIONS ===== */
 .setup-card {
   background: #fff;
   border-radius: var(--radius-lg);
@@ -558,482 +762,7 @@ body {
   font-weight: 500;
 }
 
-/* Schedule Table */
-.schedule-table-wrapper {
-  overflow-x: auto;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  background: #fff;
-  -webkit-overflow-scrolling: touch;
-}
-
-.schedule-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.schedule-table thead {
-  background: var(--navy);
-  color: #fff;
-}
-
-.schedule-table th {
-  padding: 14px 16px;
-  font-family: 'Oswald', sans-serif;
-  font-weight: 500;
-  font-size: 0.82rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.schedule-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--gray-100);
-  vertical-align: middle;
-}
-
-.schedule-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.schedule-table tbody tr {
-  transition: background 0.2s ease;
-}
-
-.schedule-table tbody tr:hover {
-  background: var(--gray-100);
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 3px 12px;
-  border-radius: 20px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.status-open {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.status-closed {
-  background: #fce4ec;
-  color: #c62828;
-}
-
-.status-few {
-  background: #fff3e0;
-  color: #e65100;
-}
-
-.status-default {
-  background: var(--gray-100);
-  color: var(--gray-500);
-}
-
-/* Schedule Cards (mobile) */
-.schedule-cards {
-  display: none;
-}
-
-.schedule-card-item {
-  background: #fff;
-  border-radius: var(--radius-md);
-  padding: 1.2rem;
-  margin-bottom: 0.75rem;
-  box-shadow: var(--shadow-sm);
-  border-left: 4px solid var(--coral);
-}
-
-.schedule-card-date {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--navy);
-  margin-bottom: 0.6rem;
-}
-
-.schedule-card-detail {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.85rem;
-  padding: 0.25rem 0;
-  color: var(--charcoal);
-}
-
-.schedule-card-label {
-  color: var(--gray-500);
-  font-size: 0.78rem;
-  min-width: 60px;
-}
-
-/* Error message */
-.error-container {
-  text-align: center;
-  padding: 3rem 2rem;
-}
-
-.error-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  opacity: 0.3;
-}
-
-.error-message {
-  font-size: 0.9rem;
-  color: var(--gray-500);
-  margin-bottom: 1rem;
-}
-
-.error-retry {
-  padding: 10px 24px;
-  border: 2px solid var(--coral);
-  border-radius: 30px;
-  background: transparent;
-  color: var(--coral);
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.error-retry:hover {
-  background: var(--coral);
-  color: #fff;
-}
-
-/* ===== BOOKING TAB ===== */
-.booking-container {
-  background: #fff;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-}
-
-.booking-header {
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid var(--gray-100);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.booking-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--navy);
-}
-
-.booking-iframe {
-  width: 100%;
-  min-height: 600px;
-  border: none;
-  display: block;
-}
-
-.booking-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  text-align: center;
-}
-
-.booking-placeholder-icon {
-  width: 64px;
-  height: 64px;
-  background: var(--gray-100);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.2rem;
-}
-
-.booking-placeholder-icon svg {
-  width: 28px;
-  height: 28px;
-  stroke: var(--gray-500);
-  fill: none;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.booking-placeholder-text {
-  font-size: 0.95rem;
-  color: var(--gray-500);
-  margin-bottom: 0.5rem;
-}
-
-.booking-placeholder-hint {
-  font-size: 0.8rem;
-  color: var(--gray-300);
-}
-
-/* ===== ANNOUNCEMENTS TAB ===== */
-.announcements-container {
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.announcements-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--navy);
-  margin-bottom: 1.5rem;
-  letter-spacing: 0.05em;
-}
-
-.announcement-empty {
-  background: #fff;
-  border-radius: var(--radius-lg);
-  padding: 3rem 2rem;
-  text-align: center;
-  box-shadow: var(--shadow-sm);
-}
-
-.announcement-empty-icon {
-  width: 56px;
-  height: 56px;
-  background: var(--gray-100);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-}
-
-.announcement-empty-icon svg {
-  width: 24px;
-  height: 24px;
-  stroke: var(--gray-300);
-  fill: none;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.announcement-empty-text {
-  font-size: 0.9rem;
-  color: var(--gray-500);
-}
-
-/* Announcement Cards (Google Sheets powered) */
-/* ===== BOOKING LIST ===== */
-.bklist-date-group {
-  margin-bottom: 1.5rem;
-}
-
-.bklist-date-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: var(--navy);
-  color: #fff;
-  border-radius: var(--radius-sm);
-  font-family: 'Oswald', sans-serif;
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
-}
-
-.bklist-date-header svg {
-  width: 18px;
-  height: 18px;
-  stroke: var(--coral);
-  stroke-width: 2;
-  fill: none;
-  flex-shrink: 0;
-}
-
-.bklist-slot {
-  background: #fff;
-  border-radius: var(--radius-md);
-  padding: 1rem 1.25rem;
-  margin-bottom: 0.5rem;
-  box-shadow: var(--shadow-sm);
-  border-left: 4px solid var(--coral);
-}
-
-.bklist-slot-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.6rem;
-  padding-bottom: 0.6rem;
-  border-bottom: 1px solid var(--gray-200);
-}
-
-.bklist-slot-info {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--charcoal);
-}
-
-.bklist-slot-info span {
-  color: var(--gray-500);
-  font-weight: 400;
-  margin-left: 0.3rem;
-}
-
-.bklist-slot-count {
-  font-size: 0.8rem;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.bklist-slot-count.full {
-  background: #ffe0e0;
-  color: #c0392b;
-}
-
-.bklist-slot-count.has-space {
-  background: #e0f5e0;
-  color: #27ae60;
-}
-
-.bklist-member {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.4rem 0;
-  font-size: 0.88rem;
-}
-
-.bklist-member + .bklist-member {
-  border-top: 1px dashed var(--gray-200);
-}
-
-.bklist-member-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--gray-100);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.bklist-member-icon svg {
-  width: 14px;
-  height: 14px;
-  stroke: var(--gray-500);
-  stroke-width: 2;
-  fill: none;
-}
-
-.bklist-member-name {
-  font-weight: 500;
-  color: var(--charcoal);
-}
-
-.bklist-member-time {
-  font-size: 0.75rem;
-  color: var(--gray-500);
-  margin-left: auto;
-}
-
-.bklist-empty {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: var(--gray-500);
-  font-size: 0.95rem;
-}
-
-.bklist-empty svg {
-  width: 48px;
-  height: 48px;
-  stroke: var(--gray-300);
-  stroke-width: 1.5;
-  fill: none;
-  display: block;
-  margin: 0 auto 1rem;
-}
-
-.announce-card {
-  background: #fff;
-  border-radius: var(--radius-md);
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s ease;
-}
-
-.announce-card:hover {
-  box-shadow: var(--shadow-md);
-}
-
-.announce-card.important {
-  border-left: 4px solid var(--coral);
-}
-
-.announce-card-header {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 0.6rem;
-  flex-wrap: wrap;
-}
-
-.announce-date {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--gray-500);
-  letter-spacing: 0.05em;
-}
-
-.announce-badge-important {
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 2px 10px;
-  border-radius: 20px;
-  background: var(--coral);
-  color: #fff;
-  letter-spacing: 0.05em;
-}
-
-.announce-card h4 {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--navy);
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
-}
-
-.announce-card p {
-  font-size: 0.88rem;
-  color: var(--charcoal);
-  line-height: 1.8;
-  white-space: pre-wrap;
-}
-
-/* ===== BOOKING SYSTEM ===== */
-.booking-slots-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
+/* ===== SLOT CARDS ===== */
 .slot-card {
   background: #fff;
   border-radius: var(--radius-md);
@@ -1043,17 +772,13 @@ body {
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
+.category-future .slot-card {
+  border-left-color: var(--navy);
+}
+
 .slot-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
-}
-
-.slot-card-date {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--navy);
-  margin-bottom: 0.5rem;
 }
 
 .slot-card-info {
@@ -1117,7 +842,7 @@ body {
   cursor: not-allowed;
 }
 
-/* Booking Modal */
+/* ===== BOOKING MODAL ===== */
 .booking-modal-overlay {
   position: fixed;
   inset: 0;
@@ -1279,19 +1004,303 @@ body {
   color: var(--gray-500);
 }
 
-.booking-date-group {
+/* ===== BOOKING LIST ===== */
+.schedule-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.schedule-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--navy);
+  letter-spacing: 0.05em;
+}
+
+.schedule-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.refresh-button {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 6px 14px;
+  border: 1px solid var(--gray-200);
+  border-radius: 20px;
+  background: #fff;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.78rem;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.refresh-button:hover {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+
+.refresh-button svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bklist-date-group {
   margin-bottom: 1.5rem;
 }
 
-.booking-date-label {
+.bklist-date-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--navy);
+  color: #fff;
+  border-radius: var(--radius-sm);
   font-family: 'Oswald', sans-serif;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.bklist-date-header svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--coral);
+  stroke-width: 2;
+  fill: none;
+  flex-shrink: 0;
+}
+
+.bklist-slot {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.5rem;
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--coral);
+}
+
+.bklist-slot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.bklist-slot-info {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--charcoal);
+}
+
+.bklist-slot-info span {
+  color: var(--gray-500);
+  font-weight: 400;
+  margin-left: 0.3rem;
+}
+
+.bklist-slot-count {
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.bklist-slot-count.full {
+  background: #ffe0e0;
+  color: #c0392b;
+}
+
+.bklist-slot-count.has-space {
+  background: #e0f5e0;
+  color: #27ae60;
+}
+
+.bklist-member {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0;
+  font-size: 0.88rem;
+}
+
+.bklist-member + .bklist-member {
+  border-top: 1px dashed var(--gray-200);
+}
+
+.bklist-member-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bklist-member-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--gray-500);
+  stroke-width: 2;
+  fill: none;
+}
+
+.bklist-member-name {
+  font-weight: 500;
+  color: var(--charcoal);
+}
+
+.bklist-member-time {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-left: auto;
+}
+
+.bklist-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--gray-500);
+  font-size: 0.95rem;
+}
+
+.bklist-empty svg {
+  width: 48px;
+  height: 48px;
+  stroke: var(--gray-300);
+  stroke-width: 1.5;
+  fill: none;
+  display: block;
+  margin: 0 auto 1rem;
+}
+
+/* ===== ANNOUNCEMENTS ===== */
+.announcements-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.announcements-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--navy);
-  padding-bottom: 0.5rem;
-  margin-bottom: 0.8rem;
-  border-bottom: 2px solid var(--gray-100);
-  letter-spacing: 0.03em;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.05em;
+}
+
+.announcement-empty {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.announcement-empty-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--gray-100);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.announcement-empty-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--gray-300);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.announcement-empty-text {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+}
+
+.announce-card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease;
+}
+
+.announce-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.announce-card.important {
+  border-left: 4px solid var(--coral);
+}
+
+.announce-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.announce-date {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--gray-500);
+  letter-spacing: 0.05em;
+}
+
+.announce-badge-important {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: var(--coral);
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+.announce-card h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.announce-card p {
+  font-size: 0.88rem;
+  color: var(--charcoal);
+  line-height: 1.8;
+  white-space: pre-wrap;
 }
 
 /* ===== FOOTER ===== */
@@ -1329,17 +1338,20 @@ body {
     padding: 1rem;
   }
 
-  .schedule-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .category-toggle {
+    max-width: 100%;
   }
 
-  .schedule-table-wrapper {
-    display: none;
+  .calendar-day {
+    min-height: 40px;
   }
 
-  .schedule-cards {
-    display: block;
+  .day-number {
+    font-size: 0.82rem;
+  }
+
+  .day-lessons-grid {
+    grid-template-columns: 1fr;
   }
 
   .setup-card {
@@ -1351,12 +1363,9 @@ body {
     font-size: 0.85rem;
   }
 
-  .booking-header {
-    padding: 1rem 1.2rem;
-  }
-
-  .booking-iframe {
-    min-height: 500px;
+  .schedule-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
@@ -1377,6 +1386,31 @@ body {
 
   .navbar-member-badge {
     display: none;
+  }
+
+  .calendar-nav {
+    padding: 0.75rem 1rem;
+  }
+
+  .calendar-month-label {
+    font-size: 1rem;
+  }
+
+  .calendar-grid {
+    padding: 0.25rem 0.5rem 0.5rem;
+  }
+
+  .calendar-day {
+    min-height: 36px;
+  }
+
+  .day-number {
+    font-size: 0.78rem;
+  }
+
+  .day-dot {
+    width: 16px;
+    height: 3px;
   }
 }
 </style>
@@ -1425,13 +1459,11 @@ body {
     </div>
   </nav>
 
-  <!-- Tabs -->
+  <!-- Tabs (2 tabs: Schedule / Announcements) -->
   <div class="tabs-container">
     <div class="tabs" id="tabs">
       <div class="tab-slider" id="tab-slider"></div>
       <button class="tab-button active" data-tab="schedule">スケジュール</button>
-      <button class="tab-button" data-tab="booking">予約</button>
-      <button class="tab-button" data-tab="bookinglist">予約一覧</button>
       <button class="tab-button" data-tab="announcements">お知らせ</button>
     </div>
   </div>
@@ -1439,40 +1471,42 @@ body {
   <!-- Tab Panels -->
   <div class="tab-panels">
 
-    <!-- Schedule Panel -->
-    <div class="tab-panel active" id="panel-schedule">
-      <div class="schedule-header">
-        <h2 class="schedule-title">Schedule</h2>
-        <div class="schedule-meta">
-          <span class="last-updated" id="last-updated"></span>
-          <button class="refresh-button" id="refresh-button" onclick="fetchSchedule()">
-            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-            更新
+    <!-- Schedule + Booking Panel (Calendar View) -->
+    <div class="tab-panel active category-kids" id="panel-schedule">
+      <!-- Category Toggle -->
+      <div class="category-toggle">
+        <button class="category-btn active" data-category="kids">KIDS</button>
+        <button class="category-btn" data-category="future">FUTURE</button>
+      </div>
+
+      <!-- Calendar -->
+      <div class="calendar-container" id="calendar-container">
+        <div class="calendar-nav">
+          <button class="calendar-nav-btn" onclick="changeMonth(-1)" aria-label="前の月">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <span class="calendar-month-label" id="calendar-month-label"></span>
+          <button class="calendar-nav-btn" onclick="changeMonth(1)" aria-label="次の月">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </button>
         </div>
-      </div>
-      <div id="schedule-content">
-        <!-- Content loaded dynamically -->
-      </div>
-    </div>
-
-    <!-- Booking Panel -->
-    <div class="tab-panel" id="panel-booking">
-      <div class="schedule-header">
-        <h2 class="schedule-title">Reservation</h2>
-        <div class="schedule-meta">
-          <button class="refresh-button" onclick="fetchBookingSlots()">
-            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-            空き更新
-          </button>
+        <div class="calendar-weekdays">
+          <span class="calendar-weekday">月</span>
+          <span class="calendar-weekday">火</span>
+          <span class="calendar-weekday">水</span>
+          <span class="calendar-weekday">木</span>
+          <span class="calendar-weekday">金</span>
+          <span class="calendar-weekday">土</span>
+          <span class="calendar-weekday">日</span>
         </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
       </div>
-      <div id="booking-content">
-        <!-- Slots loaded dynamically -->
-      </div>
+
+      <!-- Selected Date Lessons -->
+      <div id="day-lessons"></div>
     </div>
 
-    <!-- Booking Modal (outside panels) -->
+    <!-- Booking Modal -->
     <div class="booking-modal-overlay" id="booking-modal">
       <div class="booking-modal">
         <div id="booking-modal-body">
@@ -1502,22 +1536,6 @@ body {
       </div>
     </div>
 
-    <!-- Booking List Panel -->
-    <div class="tab-panel" id="panel-bookinglist">
-      <div class="schedule-header">
-        <h2 class="schedule-title">Booking List</h2>
-        <div class="schedule-meta">
-          <button class="refresh-button" onclick="fetchBookingList()">
-            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-            更新
-          </button>
-        </div>
-      </div>
-      <div id="bookinglist-content">
-        <!-- Loaded dynamically -->
-      </div>
-    </div>
-
     <!-- Announcements Panel -->
     <div class="tab-panel" id="panel-announcements">
       <div class="announcements-container">
@@ -1528,9 +1546,7 @@ body {
             更新
           </button>
         </div>
-        <div id="announcements-content">
-          <!-- Loaded from Google Sheets -->
-        </div>
+        <div id="announcements-content"></div>
       </div>
     </div>
 
@@ -1545,16 +1561,18 @@ body {
 
 <script>
 // ===== CONFIGURATION =====
-const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE'; // Google SpreadsheetのIDをここに入力
-const SHEET_NAME = 'Sheet1'; // スケジュール用シート名
-const ANNOUNCE_SHEET = 'お知らせ'; // お知らせ用シート名（列: 日付 | タイトル | 内容 | 重要度）
-const PASSWORD = 'btm2025'; // メンバーパスワード
-const APPS_SCRIPT_URL = ''; // Google Apps ScriptのウェブアプリURLをここに入力（セットアップ手順はbooking-setup.htmlを参照）
-const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 自動更新間隔（5分）
-const DEMO_MODE = true; // trueならデモデータで動作（テスト用）。本番ではfalseに変更
+const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE';
+const ANNOUNCE_SHEET = 'お知らせ';
+const PASSWORD = 'btm2025';
+const APPS_SCRIPT_URL = '';
+const DEMO_MODE = true;
 // =========================
 
-let autoRefreshTimer = null;
+// ===== STATE =====
+var currentCategory = 'kids';
+var currentMonth = new Date();
+var selectedDate = null;
+var allSlots = []; // Populated from demo or API
 
 // ===== DEMO DATA =====
 var demoSlots = [
@@ -1577,14 +1595,12 @@ var demoAnnouncements = [
 
 // ===== PASSWORD GATE =====
 (function initGate() {
-  const gate = document.getElementById('password-gate');
-  const mainContent = document.getElementById('main-content');
-  const form = document.getElementById('gate-form');
-  const input = document.getElementById('gate-input');
-  const inputWrapper = document.getElementById('gate-input-wrapper');
-  const errorEl = document.getElementById('gate-error');
+  var gate = document.getElementById('password-gate');
+  var form = document.getElementById('gate-form');
+  var input = document.getElementById('gate-input');
+  var inputWrapper = document.getElementById('gate-input-wrapper');
+  var errorEl = document.getElementById('gate-error');
 
-  // Check sessionStorage
   if (sessionStorage.getItem('btm_authenticated') === 'true') {
     gate.classList.add('hidden');
     showMainContent();
@@ -1593,26 +1609,18 @@ var demoAnnouncements = [
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
-    const value = input.value.trim();
-
+    var value = input.value.trim();
     if (value === PASSWORD) {
       sessionStorage.setItem('btm_authenticated', 'true');
       gate.classList.add('hidden');
       setTimeout(showMainContent, 300);
     } else {
-      // Show error with shake
       errorEl.classList.add('visible');
       inputWrapper.classList.add('shake');
       input.value = '';
       input.focus();
-
-      setTimeout(function() {
-        inputWrapper.classList.remove('shake');
-      }, 500);
-
-      setTimeout(function() {
-        errorEl.classList.remove('visible');
-      }, 3000);
+      setTimeout(function() { inputWrapper.classList.remove('shake'); }, 500);
+      setTimeout(function() { errorEl.classList.remove('visible'); }, 3000);
     }
   });
 })();
@@ -1620,16 +1628,14 @@ var demoAnnouncements = [
 function showMainContent() {
   var mainContent = document.getElementById('main-content');
   mainContent.style.display = 'block';
-  // Force reflow to enable transition
   void mainContent.offsetHeight;
   mainContent.classList.add('visible');
 
   initTabs();
-  initBooking();
-  fetchSchedule();
-  fetchBookingList();
+  initCategoryToggle();
+  initCalendar();
+  initBookingModal();
   fetchAnnouncements();
-  startAutoRefresh();
 }
 
 // ===== TAB NAVIGATION =====
@@ -1642,299 +1648,63 @@ function initTabs() {
     slider.style.transform = 'translateX(' + (button.offsetLeft - 4) + 'px)';
   }
 
-  // Initialize slider position
   var activeBtn = document.querySelector('.tab-button.active');
-  if (activeBtn) {
-    updateSlider(activeBtn);
-  }
+  if (activeBtn) updateSlider(activeBtn);
 
   buttons.forEach(function(button) {
     button.addEventListener('click', function() {
       var tabName = this.getAttribute('data-tab');
-
-      // Update active button
       buttons.forEach(function(b) { b.classList.remove('active'); });
       this.classList.add('active');
-
-      // Slide indicator
       updateSlider(this);
-
-      // Show corresponding panel
-      document.querySelectorAll('.tab-panel').forEach(function(p) {
-        p.classList.remove('active');
-      });
+      document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
       document.getElementById('panel-' + tabName).classList.add('active');
     });
   });
 
-  // Recalculate slider on resize
   window.addEventListener('resize', function() {
     var active = document.querySelector('.tab-button.active');
     if (active) updateSlider(active);
   });
 }
 
-// ===== SCHEDULE: GOOGLE SHEETS INTEGRATION =====
-function fetchSchedule() {
-  var container = document.getElementById('schedule-content');
-  var refreshBtn = document.getElementById('refresh-button');
+// ===== CATEGORY TOGGLE (KIDS / FUTURE) =====
+function initCategoryToggle() {
+  var buttons = document.querySelectorAll('.category-btn');
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var cat = this.getAttribute('data-category');
+      currentCategory = cat;
+      buttons.forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
 
-  // Demo mode: show demo schedule
-  if (DEMO_MODE) {
-    var tableHtml = '<div class="schedule-table-wrapper"><table class="schedule-table"><thead><tr>' +
-      '<th>日付</th><th>スタジオ</th><th>時間</th><th>クラス</th><th>ステータス</th></tr></thead><tbody>';
-    var cardsHtml = '<div class="schedule-cards">';
-    demoSlots.forEach(function(s) {
-      var extraBooked = demoBookings.filter(function(b) {
-        return b.date === s.date && b.studio === s.studio && b.time === s.time;
-      }).length;
-      var avail = Math.max(0, s.available - extraBooked);
-      var status = avail === 0 ? '満員' : avail <= 2 ? '残りわずか' : '空きあり';
-      tableHtml += '<tr><td>' + escapeHtml(s.date) + '</td><td>' + escapeHtml(s.studio) +
-        '</td><td>' + escapeHtml(s.time) + '</td><td>' + escapeHtml(s.class_name) +
-        '</td><td>' + renderStatusBadge(status) + '</td></tr>';
-      cardsHtml += '<div class="schedule-card-item"><div class="schedule-card-date">' +
-        escapeHtml(s.date) + '</div>' +
-        '<div class="schedule-card-detail"><span class="schedule-card-label">スタジオ</span><span>' + escapeHtml(s.studio) + '</span></div>' +
-        '<div class="schedule-card-detail"><span class="schedule-card-label">時間</span><span>' + escapeHtml(s.time) + '</span></div>' +
-        '<div class="schedule-card-detail"><span class="schedule-card-label">クラス</span><span>' + escapeHtml(s.class_name) + '</span></div>' +
-        '<div class="schedule-card-detail"><span class="schedule-card-label">ステータス</span>' + renderStatusBadge(status) + '</div></div>';
+      var panel = document.getElementById('panel-schedule');
+      panel.classList.remove('category-kids', 'category-future');
+      panel.classList.add('category-' + cat);
+
+      selectedDate = null;
+      document.getElementById('day-lessons').innerHTML = '';
+      renderCalendar();
     });
-    tableHtml += '</tbody></table></div>';
-    cardsHtml += '</div>';
-    container.innerHTML = tableHtml + cardsHtml;
-    updateTimestamp();
-    return;
-  }
-
-  // Check if spreadsheet ID is configured
-  if (!SPREADSHEET_ID || SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
-    showSetupInstructions(container);
-    return;
-  }
-
-  // Show loading
-  container.innerHTML =
-    '<div class="loading-container">' +
-      '<div class="spinner"></div>' +
-      '<span class="loading-text">スケジュールを読み込み中...</span>' +
-    '</div>';
-
-  refreshBtn.classList.add('spinning');
-
-  var url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID +
-    '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
-
-  // Use JSONP-style fetch since Google Visualization API returns a callback-wrapped response
-  var callbackName = 'googleSheetsCallback_' + Date.now();
-
-  // Fetch via XMLHttpRequest and parse manually
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
-  xhr.onload = function() {
-    refreshBtn.classList.remove('spinning');
-
-    if (xhr.status === 200) {
-      try {
-        // Google returns: google.visualization.Query.setResponse({...})
-        var text = xhr.responseText;
-        var jsonStart = text.indexOf('{');
-        var jsonEnd = text.lastIndexOf('}');
-        var jsonStr = text.substring(jsonStart, jsonEnd + 1);
-        var data = JSON.parse(jsonStr);
-
-        if (data.status === 'ok' && data.table) {
-          renderSchedule(data.table, container);
-          updateTimestamp();
-        } else {
-          showError(container, 'データの読み込みに失敗しました');
-        }
-      } catch (e) {
-        showError(container, 'データの解析に失敗しました: ' + e.message);
-      }
-    } else {
-      showError(container, 'スプレッドシートに接続できません (HTTP ' + xhr.status + ')');
-    }
-  };
-  xhr.onerror = function() {
-    refreshBtn.classList.remove('spinning');
-    showError(container, 'ネットワークエラーが発生しました');
-  };
-  xhr.send();
-}
-
-function renderSchedule(table, container) {
-  var cols = table.cols || [];
-  var rows = table.rows || [];
-
-  if (rows.length === 0) {
-    container.innerHTML =
-      '<div class="error-container">' +
-        '<div class="error-icon">&#128196;</div>' +
-        '<p class="error-message">スケジュールデータがありません</p>' +
-      '</div>';
-    return;
-  }
-
-  // Get column headers
-  var headers = cols.map(function(col) {
-    return col.label || '';
-  });
-
-  // Build table HTML (desktop)
-  var tableHtml = '<div class="schedule-table-wrapper"><table class="schedule-table"><thead><tr>';
-  headers.forEach(function(h) {
-    tableHtml += '<th>' + escapeHtml(h) + '</th>';
-  });
-  tableHtml += '</tr></thead><tbody>';
-
-  rows.forEach(function(row) {
-    tableHtml += '<tr>';
-    var cells = row.c || [];
-    cells.forEach(function(cell, i) {
-      var value = cell ? (cell.f || cell.v || '') : '';
-      value = String(value);
-
-      // Check if this is a status column (by header name)
-      var headerLower = (headers[i] || '').toLowerCase();
-      if (headerLower.indexOf('ステータス') !== -1 || headerLower.indexOf('status') !== -1) {
-        tableHtml += '<td>' + renderStatusBadge(value) + '</td>';
-      } else {
-        tableHtml += '<td>' + escapeHtml(value) + '</td>';
-      }
-    });
-    tableHtml += '</tr>';
-  });
-
-  tableHtml += '</tbody></table></div>';
-
-  // Build card HTML (mobile)
-  var cardsHtml = '<div class="schedule-cards">';
-  rows.forEach(function(row) {
-    var cells = row.c || [];
-    var firstValue = cells[0] ? (cells[0].f || cells[0].v || '') : '';
-    cardsHtml += '<div class="schedule-card-item">';
-    cardsHtml += '<div class="schedule-card-date">' + escapeHtml(String(firstValue)) + '</div>';
-
-    for (var i = 1; i < cells.length; i++) {
-      var val = cells[i] ? (cells[i].f || cells[i].v || '') : '';
-      val = String(val);
-      var header = headers[i] || '';
-      var headerLower = header.toLowerCase();
-
-      cardsHtml += '<div class="schedule-card-detail">';
-      cardsHtml += '<span class="schedule-card-label">' + escapeHtml(header) + '</span>';
-
-      if (headerLower.indexOf('ステータス') !== -1 || headerLower.indexOf('status') !== -1) {
-        cardsHtml += renderStatusBadge(val);
-      } else {
-        cardsHtml += '<span>' + escapeHtml(val) + '</span>';
-      }
-
-      cardsHtml += '</div>';
-    }
-
-    cardsHtml += '</div>';
-  });
-  cardsHtml += '</div>';
-
-  container.innerHTML = tableHtml + cardsHtml;
-}
-
-function renderStatusBadge(value) {
-  var lower = value.toLowerCase();
-  var cls = 'status-default';
-
-  if (lower.indexOf('空き') !== -1 || lower.indexOf('open') !== -1 || lower === 'ok' || lower === 'o') {
-    cls = 'status-open';
-  } else if (lower.indexOf('満') !== -1 || lower.indexOf('closed') !== -1 || lower === 'x' || lower.indexOf('締切') !== -1) {
-    cls = 'status-closed';
-  } else if (lower.indexOf('残') !== -1 || lower.indexOf('few') !== -1 || lower.indexOf('わずか') !== -1) {
-    cls = 'status-few';
-  }
-
-  return '<span class="status-badge ' + cls + '">' + escapeHtml(value) + '</span>';
-}
-
-function showSetupInstructions(container) {
-  container.innerHTML =
-    '<div class="setup-card">' +
-      '<h3>Google Spreadsheet Setup</h3>' +
-      '<p class="setup-subtitle">スケジュール表示にはGoogleスプレッドシートの設定が必要です</p>' +
-      '<ol class="setup-steps">' +
-        '<li>Googleスプレッドシートを新規作成します</li>' +
-        '<li>以下のカラムを追加してください:' +
-          '<div class="setup-columns">' +
-            '<span class="setup-column-tag">日付</span>' +
-            '<span class="setup-column-tag">スタジオ</span>' +
-            '<span class="setup-column-tag">時間</span>' +
-            '<span class="setup-column-tag">クラス</span>' +
-            '<span class="setup-column-tag">ステータス</span>' +
-            '<span class="setup-column-tag">備考</span>' +
-          '</div>' +
-        '</li>' +
-        '<li><strong>ファイル</strong> &rarr; <strong>共有</strong> &rarr; <strong>ウェブに公開</strong> を選択し、公開設定を行います</li>' +
-        '<li>スプレッドシートのURLからIDをコピーします<br>' +
-          '<code>https://docs.google.com/spreadsheets/d/<strong>ここがID</strong>/edit</code>' +
-        '</li>' +
-        '<li>このHTMLファイルのJavaScript内の<br>' +
-          '<code>YOUR_SPREADSHEET_ID_HERE</code> をコピーしたIDに置き換えます' +
-        '</li>' +
-      '</ol>' +
-    '</div>';
-}
-
-function showError(container, message) {
-  container.innerHTML =
-    '<div class="error-container">' +
-      '<div class="error-icon">&#9888;</div>' +
-      '<p class="error-message">' + escapeHtml(message) + '</p>' +
-      '<button class="error-retry" onclick="fetchSchedule()">再読み込み</button>' +
-    '</div>';
-}
-
-function updateTimestamp() {
-  var el = document.getElementById('last-updated');
-  var now = new Date();
-  var h = String(now.getHours()).padStart(2, '0');
-  var m = String(now.getMinutes()).padStart(2, '0');
-  el.textContent = '最終更新: ' + h + ':' + m;
-}
-
-function startAutoRefresh() {
-  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-  autoRefreshTimer = setInterval(function() {
-    if (SPREADSHEET_ID && SPREADSHEET_ID !== 'YOUR_SPREADSHEET_ID_HERE') {
-      fetchSchedule();
-    }
-  }, AUTO_REFRESH_INTERVAL);
-}
-
-// ===== BOOKING SYSTEM (Google Sheets + Apps Script) =====
-var currentBookingSlot = null;
-
-function initBooking() {
-  fetchBookingSlots();
-
-  // Modal close on overlay click
-  document.getElementById('booking-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeBookingModal();
-  });
-
-  // Booking form submit
-  document.getElementById('booking-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    submitBooking();
   });
 }
 
-function fetchBookingSlots() {
-  var container = document.getElementById('booking-content');
+// ===== CALENDAR =====
+function isKidsSlot(slot) {
+  var cn = (slot.class_name || '').toLowerCase();
+  return cn.indexOf('kids') !== -1 || cn.indexOf('teen') !== -1 || cn.indexOf('レベルアップ') !== -1;
+}
 
-  // Demo mode: use local data
+function isFutureSlot(slot) {
+  var cn = (slot.class_name || '').toLowerCase();
+  return cn.indexOf('future') !== -1;
+}
+
+function getFilteredSlots() {
+  var filterFn = currentCategory === 'kids' ? isKidsSlot : isFutureSlot;
+
   if (DEMO_MODE) {
-    // Recalculate availability based on demo bookings
-    var slots = demoSlots.map(function(s) {
+    return demoSlots.filter(filterFn).map(function(s) {
       var extraBooked = demoBookings.filter(function(b) {
         return b.date === s.date && b.studio === s.studio && b.time === s.time;
       }).length;
@@ -1944,119 +1714,216 @@ function fetchBookingSlots() {
         available: Math.max(0, s.available - extraBooked)
       };
     });
-    renderBookingSlots(slots, container);
-    return;
   }
 
-  if (!APPS_SCRIPT_URL) {
-    showBookingSetup(container);
-    return;
+  return allSlots.filter(filterFn);
+}
+
+function initCalendar() {
+  if (!DEMO_MODE && APPS_SCRIPT_URL) {
+    fetchSlotsFromAPI(function() { renderCalendar(); });
+  } else {
+    renderCalendar();
   }
+}
 
-  container.innerHTML =
-    '<div class="loading-container">' +
-      '<div class="spinner"></div>' +
-      '<span class="loading-text">空きレッスンを読み込み中...</span>' +
-    '</div>';
-
-  var url = APPS_SCRIPT_URL + '?action=slots';
+function fetchSlotsFromAPI(callback) {
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
+  xhr.open('GET', APPS_SCRIPT_URL + '?action=slots', true);
   xhr.onload = function() {
     if (xhr.status === 200) {
-      try {
-        var data = JSON.parse(xhr.responseText);
-        renderBookingSlots(data, container);
-      } catch (e) {
-        showError(container, 'データの解析に失敗しました');
-      }
-    } else {
-      showError(container, '接続に失敗しました (HTTP ' + xhr.status + ')');
+      try { allSlots = JSON.parse(xhr.responseText); } catch(e) { allSlots = []; }
     }
+    if (callback) callback();
   };
-  xhr.onerror = function() {
-    showError(container, 'ネットワークエラーが発生しました');
-  };
+  xhr.onerror = function() { if (callback) callback(); };
   xhr.send();
 }
 
-function renderBookingSlots(slots, container) {
-  if (!slots || slots.length === 0) {
+function renderCalendar() {
+  var year = currentMonth.getFullYear();
+  var month = currentMonth.getMonth();
+
+  document.getElementById('calendar-month-label').textContent = year + '年 ' + (month + 1) + '月';
+
+  var grid = document.getElementById('calendar-grid');
+  var firstDay = new Date(year, month, 1).getDay();
+  var startOffset = (firstDay + 6) % 7; // Monday = 0
+  var daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  var today = new Date();
+  var todayStr = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+
+  var filteredSlots = getFilteredSlots();
+  var lessonDates = {};
+  filteredSlots.forEach(function(s) { lessonDates[s.date] = true; });
+
+  var html = '';
+
+  // Empty cells for offset
+  for (var i = 0; i < startOffset; i++) {
+    html += '<div class="calendar-day empty"></div>';
+  }
+
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dateStr = year + '/' + String(month + 1).padStart(2, '0') + '/' + String(d).padStart(2, '0');
+    var classes = ['calendar-day'];
+    if (dateStr === todayStr) classes.push('today');
+    if (dateStr === selectedDate) classes.push('selected');
+    if (lessonDates[dateStr]) classes.push('has-lessons');
+
+    html += '<div class="' + classes.join(' ') + '" onclick="selectDate(\'' + dateStr + '\')">';
+    html += '<span class="day-number">' + d + '</span>';
+    if (lessonDates[dateStr]) html += '<span class="day-dot"></span>';
+    html += '</div>';
+  }
+
+  grid.innerHTML = html;
+
+  // Re-render lessons if a date is selected
+  if (selectedDate) {
+    renderDayLessons(selectedDate);
+  }
+}
+
+function selectDate(dateStr) {
+  selectedDate = dateStr;
+  renderCalendar();
+  renderDayLessons(dateStr);
+
+  // Smooth scroll to lessons on mobile
+  var lessonsEl = document.getElementById('day-lessons');
+  if (lessonsEl && window.innerWidth <= 768) {
+    setTimeout(function() {
+      lessonsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+}
+
+function changeMonth(delta) {
+  currentMonth.setMonth(currentMonth.getMonth() + delta);
+  selectedDate = null;
+  document.getElementById('day-lessons').innerHTML = '';
+  renderCalendar();
+}
+
+function getSlotMembers(slot) {
+  var members = [];
+  if (!DEMO_MODE) return members;
+
+  var names = ['田中さくら','鈴木はると','佐藤ゆい','山田れん','高橋あおい','伊藤そら','渡辺ひなた','中村みお'];
+  var baseSlot = demoSlots.find(function(s) {
+    return s.date === slot.date && s.studio === slot.studio && s.time === slot.time;
+  });
+  if (baseSlot) {
+    for (var i = 0; i < baseSlot.booked; i++) {
+      members.push({ name: names[i % names.length], booked_at: '03/18 10:' + String(10 + i * 5).padStart(2, '0') });
+    }
+  }
+
+  demoBookings.filter(function(b) {
+    return b.date === slot.date && b.studio === slot.studio && b.time === slot.time;
+  }).forEach(function(b) {
+    members.push({
+      name: b.name,
+      booked_at: new Date(b.bookedAt).toLocaleString('ja-JP', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})
+    });
+  });
+
+  return members;
+}
+
+function renderDayLessons(dateStr) {
+  var container = document.getElementById('day-lessons');
+  var slots = getFilteredSlots().filter(function(s) { return s.date === dateStr; });
+
+  var parts = dateStr.split('/');
+  var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  var days = ['日', '月', '火', '水', '木', '金', '土'];
+  var dateLabel = parseInt(parts[1]) + '/' + parseInt(parts[2]) + '（' + days[dateObj.getDay()] + '）';
+
+  if (slots.length === 0) {
     container.innerHTML =
-      '<div class="error-container">' +
-        '<div class="error-icon">&#128197;</div>' +
-        '<p class="error-message">現在予約可能なレッスンはありません</p>' +
-      '</div>';
+      '<div class="day-lessons-header">' + escapeHtml(dateLabel) + '</div>' +
+      '<div class="day-lessons-empty">この日のレッスンはありません</div>';
     return;
   }
 
-  // Group by date
-  var grouped = {};
+  var html = '<div class="day-lessons-header">' + escapeHtml(dateLabel) + ' のレッスン</div>';
+  html += '<div class="day-lessons-grid">';
+
   slots.forEach(function(slot) {
-    var date = slot.date || '日付未定';
-    if (!grouped[date]) grouped[date] = [];
-    grouped[date].push(slot);
+    var available = slot.available || 0;
+    var spotClass = available <= 0 ? 'full' : available <= 2 ? 'few' : '';
+
+    html += '<div class="slot-card">';
+    html += '<div class="slot-card-info">';
+    html += '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>';
+    html += '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>';
+    html += '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
+    html += '</div>';
+    html += '<div class="slot-availability">';
+    html += '<span class="slot-spots ' + spotClass + '">残り <strong>' + available + '</strong> 枠</span>';
+
+    if (available > 0) {
+      html += '<button class="slot-book-btn" onclick=\'openBookingModal(' +
+        JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>予約する</button>';
+    } else {
+      html += '<button class="slot-book-btn" disabled>満員</button>';
+    }
+
+    html += '</div>';
+
+    // Show booked members
+    var members = getSlotMembers(slot);
+    if (members.length > 0) {
+      html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--gray-100)">';
+      html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin-bottom:0.4rem;">予約者 (' + members.length + '/' + (slot.max || 10) + '名)</div>';
+      members.forEach(function(m) {
+        html += '<div class="bklist-member">';
+        html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+        html += '<span class="bklist-member-name">' + escapeHtml(m.name) + '</span>';
+        if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
   });
 
-  var html = '';
-  Object.keys(grouped).forEach(function(date) {
-    html += '<div class="booking-date-group">';
-    html += '<div class="booking-date-label">' + escapeHtml(date) + '</div>';
-    html += '<div class="booking-slots-grid">';
-
-    grouped[date].forEach(function(slot, i) {
-      var available = slot.available || 0;
-      var spotClass = available <= 2 ? 'few' : '';
-      if (available <= 0) spotClass = 'full';
-
-      html += '<div class="slot-card">';
-      html += '<div class="slot-card-info">';
-      html += '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>';
-      html += '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>';
-      html += '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
-      html += '</div>';
-      html += '<div class="slot-availability">';
-      html += '<span class="slot-spots ' + spotClass + '">残り <strong>' + available + '</strong> 枠</span>';
-
-      if (available > 0) {
-        html += '<button class="slot-book-btn" onclick=\'openBookingModal(' +
-          JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>予約する</button>';
-      } else {
-        html += '<button class="slot-book-btn" disabled>満員</button>';
-      }
-
-      html += '</div>';
-      html += '</div>';
-    });
-
-    html += '</div></div>';
-  });
-
+  html += '</div>';
   container.innerHTML = html;
+}
+
+// ===== BOOKING MODAL =====
+var currentBookingSlot = null;
+
+function initBookingModal() {
+  document.getElementById('booking-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeBookingModal();
+  });
+
+  document.getElementById('booking-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    submitBooking();
+  });
 }
 
 function openBookingModal(slot) {
   currentBookingSlot = slot;
   var modal = document.getElementById('booking-modal');
-  var slotInfo = document.getElementById('booking-modal-slot');
 
-  slotInfo.innerHTML =
+  var slotHtml =
     '<span class="slot-tag">' + escapeHtml(slot.date || '') + '</span>' +
     '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>' +
     '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>' +
     '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
 
-  // Reset form
-  document.getElementById('booking-name').value = '';
-  document.getElementById('booking-phone').value = '';
-  document.getElementById('booking-submit-btn').disabled = false;
-  document.getElementById('booking-submit-btn').textContent = '予約する';
-
-  // Show form, hide success
   document.getElementById('booking-modal-body').innerHTML =
     '<h3>レッスン予約</h3>' +
     '<p class="booking-modal-sub">以下のレッスンを予約します</p>' +
-    '<div class="booking-modal-slot" id="booking-modal-slot">' + slotInfo.innerHTML + '</div>' +
+    '<div class="booking-modal-slot">' + slotHtml + '</div>' +
     '<form id="booking-form" onsubmit="event.preventDefault();submitBooking()">' +
       '<div class="booking-field">' +
         '<label>お名前 <span style="color:var(--coral)">*</span></label>' +
@@ -2065,6 +1932,11 @@ function openBookingModal(slot) {
       '<div class="booking-field">' +
         '<label>電話番号</label>' +
         '<input type="tel" id="booking-phone" placeholder="090-1234-5678">' +
+      '</div>' +
+      '<div class="booking-field">' +
+        '<label>メールアドレス</label>' +
+        '<input type="email" id="booking-email" placeholder="example@gmail.com">' +
+        '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">予約確認メールをお送りします</span>' +
       '</div>' +
       '<div class="booking-modal-actions">' +
         '<button type="button" class="booking-cancel-btn" onclick="closeBookingModal()">キャンセル</button>' +
@@ -2085,7 +1957,8 @@ function submitBooking() {
 
   var name = document.getElementById('booking-name').value.trim();
   var phone = document.getElementById('booking-phone').value.trim();
-  var email = document.getElementById('booking-email').value.trim();
+  var emailEl = document.getElementById('booking-email');
+  var email = emailEl ? emailEl.value.trim() : '';
 
   if (!name) {
     document.getElementById('booking-name').focus();
@@ -2096,7 +1969,6 @@ function submitBooking() {
   btn.disabled = true;
   btn.textContent = '送信中...';
 
-  // Demo mode: save to sessionStorage
   if (DEMO_MODE) {
     setTimeout(function() {
       demoBookings.push({
@@ -2120,38 +1992,21 @@ function submitBooking() {
     studio: currentBookingSlot.studio || '',
     time: currentBookingSlot.time || '',
     class_name: currentBookingSlot.class_name || '',
-    name: name,
-    phone: phone,
-    email: email
+    name: name, phone: phone, email: email
   });
 
-  var url = APPS_SCRIPT_URL + '?' + params.toString();
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
+  xhr.open('GET', APPS_SCRIPT_URL + '?' + params.toString(), true);
   xhr.onload = function() {
     if (xhr.status === 200) {
       try {
         var result = JSON.parse(xhr.responseText);
-        if (result.success) {
-          showBookingSuccess(name);
-        } else {
-          btn.disabled = false;
-          btn.textContent = '予約する';
-          alert(result.error || '予約に失敗しました');
-        }
-      } catch (e) {
-        showBookingSuccess(name); // Assume success if can't parse (no-cors)
-      }
-    } else {
-      btn.disabled = false;
-      btn.textContent = '予約する';
-      alert('通信エラーが発生しました');
-    }
+        if (result.success) { showBookingSuccess(name); }
+        else { btn.disabled = false; btn.textContent = '予約する'; alert(result.error || '予約に失敗しました'); }
+      } catch (e) { showBookingSuccess(name); }
+    } else { btn.disabled = false; btn.textContent = '予約する'; alert('通信エラーが発生しました'); }
   };
-  xhr.onerror = function() {
-    // Google Apps Script redirects may cause onerror with no-cors, treat as success
-    showBookingSuccess(name);
-  };
+  xhr.onerror = function() { showBookingSuccess(name); };
   xhr.send();
 }
 
@@ -2163,189 +2018,14 @@ function showBookingSuccess(name) {
       '<h4>予約完了！</h4>' +
       '<p>' + escapeHtml(name) + ' さんの予約を受け付けました</p>' +
       '<br>' +
-      '<button class="slot-book-btn" onclick="closeBookingModal();fetchBookingSlots();fetchBookingList();fetchSchedule();">閉じる</button>' +
+      '<button class="slot-book-btn" onclick="closeBookingModal();renderCalendar();if(selectedDate)renderDayLessons(selectedDate);">閉じる</button>' +
     '</div>';
 }
 
-function showBookingSetup(container) {
-  container.innerHTML =
-    '<div class="setup-card">' +
-      '<h3>予約システム セットアップ</h3>' +
-      '<p class="setup-subtitle">Google Sheets + Apps Scriptで無料の予約システムを構築します</p>' +
-      '<ol class="setup-steps">' +
-        '<li>Googleスプレッドシートを作成し、2つのシートを用意:<br>' +
-          '<div class="setup-columns" style="margin-top:0.5rem">' +
-            '<span class="setup-column-tag">スケジュール</span>' +
-            '<span class="setup-column-tag">予約一覧</span>' +
-          '</div>' +
-        '</li>' +
-        '<li>「スケジュール」シートに列を追加:' +
-          '<div class="setup-columns">' +
-            '<span class="setup-column-tag">日付</span>' +
-            '<span class="setup-column-tag">スタジオ</span>' +
-            '<span class="setup-column-tag">時間</span>' +
-            '<span class="setup-column-tag">クラス</span>' +
-            '<span class="setup-column-tag">定員</span>' +
-          '</div>' +
-        '</li>' +
-        '<li><code>booking-script.gs</code> のコードをApps Scriptエディタにコピー</li>' +
-        '<li>「デプロイ」→「新しいデプロイ」→「ウェブアプリ」で公開<br>' +
-          '<span style="font-size:0.8rem;color:var(--gray-500)">アクセス権: 「全員」に設定</span></li>' +
-        '<li>デプロイURLをこのHTMLの <code>APPS_SCRIPT_URL</code> に設定</li>' +
-      '</ol>' +
-    '</div>';
-}
-
-// ===== ANNOUNCEMENTS (Google Sheets) =====
-// ===== BOOKING LIST =====
-function fetchBookingList() {
-  var container = document.getElementById('bookinglist-content');
-
-  // Demo mode
-  if (DEMO_MODE) {
-    // Build demo booking list from demoSlots + demoBookings
-    var demoList = [];
-    var dateMap = {};
-
-    // Add pre-set bookings from demo slots
-    demoSlots.forEach(function(s) {
-      if (!dateMap[s.date]) dateMap[s.date] = {};
-      var slotKey = s.studio + '|' + s.time + '|' + s.class_name;
-      if (!dateMap[s.date][slotKey]) {
-        dateMap[s.date][slotKey] = {
-          studio: s.studio, time: s.time, class_name: s.class_name,
-          max: s.max, members: []
-        };
-      }
-      // Add fake pre-booked members
-      for (var i = 0; i < s.booked; i++) {
-        var names = ['田中さくら','鈴木はると','佐藤ゆい','山田れん','高橋あおい','伊藤そら','渡辺ひなた','中村みお'];
-        dateMap[s.date][slotKey].members.push({
-          name: names[i % names.length],
-          phone: '',
-          booked_at: '03/18 10:' + (10 + i * 5)
-        });
-      }
-    });
-
-    // Add session bookings
-    demoBookings.forEach(function(b) {
-      if (!dateMap[b.date]) dateMap[b.date] = {};
-      var slotKey = b.studio + '|' + b.time + '|' + b.class_name;
-      if (!dateMap[b.date][slotKey]) {
-        var slot = demoSlots.find(function(s) {
-          return s.date === b.date && s.studio === b.studio && s.time === b.time;
-        });
-        dateMap[b.date][slotKey] = {
-          studio: b.studio, time: b.time, class_name: b.class_name,
-          max: slot ? slot.max : 10, members: []
-        };
-      }
-      dateMap[b.date][slotKey].members.push({
-        name: b.name,
-        phone: b.phone || '',
-        booked_at: new Date(b.bookedAt).toLocaleString('ja-JP', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})
-      });
-    });
-
-    var dates = Object.keys(dateMap).sort();
-    var result = dates.map(function(d) {
-      var slots = Object.keys(dateMap[d]).map(function(k) { return dateMap[d][k]; });
-      return { date: d, slots: slots };
-    });
-
-    renderBookingList(result, container);
-    return;
-  }
-
-  if (!APPS_SCRIPT_URL) {
-    container.innerHTML = '<div class="bklist-empty">' +
-      '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' +
-      '<p>APPS_SCRIPT_URL を設定すると予約一覧が表示されます</p></div>';
-    return;
-  }
-
-  container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--gray-500);">読み込み中...</div>';
-
-  fetch(APPS_SCRIPT_URL + '?action=list')
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data.error) {
-        container.innerHTML = '<div class="bklist-empty"><p>' + escapeHtml(data.error) + '</p></div>';
-        return;
-      }
-      renderBookingList(data, container);
-    })
-    .catch(function(err) {
-      container.innerHTML = '<div class="bklist-empty"><p>読み込みエラー: ' + escapeHtml(err.message) + '</p></div>';
-    });
-}
-
-function renderBookingList(data, container) {
-  if (!data || data.length === 0) {
-    container.innerHTML = '<div class="bklist-empty">' +
-      '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' +
-      '<p>予約はまだありません</p></div>';
-    return;
-  }
-
-  var html = '';
-  var today = new Date();
-  today.setHours(0,0,0,0);
-
-  data.forEach(function(dateGroup) {
-    // Parse date for day of week
-    var parts = dateGroup.date.split('/');
-    var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-    var days = ['日','月','火','水','木','金','土'];
-    var dayStr = days[dateObj.getDay()];
-    var isPast = dateObj < today;
-
-    html += '<div class="bklist-date-group"' + (isPast ? ' style="opacity:0.5"' : '') + '>';
-    html += '<div class="bklist-date-header">';
-    html += '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
-    html += escapeHtml(dateGroup.date) + '（' + dayStr + '）';
-    if (isPast) html += ' <span style="font-size:0.75rem;opacity:0.7;margin-left:0.5rem">終了</span>';
-    html += '</div>';
-
-    dateGroup.slots.forEach(function(slot) {
-      var count = slot.members.length;
-      var max = slot.max || 10;
-      var isFull = count >= max;
-      var countClass = isFull ? 'full' : 'has-space';
-
-      html += '<div class="bklist-slot">';
-      html += '<div class="bklist-slot-header">';
-      html += '<div class="bklist-slot-info">' + escapeHtml(slot.class_name) +
-        '<span>' + escapeHtml(slot.studio) + ' / ' + escapeHtml(slot.time) + '</span></div>';
-      html += '<div class="bklist-slot-count ' + countClass + '">' + count + ' / ' + max + '名</div>';
-      html += '</div>';
-
-      if (count === 0) {
-        html += '<div style="color:var(--gray-500);font-size:0.85rem;padding:0.3rem 0;">予約者なし</div>';
-      } else {
-        slot.members.forEach(function(m) {
-          html += '<div class="bklist-member">';
-          html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
-          html += '<span class="bklist-member-name">' + escapeHtml(m.name) + '</span>';
-          if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
-          html += '</div>';
-        });
-      }
-
-      html += '</div>';
-    });
-
-    html += '</div>';
-  });
-
-  container.innerHTML = html;
-}
-
+// ===== ANNOUNCEMENTS =====
 function fetchAnnouncements() {
   var container = document.getElementById('announcements-content');
 
-  // Demo mode
   if (DEMO_MODE) {
     var html = '';
     for (var i = demoAnnouncements.length - 1; i >= 0; i--) {
@@ -2367,72 +2047,40 @@ function fetchAnnouncements() {
 
   if (!SPREADSHEET_ID || SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
     container.innerHTML =
-      '<div class="setup-card">' +
-        '<h3>お知らせセットアップ</h3>' +
-        '<p class="setup-subtitle">Googleスプレッドシートに「お知らせ」シートを追加してください</p>' +
-        '<ol class="setup-steps">' +
-          '<li>スケジュール用と同じスプレッドシートに新しいシートを追加</li>' +
-          '<li>シート名を「お知らせ」に変更</li>' +
-          '<li>以下のカラムを1行目に追加:' +
-            '<div class="setup-columns">' +
-              '<span class="setup-column-tag">日付</span>' +
-              '<span class="setup-column-tag">タイトル</span>' +
-              '<span class="setup-column-tag">内容</span>' +
-              '<span class="setup-column-tag">重要度</span>' +
-            '</div>' +
-          '</li>' +
-          '<li>重要度は「重要」と入力すると赤バッジが付きます（空欄=通常）</li>' +
-        '</ol>' +
-      '</div>';
+      '<div class="setup-card"><h3>お知らせセットアップ</h3>' +
+      '<p class="setup-subtitle">Googleスプレッドシートに「お知らせ」シートを追加してください</p>' +
+      '<ol class="setup-steps">' +
+        '<li>スプレッドシートに新しいシートを追加</li>' +
+        '<li>シート名を「お知らせ」に変更</li>' +
+        '<li>列を追加: <div class="setup-columns"><span class="setup-column-tag">日付</span><span class="setup-column-tag">タイトル</span><span class="setup-column-tag">内容</span><span class="setup-column-tag">重要度</span></div></li>' +
+        '<li>重要度は「重要」と入力すると赤バッジが付きます</li>' +
+      '</ol></div>';
     return;
   }
 
-  container.innerHTML =
-    '<div class="loading-container">' +
-      '<div class="spinner"></div>' +
-      '<span class="loading-text">お知らせを読み込み中...</span>' +
-    '</div>';
+  container.innerHTML = '<div class="loading-container"><div class="spinner"></div><span class="loading-text">お知らせを読み込み中...</span></div>';
 
-  var url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID +
-    '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(ANNOUNCE_SHEET);
-
+  var url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(ANNOUNCE_SHEET);
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
   xhr.onload = function() {
     if (xhr.status === 200) {
       try {
         var text = xhr.responseText;
-        var jsonStart = text.indexOf('{');
-        var jsonEnd = text.lastIndexOf('}');
-        var data = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
-
-        if (data.status === 'ok' && data.table) {
-          renderAnnouncements(data.table, container);
-        } else {
-          showAnnounceEmpty(container);
-        }
-      } catch (e) {
-        showAnnounceEmpty(container);
-      }
-    } else {
-      showAnnounceEmpty(container);
-    }
+        var data = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
+        if (data.status === 'ok' && data.table) { renderAnnouncements(data.table, container); }
+        else { showAnnounceEmpty(container); }
+      } catch (e) { showAnnounceEmpty(container); }
+    } else { showAnnounceEmpty(container); }
   };
-  xhr.onerror = function() {
-    showAnnounceEmpty(container);
-  };
+  xhr.onerror = function() { showAnnounceEmpty(container); };
   xhr.send();
 }
 
 function renderAnnouncements(table, container) {
   var rows = table.rows || [];
+  if (rows.length === 0) { showAnnounceEmpty(container); return; }
 
-  if (rows.length === 0) {
-    showAnnounceEmpty(container);
-    return;
-  }
-
-  // Reverse order (newest first)
   var html = '';
   for (var i = rows.length - 1; i >= 0; i--) {
     var cells = rows[i].c || [];
@@ -2447,26 +2095,20 @@ function renderAnnouncements(table, container) {
     html += '<div class="' + cardClass + '">';
     html += '<div class="announce-card-header">';
     html += '<span class="announce-date">' + escapeHtml(String(date)) + '</span>';
-    if (isImportant) {
-      html += '<span class="announce-badge-important">重要</span>';
-    }
+    if (isImportant) html += '<span class="announce-badge-important">重要</span>';
     html += '</div>';
     html += '<h4>' + escapeHtml(String(title)) + '</h4>';
     html += '<p>' + escapeHtml(String(content)) + '</p>';
     html += '</div>';
   }
-
   container.innerHTML = html;
 }
 
 function showAnnounceEmpty(container) {
   container.innerHTML =
-    '<div class="announcement-empty">' +
-      '<div class="announcement-empty-icon">' +
-        '<svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>' +
-      '</div>' +
-      '<p class="announcement-empty-text">お知らせはまだありません</p>' +
-    '</div>';
+    '<div class="announcement-empty"><div class="announcement-empty-icon">' +
+    '<svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>' +
+    '</div><p class="announcement-empty-text">お知らせはまだありません</p></div>';
 }
 
 // ===== UTILITIES =====
