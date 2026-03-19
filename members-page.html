@@ -552,21 +552,27 @@ body {
   background: var(--navy);
 }
 
-/* Lesson day background highlight */
+/* Lesson day highlight - border + background */
 .calendar-day.has-lessons {
-  background: rgba(255, 107, 53, 0.1);
+  background: rgba(255, 107, 53, 0.08);
+  border: 2px solid var(--coral);
 }
 
 .category-future .calendar-day.has-lessons {
-  background: rgba(13, 27, 42, 0.08);
+  background: rgba(13, 27, 42, 0.06);
+  border-color: var(--navy);
 }
 
 .calendar-day.has-lessons.today {
-  background: rgba(255, 107, 53, 0.2);
+  background: rgba(255, 107, 53, 0.18);
 }
 
 .category-future .calendar-day.has-lessons.today {
-  background: rgba(13, 27, 42, 0.15);
+  background: rgba(13, 27, 42, 0.12);
+}
+
+.calendar-day.has-lessons.selected {
+  border-color: transparent;
 }
 
 .day-dot {
@@ -1808,9 +1814,13 @@ function changeMonth(delta) {
 }
 
 function getSlotMembers(slot) {
-  var members = [];
-  if (!DEMO_MODE) return members;
+  // API mode: members are included in slot data from GAS
+  if (!DEMO_MODE) {
+    return slot.members || [];
+  }
 
+  // Demo mode: generate from demo data
+  var members = [];
   var names = ['田中さくら','鈴木はると','佐藤ゆい','山田れん','高橋あおい','伊藤そら','渡辺ひなた','中村みお'];
   var baseSlot = demoSlots.find(function(s) {
     return s.date === slot.date && s.studio === slot.studio && s.time === slot.time;
