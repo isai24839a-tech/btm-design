@@ -1467,6 +1467,25 @@ body {
   color: #fff;
 }
 
+.admin-time-picker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  grid-column: 1 / -1;
+}
+
+.admin-time-picker select {
+  flex: 1;
+  margin: 0 !important;
+}
+
+.admin-time-sep {
+  font-weight: 600;
+  color: var(--gray-500);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
 .admin-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2436,6 +2455,15 @@ function initAdminSlotForm() {
   var nextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
   var defaultEnd = nextMonth.getFullYear() + '-' + String(nextMonth.getMonth()+1).padStart(2,'0') + '-' + String(nextMonth.getDate()).padStart(2,'0');
 
+  // Generate time options (09:00 - 22:00, 10min intervals)
+  var timeOptions = '<option value="">--:--</option>';
+  for (var h = 9; h <= 22; h++) {
+    for (var m = 0; m < 60; m += 10) {
+      var tv = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+      timeOptions += '<option value="' + tv + '">' + tv + '</option>';
+    }
+  }
+
   var studioOptions =
     '<option value="若葉studio">若葉studio</option>' +
     '<option value="稲毛studio">稲毛studio</option>' +
@@ -2466,7 +2494,11 @@ function initAdminSlotForm() {
         '<div class="admin-form-grid">' +
           '<input type="date" id="admin-slot-date" value="' + defaultDate + '">' +
           '<select id="admin-slot-studio">' + studioOptions + '</select>' +
-          '<input type="text" id="admin-slot-time" placeholder="16:00〜17:00">' +
+          '<div class="admin-time-picker">' +
+            '<select id="admin-slot-time-start">' + timeOptions + '</select>' +
+            '<span class="admin-time-sep">〜</span>' +
+            '<select id="admin-slot-time-end">' + timeOptions + '</select>' +
+          '</div>' +
           '<input type="text" id="admin-slot-class" placeholder="KIDSクラス">' +
           '<div style="display:flex;align-items:center;gap:8px">' +
             '<input type="number" id="admin-slot-max" value="8" min="1" max="30" style="flex:1;margin:0">' +
@@ -2487,7 +2519,11 @@ function initAdminSlotForm() {
           '<div><label style="font-size:0.8rem;color:var(--gray-600)">開始日</label><input type="date" id="admin-bulk-start" value="' + defaultDate + '"></div>' +
           '<div><label style="font-size:0.8rem;color:var(--gray-600)">終了日</label><input type="date" id="admin-bulk-end" value="' + defaultEnd + '"></div>' +
           '<select id="admin-bulk-studio">' + studioOptions + '</select>' +
-          '<input type="text" id="admin-bulk-time" placeholder="16:00〜17:00">' +
+          '<div class="admin-time-picker">' +
+            '<select id="admin-bulk-time-start">' + timeOptions + '</select>' +
+            '<span class="admin-time-sep">〜</span>' +
+            '<select id="admin-bulk-time-end">' + timeOptions + '</select>' +
+          '</div>' +
           '<input type="text" id="admin-bulk-class" placeholder="KIDSクラス">' +
           '<div style="display:flex;align-items:center;gap:8px">' +
             '<input type="number" id="admin-bulk-max" value="8" min="1" max="30" style="flex:1;margin:0">' +
@@ -2594,13 +2630,15 @@ function updateBulkPreview() {
 function adminAddSlot() {
   var date = document.getElementById('admin-slot-date').value;
   var studio = document.getElementById('admin-slot-studio').value;
-  var time = document.getElementById('admin-slot-time').value.trim();
+  var tStart = document.getElementById('admin-slot-time-start').value;
+  var tEnd = document.getElementById('admin-slot-time-end').value;
+  var time = tStart && tEnd ? tStart + '〜' + tEnd : '';
   var className = document.getElementById('admin-slot-class').value.trim();
   var unlimited = document.getElementById('admin-slot-unlimited').checked;
   var max = unlimited ? 0 : (parseInt(document.getElementById('admin-slot-max').value) || 8);
   var category = document.getElementById('admin-slot-category').value;
 
-  if (!date || !studio || !time || !className) {
+  if (!date || !studio || !tStart || !tEnd || !className) {
     alert('すべての項目を入力してください');
     return;
   }
@@ -2631,13 +2669,15 @@ function adminBulkAddSlots() {
   }
 
   var studio = document.getElementById('admin-bulk-studio').value;
-  var time = document.getElementById('admin-bulk-time').value.trim();
+  var tStart = document.getElementById('admin-bulk-time-start').value;
+  var tEnd = document.getElementById('admin-bulk-time-end').value;
+  var time = tStart && tEnd ? tStart + '〜' + tEnd : '';
   var className = document.getElementById('admin-bulk-class').value.trim();
   var unlimited = document.getElementById('admin-bulk-unlimited').checked;
   var max = unlimited ? 0 : (parseInt(document.getElementById('admin-bulk-max').value) || 8);
   var category = document.getElementById('admin-bulk-category').value;
 
-  if (!studio || !time || !className) {
+  if (!studio || !tStart || !tEnd || !className) {
     alert('スタジオ・時間・クラス名を入力してください');
     return;
   }
