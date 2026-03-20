@@ -102,7 +102,8 @@ C:\Users\shirasaki910\Desktop\dance-studio\
 - 体験申し込みGoogleフォーム: https://docs.google.com/forms/d/e/1FAIpQLSck2gvaKBhbpE8hJqAwyume9r-ghJhlEAOaOUUXefHl5jGflQ/viewform
 
 ## 会員ページ設定
-- パスワード: `btm2025`（members-page.html内のPASSWORD変数で変更可）
+- 会員パスワード: `btm2025`（members-page.html内のPASSWORD変数）
+- 管理者パスワード: `btmadmin2026`（同じパスワード画面から管理モードに入る）
 
 ## 注意事項
 - 個人PJのためDropbox/claude_memory(GitHub同期)には保存しない

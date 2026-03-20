@@ -5,8 +5,8 @@
  * 1. Google Spreadsheet to create with 3 sheets:
  *
  *    Sheet "スケジュール" (columns):
- *    | date       | studio      | time          | class_name  | max |
- *    | 2026/03/22 | 若葉studio  | 16:00〜17:00   | KIDSクラス   | 8   |
+ *    | date       | studio      | time          | class_name  | max | category |
+ *    | 2026/03/22 | 若葉studio  | 16:00〜17:00   | KIDSクラス   | 8   | KIDS     |
  *
  *    Sheet "予約" (columns):
  *    | date       | studio      | time          | class_name  | name     | phone          | email              | booked_at        |
@@ -24,9 +24,17 @@
  * 5. Set DEMO_MODE = false in members-page.html
  *
  * === API ENDPOINTS ===
- * GET ?action=slots              → Returns all lesson slots with availability + members
- * GET ?action=book&date=...&...  → Creates a booking
+ * GET ?action=slots                          → All lesson slots with availability + members
+ * GET ?action=book&date=...&...              → Create a booking
+ * GET ?action=announcements                  → All announcements (with row numbers)
+ * GET ?action=addSlot&adminKey=...&...       → Add a lesson slot (admin)
+ * GET ?action=deleteSlot&adminKey=...&...    → Delete a lesson slot (admin)
+ * GET ?action=addAnnouncement&adminKey=...   → Add an announcement (admin)
+ * GET ?action=deleteAnnouncement&adminKey=...→ Delete an announcement (admin)
+ * GET ?action=cancelBooking&adminKey=...     → Cancel a booking (admin)
  */
+
+var ADMIN_KEY = 'btmadmin2026';
 
 function doGet(e) {
   var action = (e.parameter.action || '').toLowerCase();
@@ -38,6 +46,23 @@ function doGet(e) {
         return getSlots(ss);
       case 'book':
         return createBooking(ss, e.parameter);
+      case 'announcements':
+        return getAnnouncements(ss);
+      case 'addslot':
+        validateAdmin(e.parameter);
+        return addSlot(ss, e.parameter);
+      case 'deleteslot':
+        validateAdmin(e.parameter);
+        return deleteSlot(ss, e.parameter);
+      case 'addannouncement':
+        validateAdmin(e.parameter);
+        return addAnnouncement(ss, e.parameter);
+      case 'deleteannouncement':
+        validateAdmin(e.parameter);
+        return deleteAnnouncement(ss, e.parameter);
+      case 'cancelbooking':
+        validateAdmin(e.parameter);
+        return cancelBooking(ss, e.parameter);
       default:
         return jsonResponse({ error: 'Unknown action: ' + action });
     }
@@ -46,8 +71,14 @@ function doGet(e) {
   }
 }
 
+// ===== ADMIN VALIDATION =====
+function validateAdmin(params) {
+  if ((params.adminKey || '') !== ADMIN_KEY) {
+    throw new Error('管理者権限がありません');
+  }
+}
+
 // ===== GET SLOTS =====
-// Returns all slots with booked count, availability, and member list
 function getSlots(ss) {
   var schedSheet = ss.getSheetByName('スケジュール');
   if (!schedSheet) return jsonResponse([]);
@@ -55,9 +86,8 @@ function getSlots(ss) {
   var schedData = schedSheet.getDataRange().getValues();
   if (schedData.length <= 1) return jsonResponse([]);
 
-  // Load all bookings
   var bookingSheet = ss.getSheetByName('予約');
-  var bookingMap = {}; // key -> [{name, booked_at}]
+  var bookingMap = {};
 
   if (bookingSheet && bookingSheet.getLastRow() > 1) {
     var bookData = bookingSheet.getDataRange().getValues();
@@ -72,17 +102,17 @@ function getSlots(ss) {
     }
   }
 
-  // Build slot list
   var slots = [];
   for (var i = 1; i < schedData.length; i++) {
     var row = schedData[i];
-    if (!row[0]) continue; // skip empty rows
+    if (!row[0]) continue;
 
     var dateStr = formatDate(row[0]);
     var studio = String(row[1] || '');
     var time = String(row[2] || '');
     var className = String(row[3] || '');
     var max = parseInt(row[4]) || 10;
+    var category = String(row[5] || '');
     var key = dateStr + '|' + studio + '|' + time;
     var members = bookingMap[key] || [];
     var booked = members.length;
@@ -93,6 +123,7 @@ function getSlots(ss) {
       time: time,
       class_name: className,
       max: max,
+      category: category,
       booked: booked,
       available: Math.max(0, max - booked),
       members: members
@@ -104,19 +135,16 @@ function getSlots(ss) {
 
 // ===== CREATE BOOKING =====
 function createBooking(ss, params) {
-  // Validate required fields
   if (!params.name || !params.date || !params.studio || !params.time) {
     return jsonResponse({ success: false, error: '必須項目が不足しています' });
   }
 
-  // Ensure 予約 sheet exists
   var sheet = ss.getSheetByName('予約');
   if (!sheet) {
     sheet = ss.insertSheet('予約');
     sheet.appendRow(['date', 'studio', 'time', 'class_name', 'name', 'phone', 'email', 'booked_at']);
   }
 
-  // Check capacity
   var schedSheet = ss.getSheetByName('スケジュール');
   if (schedSheet) {
     var schedData = schedSheet.getDataRange().getValues();
@@ -130,7 +158,6 @@ function createBooking(ss, params) {
       }
     }
 
-    // Count existing bookings for this slot
     var bookData = sheet.getDataRange().getValues();
     var count = 0;
     for (var i = 1; i < bookData.length; i++) {
@@ -145,7 +172,6 @@ function createBooking(ss, params) {
       return jsonResponse({ success: false, error: 'このレッスンは満員です' });
     }
 
-    // Duplicate check (same name + same slot)
     for (var i = 1; i < bookData.length; i++) {
       if (String(bookData[i][0]) === params.date &&
           String(bookData[i][1]) === params.studio &&
@@ -156,7 +182,6 @@ function createBooking(ss, params) {
     }
   }
 
-  // Write booking
   var now = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'MM/dd HH:mm');
   sheet.appendRow([
     params.date,
@@ -170,6 +195,131 @@ function createBooking(ss, params) {
   ]);
 
   return jsonResponse({ success: true });
+}
+
+// ===== GET ANNOUNCEMENTS (with row numbers for admin delete) =====
+function getAnnouncements(ss) {
+  var sheet = ss.getSheetByName('お知らせ');
+  if (!sheet || sheet.getLastRow() <= 1) return jsonResponse([]);
+
+  var data = sheet.getDataRange().getValues();
+  var items = [];
+  for (var i = 1; i < data.length; i++) {
+    items.push({
+      row: i + 1,
+      date: formatDate(data[i][0]) || String(data[i][0] || ''),
+      title: String(data[i][1] || ''),
+      content: String(data[i][2] || ''),
+      importance: String(data[i][3] || '')
+    });
+  }
+  return jsonResponse(items);
+}
+
+// ===== ADMIN: ADD SLOT =====
+function addSlot(ss, params) {
+  if (!params.date || !params.studio || !params.time || !params.class_name) {
+    return jsonResponse({ success: false, error: '必須項目が不足しています' });
+  }
+
+  var sheet = ss.getSheetByName('スケジュール');
+  if (!sheet) {
+    sheet = ss.insertSheet('スケジュール');
+    sheet.appendRow(['date', 'studio', 'time', 'class_name', 'max', 'category']);
+  }
+
+  sheet.appendRow([
+    params.date,
+    params.studio,
+    params.time,
+    params.class_name,
+    parseInt(params.max) || 10,
+    params.category || ''
+  ]);
+
+  return jsonResponse({ success: true });
+}
+
+// ===== ADMIN: DELETE SLOT =====
+function deleteSlot(ss, params) {
+  if (!params.date || !params.studio || !params.time) {
+    return jsonResponse({ success: false, error: '必須項目が不足しています' });
+  }
+
+  var sheet = ss.getSheetByName('スケジュール');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートが見つかりません' });
+
+  var data = sheet.getDataRange().getValues();
+  var deleted = 0;
+  for (var i = data.length - 1; i >= 1; i--) {
+    if (formatDate(data[i][0]) === params.date &&
+        String(data[i][1]) === params.studio &&
+        String(data[i][2]) === params.time) {
+      sheet.deleteRow(i + 1);
+      deleted++;
+    }
+  }
+
+  return jsonResponse({ success: true, deleted: deleted });
+}
+
+// ===== ADMIN: ADD ANNOUNCEMENT =====
+function addAnnouncement(ss, params) {
+  if (!params.title) {
+    return jsonResponse({ success: false, error: 'タイトルは必須です' });
+  }
+
+  var sheet = ss.getSheetByName('お知らせ');
+  if (!sheet) {
+    sheet = ss.insertSheet('お知らせ');
+    sheet.appendRow(['日付', 'タイトル', '内容', '重要度']);
+  }
+
+  var date = params.date || Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd');
+  sheet.appendRow([date, params.title, params.content || '', params.importance || '']);
+
+  return jsonResponse({ success: true });
+}
+
+// ===== ADMIN: DELETE ANNOUNCEMENT =====
+function deleteAnnouncement(ss, params) {
+  var row = parseInt(params.row);
+  if (!row || row < 2) {
+    return jsonResponse({ success: false, error: '無効な行番号です' });
+  }
+
+  var sheet = ss.getSheetByName('お知らせ');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートが見つかりません' });
+
+  if (row > sheet.getLastRow()) {
+    return jsonResponse({ success: false, error: '該当する行がありません' });
+  }
+
+  sheet.deleteRow(row);
+  return jsonResponse({ success: true });
+}
+
+// ===== ADMIN: CANCEL BOOKING =====
+function cancelBooking(ss, params) {
+  if (!params.date || !params.studio || !params.time || !params.name) {
+    return jsonResponse({ success: false, error: '必須項目が不足しています' });
+  }
+
+  var sheet = ss.getSheetByName('予約');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートが見つかりません' });
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = data.length - 1; i >= 1; i--) {
+    if (formatDate(data[i][0]) === params.date &&
+        String(data[i][1]) === params.studio &&
+        String(data[i][2]) === params.time &&
+        String(data[i][4]) === params.name) {
+      sheet.deleteRow(i + 1);
+      return jsonResponse({ success: true });
+    }
+  }
+
+  return jsonResponse({ success: false, error: '該当する予約が見つかりません' });
 }
 
 // ===== UTILITIES =====

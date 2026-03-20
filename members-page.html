@@ -1317,6 +1317,122 @@ body {
   color: var(--gray-300);
 }
 
+/* ===== ADMIN MODE ===== */
+.admin-badge {
+  background: rgba(229, 90, 40, 0.2) !important;
+  color: var(--coral-dark) !important;
+  font-weight: 600 !important;
+}
+
+.admin-add-form {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.admin-add-form h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 1rem;
+}
+
+.admin-add-form input,
+.admin-add-form select,
+.admin-add-form textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  outline: none;
+  background: #fff;
+}
+
+.admin-add-form input:focus,
+.admin-add-form select:focus,
+.admin-add-form textarea:focus {
+  border-color: var(--coral);
+}
+
+.admin-add-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.admin-add-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--coral);
+  color: #fff;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-add-btn:hover {
+  background: var(--coral-light);
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.admin-form-grid input,
+.admin-form-grid select {
+  margin-bottom: 0;
+}
+
+.admin-delete-btn {
+  padding: 6px 14px;
+  border: 2px solid #e53935;
+  border-radius: 20px;
+  background: transparent;
+  color: #e53935;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.admin-delete-btn:hover {
+  background: #e53935;
+  color: #fff;
+}
+
+.admin-cancel-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(229, 57, 53, 0.1);
+  color: #e53935;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  line-height: 1;
+}
+
+.admin-cancel-btn:hover {
+  background: #e53935;
+  color: #fff;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .gate-title {
@@ -1372,6 +1488,10 @@ body {
   .schedule-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .admin-form-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1510,6 +1630,9 @@ body {
 
       <!-- Selected Date Lessons -->
       <div id="day-lessons"></div>
+
+      <!-- Admin: Add Slot Form (injected by JS if admin) -->
+      <div id="admin-slot-form-container"></div>
     </div>
 
     <!-- Booking Modal -->
@@ -1569,12 +1692,14 @@ body {
 // ===== CONFIGURATION =====
 const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE';
 const ANNOUNCE_SHEET = 'お知らせ';
-const PASSWORD = 'btm2025';
+const MEMBER_PASSWORD = 'btm2025';
+const ADMIN_PASSWORD = 'btmadmin2026';
 const APPS_SCRIPT_URL = '';
 const DEMO_MODE = true;
 // =========================
 
 // ===== STATE =====
+var isAdminMode = false;
 var currentCategory = 'kids';
 var currentMonth = new Date();
 var selectedDate = null;
@@ -1582,15 +1707,18 @@ var allSlots = []; // Populated from demo or API
 
 // ===== DEMO DATA =====
 var demoSlots = [
-  { date: '2026/03/22', studio: '若葉studio', time: '16:00〜17:00', class_name: 'KIDSクラス', max: 8, booked: 3, available: 5 },
-  { date: '2026/03/22', studio: '若葉studio', time: '17:10〜18:10', class_name: 'Teenクラス', max: 6, booked: 4, available: 2 },
-  { date: '2026/03/23', studio: '稲毛studio', time: '16:30〜17:30', class_name: 'KIDSクラス', max: 8, booked: 7, available: 1 },
-  { date: '2026/03/23', studio: '稲毛studio', time: '17:30〜18:30', class_name: 'レベルアップ', max: 5, booked: 5, available: 0 },
-  { date: '2026/03/24', studio: '千葉studio', time: '19:10〜20:10', class_name: 'FUTUREダンス', max: 10, booked: 2, available: 8 },
-  { date: '2026/03/24', studio: '千葉studio', time: '20:20〜21:20', class_name: 'FUTUREストレッチ', max: 10, booked: 6, available: 4 },
-  { date: '2026/03/25', studio: '美浜studio', time: '19:10〜20:10', class_name: 'FUTUREダンス', max: 8, booked: 0, available: 8 },
-  { date: '2026/03/26', studio: '稲毛studio(穴川)', time: '19:10〜20:10', class_name: 'FUTUREダンス', max: 8, booked: 3, available: 5 },
+  { date: '2026/03/22', studio: '若葉studio', time: '16:00〜17:00', class_name: 'KIDSクラス', max: 8, booked: 3, available: 5, category: 'KIDS' },
+  { date: '2026/03/22', studio: '若葉studio', time: '17:10〜18:10', class_name: 'Teenクラス', max: 6, booked: 4, available: 2, category: 'KIDS' },
+  { date: '2026/03/23', studio: '稲毛studio', time: '16:30〜17:30', class_name: 'KIDSクラス', max: 8, booked: 7, available: 1, category: 'KIDS' },
+  { date: '2026/03/23', studio: '稲毛studio', time: '17:30〜18:30', class_name: 'レベルアップ', max: 5, booked: 5, available: 0, category: 'KIDS' },
+  { date: '2026/03/24', studio: '千葉studio', time: '19:10〜20:10', class_name: 'FUTUREダンス', max: 10, booked: 2, available: 8, category: 'FUTURE' },
+  { date: '2026/03/24', studio: '千葉studio', time: '20:20〜21:20', class_name: 'FUTUREストレッチ', max: 10, booked: 6, available: 4, category: 'FUTURE' },
+  { date: '2026/03/25', studio: '美浜studio', time: '19:10〜20:10', class_name: 'FUTUREダンス', max: 8, booked: 0, available: 8, category: 'FUTURE' },
+  { date: '2026/03/26', studio: '稲毛studio(穴川)', time: '19:10〜20:10', class_name: 'FUTUREダンス', max: 8, booked: 3, available: 5, category: 'FUTURE' },
 ];
+// Admin demo: track added/deleted slots in session
+var demoAdminSlots = JSON.parse(sessionStorage.getItem('btm_demo_admin_slots') || '[]');
+var demoDeletedSlots = JSON.parse(sessionStorage.getItem('btm_demo_deleted_slots') || '[]');
 var demoBookings = JSON.parse(sessionStorage.getItem('btm_demo_bookings') || '[]');
 
 var demoAnnouncements = [
@@ -1607,7 +1735,9 @@ var demoAnnouncements = [
   var inputWrapper = document.getElementById('gate-input-wrapper');
   var errorEl = document.getElementById('gate-error');
 
-  if (sessionStorage.getItem('btm_authenticated') === 'true') {
+  var storedMode = sessionStorage.getItem('btm_mode');
+  if (storedMode === 'member' || storedMode === 'admin') {
+    isAdminMode = storedMode === 'admin';
     gate.classList.add('hidden');
     showMainContent();
     return;
@@ -1616,8 +1746,9 @@ var demoAnnouncements = [
   form.addEventListener('submit', function(e) {
     e.preventDefault();
     var value = input.value.trim();
-    if (value === PASSWORD) {
-      sessionStorage.setItem('btm_authenticated', 'true');
+    if (value === MEMBER_PASSWORD || value === ADMIN_PASSWORD) {
+      isAdminMode = value === ADMIN_PASSWORD;
+      sessionStorage.setItem('btm_mode', isAdminMode ? 'admin' : 'member');
       gate.classList.add('hidden');
       setTimeout(showMainContent, 300);
     } else {
@@ -1637,11 +1768,60 @@ function showMainContent() {
   void mainContent.offsetHeight;
   mainContent.classList.add('visible');
 
+  // Admin mode: update badge + tabs
+  if (isAdminMode) {
+    var badge = document.querySelector('.navbar-member-badge');
+    if (badge) { badge.textContent = 'Admin'; badge.classList.add('admin-badge'); }
+
+    // Replace tabs with admin tabs
+    var tabsEl = document.getElementById('tabs');
+    tabsEl.innerHTML =
+      '<div class="tab-slider" id="tab-slider"></div>' +
+      '<button class="tab-button active" data-tab="schedule">スケジュール管理</button>' +
+      '<button class="tab-button" data-tab="admin-announce">お知らせ管理</button>';
+
+    // Add admin panels
+    var panels = document.querySelector('.tab-panels');
+    // Add admin announcements panel
+    var adminAnnouncePanel = document.createElement('div');
+    adminAnnouncePanel.className = 'tab-panel';
+    adminAnnouncePanel.id = 'panel-admin-announce';
+    adminAnnouncePanel.innerHTML =
+      '<div class="announcements-container">' +
+        '<div class="schedule-header">' +
+          '<h2 class="announcements-title">お知らせ管理</h2>' +
+        '</div>' +
+        '<div class="admin-add-form" style="margin-bottom:1.5rem">' +
+          '<h3>お知らせを追加</h3>' +
+          '<input type="date" id="admin-announce-date">' +
+          '<input type="text" id="admin-announce-title" placeholder="タイトル">' +
+          '<textarea id="admin-announce-content" placeholder="内容を入力..." rows="3"></textarea>' +
+          '<select id="admin-announce-importance">' +
+            '<option value="">通常</option>' +
+            '<option value="重要">重要</option>' +
+          '</select>' +
+          '<button class="admin-add-btn" onclick="adminAddAnnouncement()">追加する</button>' +
+        '</div>' +
+        '<div id="admin-announce-list"></div>' +
+      '</div>';
+    panels.appendChild(adminAnnouncePanel);
+
+    // Set default date for announce form
+    var today = new Date();
+    var dateInput = adminAnnouncePanel.querySelector('#admin-announce-date');
+    if (dateInput) dateInput.value = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  }
+
   initTabs();
   initCategoryToggle();
   initCalendar();
   initBookingModal();
-  fetchAnnouncements();
+  if (isAdminMode) {
+    initAdminSlotForm();
+    fetchAdminAnnouncements();
+  } else {
+    fetchAnnouncements();
+  }
 }
 
 // ===== TAB NAVIGATION =====
@@ -1697,27 +1877,40 @@ function initCategoryToggle() {
 
 // ===== CALENDAR =====
 function isKidsSlot(slot) {
+  if (slot.category) return slot.category === 'KIDS';
   var cn = (slot.class_name || '').toLowerCase();
   return cn.indexOf('kids') !== -1 || cn.indexOf('teen') !== -1 || cn.indexOf('レベルアップ') !== -1;
 }
 
 function isFutureSlot(slot) {
+  if (slot.category) return slot.category === 'FUTURE';
   var cn = (slot.class_name || '').toLowerCase();
   return cn.indexOf('future') !== -1;
+}
+
+function getAllDemoSlots() {
+  // Merge base + admin-added, then exclude deleted
+  var all = demoSlots.concat(demoAdminSlots);
+  return all.filter(function(s) {
+    return !demoDeletedSlots.some(function(d) {
+      return d.date === s.date && d.studio === s.studio && d.time === s.time;
+    });
+  });
 }
 
 function getFilteredSlots() {
   var filterFn = currentCategory === 'kids' ? isKidsSlot : isFutureSlot;
 
   if (DEMO_MODE) {
-    return demoSlots.filter(filterFn).map(function(s) {
+    return getAllDemoSlots().filter(filterFn).map(function(s) {
       var extraBooked = demoBookings.filter(function(b) {
         return b.date === s.date && b.studio === s.studio && b.time === s.time;
       }).length;
       return {
         date: s.date, studio: s.studio, time: s.time, class_name: s.class_name,
-        max: s.max, booked: s.booked + extraBooked,
-        available: Math.max(0, s.available - extraBooked)
+        max: s.max, booked: (s.booked || 0) + extraBooked,
+        available: Math.max(0, (s.available != null ? s.available : s.max) - (s.booked || 0) - extraBooked),
+        category: s.category, members: s.members
       };
     });
   }
@@ -1875,7 +2068,10 @@ function renderDayLessons(dateStr) {
     html += '<div class="slot-availability">';
     html += '<span class="slot-spots ' + spotClass + '">残り <strong>' + available + '</strong> 枠</span>';
 
-    if (available > 0) {
+    if (isAdminMode) {
+      html += '<button class="admin-delete-btn" onclick=\'adminDeleteSlot(' +
+        JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time}).replace(/'/g, "\\'") + ')\'>削除</button>';
+    } else if (available > 0) {
       html += '<button class="slot-book-btn" onclick=\'openBookingModal(' +
         JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>予約する</button>';
     } else {
@@ -1894,6 +2090,11 @@ function renderDayLessons(dateStr) {
         html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
         html += '<span class="bklist-member-name">' + escapeHtml(m.name) + '</span>';
         if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
+        if (isAdminMode) {
+          html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
+            JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,name:m.name}).replace(/'/g, "\\'") +
+            ')\'>&times;</button>';
+        }
         html += '</div>';
       });
       html += '</div>';
@@ -2119,6 +2320,214 @@ function showAnnounceEmpty(container) {
     '<div class="announcement-empty"><div class="announcement-empty-icon">' +
     '<svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>' +
     '</div><p class="announcement-empty-text">お知らせはまだありません</p></div>';
+}
+
+// ===== ADMIN FUNCTIONS =====
+function initAdminSlotForm() {
+  if (!isAdminMode) return;
+  var container = document.getElementById('admin-slot-form-container');
+  if (!container) return;
+
+  var today = new Date();
+  var defaultDate = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+
+  container.innerHTML =
+    '<div class="admin-add-form" style="margin-top:1.5rem">' +
+      '<h3>レッスン枠を追加</h3>' +
+      '<div class="admin-form-grid">' +
+        '<input type="date" id="admin-slot-date" value="' + defaultDate + '">' +
+        '<select id="admin-slot-studio">' +
+          '<option value="若葉studio">若葉studio</option>' +
+          '<option value="稲毛studio">稲毛studio</option>' +
+          '<option value="千葉studio">千葉studio</option>' +
+          '<option value="美浜studio">美浜studio</option>' +
+          '<option value="稲毛studio(穴川)">稲毛studio(穴川)</option>' +
+        '</select>' +
+        '<input type="text" id="admin-slot-time" placeholder="16:00〜17:00">' +
+        '<input type="text" id="admin-slot-class" placeholder="KIDSクラス">' +
+        '<input type="number" id="admin-slot-max" value="8" min="1" max="30">' +
+        '<select id="admin-slot-category">' +
+          '<option value="KIDS">KIDS</option>' +
+          '<option value="FUTURE">FUTURE</option>' +
+        '</select>' +
+      '</div>' +
+      '<button class="admin-add-btn" onclick="adminAddSlot()" style="margin-top:0.75rem">追加する</button>' +
+    '</div>';
+}
+
+function adminAddSlot() {
+  var date = document.getElementById('admin-slot-date').value;
+  var studio = document.getElementById('admin-slot-studio').value;
+  var time = document.getElementById('admin-slot-time').value.trim();
+  var className = document.getElementById('admin-slot-class').value.trim();
+  var max = parseInt(document.getElementById('admin-slot-max').value) || 8;
+  var category = document.getElementById('admin-slot-category').value;
+
+  if (!date || !studio || !time || !className) {
+    alert('すべての項目を入力してください');
+    return;
+  }
+
+  var dateStr = date.replace(/-/g, '/');
+
+  if (DEMO_MODE) {
+    demoAdminSlots.push({ date: dateStr, studio: studio, time: time, class_name: className, max: max, booked: 0, available: max, category: category });
+    sessionStorage.setItem('btm_demo_admin_slots', JSON.stringify(demoAdminSlots));
+    alert('追加しました');
+    renderCalendar();
+    return;
+  }
+
+  var params = new URLSearchParams({
+    action: 'addSlot', adminKey: ADMIN_PASSWORD,
+    date: dateStr, studio: studio, time: time, class_name: className, max: max, category: category
+  });
+  apiCall(params, function() { alert('追加しました'); fetchSlotsFromAPI(function() { renderCalendar(); }); });
+}
+
+function adminDeleteSlot(slot) {
+  if (!confirm(slot.date + ' ' + slot.studio + ' ' + slot.time + ' を削除しますか？')) return;
+
+  if (DEMO_MODE) {
+    demoDeletedSlots.push({ date: slot.date, studio: slot.studio, time: slot.time });
+    sessionStorage.setItem('btm_demo_deleted_slots', JSON.stringify(demoDeletedSlots));
+    renderCalendar();
+    if (selectedDate) renderDayLessons(selectedDate);
+    return;
+  }
+
+  var params = new URLSearchParams({
+    action: 'deleteSlot', adminKey: ADMIN_PASSWORD,
+    date: slot.date, studio: slot.studio, time: slot.time
+  });
+  apiCall(params, function() { fetchSlotsFromAPI(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); }); });
+}
+
+function adminCancelBooking(info) {
+  if (!confirm(info.name + ' さんの予約をキャンセルしますか？')) return;
+
+  if (DEMO_MODE) {
+    demoBookings = demoBookings.filter(function(b) {
+      return !(b.date === info.date && b.studio === info.studio && b.time === info.time && b.name === info.name);
+    });
+    sessionStorage.setItem('btm_demo_bookings', JSON.stringify(demoBookings));
+    renderCalendar();
+    if (selectedDate) renderDayLessons(selectedDate);
+    return;
+  }
+
+  var params = new URLSearchParams({
+    action: 'cancelBooking', adminKey: ADMIN_PASSWORD,
+    date: info.date, studio: info.studio, time: info.time, name: info.name
+  });
+  apiCall(params, function() { fetchSlotsFromAPI(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); }); });
+}
+
+function fetchAdminAnnouncements() {
+  var container = document.getElementById('admin-announce-list');
+  if (!container) return;
+
+  if (DEMO_MODE) {
+    renderAdminAnnouncements(demoAnnouncements, container);
+    return;
+  }
+
+  if (!APPS_SCRIPT_URL) {
+    renderAdminAnnouncements([], container);
+    return;
+  }
+
+  container.innerHTML = '<div class="loading-container"><div class="spinner"></div><span class="loading-text">読み込み中...</span></div>';
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', APPS_SCRIPT_URL + '?action=announcements', true);
+  xhr.onload = function() {
+    try { var data = JSON.parse(xhr.responseText); renderAdminAnnouncements(data, container); }
+    catch(e) { renderAdminAnnouncements([], container); }
+  };
+  xhr.onerror = function() { renderAdminAnnouncements([], container); };
+  xhr.send();
+}
+
+function renderAdminAnnouncements(items, container) {
+  if (!items || items.length === 0) {
+    container.innerHTML = '<div class="day-lessons-empty">お知らせはまだありません</div>';
+    return;
+  }
+  var html = '';
+  for (var i = items.length - 1; i >= 0; i--) {
+    var a = items[i];
+    var isImportant = (a.importance || '').indexOf('重要') !== -1;
+    html += '<div class="' + (isImportant ? 'announce-card important' : 'announce-card') + '" style="position:relative">';
+    html += '<div class="announce-card-header">';
+    html += '<span class="announce-date">' + escapeHtml(a.date || '') + '</span>';
+    if (isImportant) html += '<span class="announce-badge-important">重要</span>';
+    html += '</div>';
+    html += '<h4>' + escapeHtml(a.title || '') + '</h4>';
+    html += '<p>' + escapeHtml(a.content || '') + '</p>';
+    html += '<button class="admin-delete-btn" style="margin-top:0.8rem" onclick=\'adminDeleteAnnouncement(' +
+      (a.row ? a.row : i) + ',' + JSON.stringify(a.title||'').replace(/'/g, "\\'") + ')\'">削除</button>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function adminAddAnnouncement() {
+  var dateInput = document.getElementById('admin-announce-date').value;
+  var title = document.getElementById('admin-announce-title').value.trim();
+  var content = document.getElementById('admin-announce-content').value.trim();
+  var importance = document.getElementById('admin-announce-importance').value;
+
+  if (!title) { alert('タイトルを入力してください'); return; }
+
+  var dateStr = dateInput ? dateInput.replace(/-/g, '/') : '';
+
+  if (DEMO_MODE) {
+    demoAnnouncements.push({ date: dateStr, title: title, content: content, importance: importance });
+    document.getElementById('admin-announce-title').value = '';
+    document.getElementById('admin-announce-content').value = '';
+    document.getElementById('admin-announce-importance').value = '';
+    fetchAdminAnnouncements();
+    alert('追加しました');
+    return;
+  }
+
+  var params = new URLSearchParams({
+    action: 'addAnnouncement', adminKey: ADMIN_PASSWORD,
+    date: dateStr, title: title, content: content, importance: importance
+  });
+  apiCall(params, function() {
+    document.getElementById('admin-announce-title').value = '';
+    document.getElementById('admin-announce-content').value = '';
+    alert('追加しました');
+    fetchAdminAnnouncements();
+  });
+}
+
+function adminDeleteAnnouncement(rowOrIndex, title) {
+  if (!confirm('「' + title + '」を削除しますか？')) return;
+
+  if (DEMO_MODE) {
+    demoAnnouncements.splice(rowOrIndex, 1);
+    fetchAdminAnnouncements();
+    return;
+  }
+
+  var params = new URLSearchParams({ action: 'deleteAnnouncement', adminKey: ADMIN_PASSWORD, row: rowOrIndex });
+  apiCall(params, function() { fetchAdminAnnouncements(); });
+}
+
+function apiCall(params, onSuccess) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', APPS_SCRIPT_URL + '?' + params.toString(), true);
+  xhr.onload = function() {
+    try {
+      var result = JSON.parse(xhr.responseText);
+      if (result.success) { if (onSuccess) onSuccess(result); }
+      else { alert(result.error || 'エラーが発生しました'); }
+    } catch(e) { alert('通信エラー'); }
+  };
+  xhr.onerror = function() { alert('通信エラー'); };
+  xhr.send();
 }
 
 // ===== UTILITIES =====
