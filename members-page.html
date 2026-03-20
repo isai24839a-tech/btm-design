@@ -1382,6 +1382,74 @@ body {
   background: var(--coral-light);
 }
 
+.admin-mode-toggle {
+  display: flex;
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 1rem;
+}
+
+.admin-mode-toggle button {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-mode-toggle button.active {
+  background: var(--coral);
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(229,90,40,0.3);
+}
+
+.admin-bulk-info {
+  background: rgba(229,90,40,0.08);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--navy);
+  line-height: 1.5;
+}
+
+.admin-bulk-info strong {
+  color: var(--coral);
+}
+
+.admin-dow-grid {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.admin-dow-btn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--gray-200);
+  border-radius: 50%;
+  background: #fff;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-dow-btn.selected {
+  border-color: var(--coral);
+  background: var(--coral);
+  color: #fff;
+}
+
 .admin-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2323,6 +2391,8 @@ function showAnnounceEmpty(container) {
 }
 
 // ===== ADMIN FUNCTIONS =====
+var adminSlotMode = 'single'; // 'single' or 'bulk'
+
 function initAdminSlotForm() {
   if (!isAdminMode) return;
   var container = document.getElementById('admin-slot-form-container');
@@ -2331,28 +2401,141 @@ function initAdminSlotForm() {
   var today = new Date();
   var defaultDate = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
 
+  // Next month's last day for default end date
+  var nextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+  var defaultEnd = nextMonth.getFullYear() + '-' + String(nextMonth.getMonth()+1).padStart(2,'0') + '-' + String(nextMonth.getDate()).padStart(2,'0');
+
+  var studioOptions =
+    '<option value="若葉studio">若葉studio</option>' +
+    '<option value="稲毛studio">稲毛studio</option>' +
+    '<option value="千葉studio">千葉studio</option>' +
+    '<option value="美浜studio">美浜studio</option>' +
+    '<option value="稲毛studio(穴川)">稲毛studio(穴川)</option>';
+
+  var categoryOptions =
+    '<option value="KIDS">KIDS</option>' +
+    '<option value="FUTURE">FUTURE</option>';
+
+  var dowLabels = ['月','火','水','木','金','土','日'];
+  var dowButtons = '';
+  for (var i = 0; i < 7; i++) {
+    dowButtons += '<button type="button" class="admin-dow-btn" data-dow="' + i + '" onclick="toggleDow(this)">' + dowLabels[i] + '</button>';
+  }
+
   container.innerHTML =
     '<div class="admin-add-form" style="margin-top:1.5rem">' +
       '<h3>レッスン枠を追加</h3>' +
-      '<div class="admin-form-grid">' +
-        '<input type="date" id="admin-slot-date" value="' + defaultDate + '">' +
-        '<select id="admin-slot-studio">' +
-          '<option value="若葉studio">若葉studio</option>' +
-          '<option value="稲毛studio">稲毛studio</option>' +
-          '<option value="千葉studio">千葉studio</option>' +
-          '<option value="美浜studio">美浜studio</option>' +
-          '<option value="稲毛studio(穴川)">稲毛studio(穴川)</option>' +
-        '</select>' +
-        '<input type="text" id="admin-slot-time" placeholder="16:00〜17:00">' +
-        '<input type="text" id="admin-slot-class" placeholder="KIDSクラス">' +
-        '<input type="number" id="admin-slot-max" value="8" min="1" max="30">' +
-        '<select id="admin-slot-category">' +
-          '<option value="KIDS">KIDS</option>' +
-          '<option value="FUTURE">FUTURE</option>' +
-        '</select>' +
+      '<div class="admin-mode-toggle">' +
+        '<button class="' + (adminSlotMode === 'single' ? 'active' : '') + '" onclick="switchSlotMode(\'single\')">単発追加</button>' +
+        '<button class="' + (adminSlotMode === 'bulk' ? 'active' : '') + '" onclick="switchSlotMode(\'bulk\')">まとめて追加</button>' +
       '</div>' +
-      '<button class="admin-add-btn" onclick="adminAddSlot()" style="margin-top:0.75rem">追加する</button>' +
+
+      // Single mode
+      '<div id="admin-single-form" style="display:' + (adminSlotMode === 'single' ? 'block' : 'none') + '">' +
+        '<div class="admin-form-grid">' +
+          '<input type="date" id="admin-slot-date" value="' + defaultDate + '">' +
+          '<select id="admin-slot-studio">' + studioOptions + '</select>' +
+          '<input type="text" id="admin-slot-time" placeholder="16:00〜17:00">' +
+          '<input type="text" id="admin-slot-class" placeholder="KIDSクラス">' +
+          '<input type="number" id="admin-slot-max" value="8" min="1" max="30">' +
+          '<select id="admin-slot-category">' + categoryOptions + '</select>' +
+        '</div>' +
+        '<button class="admin-add-btn" onclick="adminAddSlot()" style="margin-top:0.75rem">追加する</button>' +
+      '</div>' +
+
+      // Bulk mode
+      '<div id="admin-bulk-form" style="display:' + (adminSlotMode === 'bulk' ? 'block' : 'none') + '">' +
+        '<label style="font-size:0.85rem;font-weight:600;color:var(--navy);margin-bottom:6px;display:block">曜日を選択</label>' +
+        '<div class="admin-dow-grid" id="admin-dow-grid">' + dowButtons + '</div>' +
+        '<div class="admin-form-grid" style="margin-top:0.75rem">' +
+          '<div><label style="font-size:0.8rem;color:var(--gray-600)">開始日</label><input type="date" id="admin-bulk-start" value="' + defaultDate + '"></div>' +
+          '<div><label style="font-size:0.8rem;color:var(--gray-600)">終了日</label><input type="date" id="admin-bulk-end" value="' + defaultEnd + '"></div>' +
+          '<select id="admin-bulk-studio">' + studioOptions + '</select>' +
+          '<input type="text" id="admin-bulk-time" placeholder="16:00〜17:00">' +
+          '<input type="text" id="admin-bulk-class" placeholder="KIDSクラス">' +
+          '<input type="number" id="admin-bulk-max" value="8" min="1" max="30">' +
+          '<select id="admin-bulk-category">' + categoryOptions + '</select>' +
+        '</div>' +
+        '<div class="admin-bulk-info" id="admin-bulk-preview">曜日を選んで日程を確認</div>' +
+        '<button class="admin-add-btn" onclick="adminBulkAddSlots()" style="margin-top:0.75rem">まとめて追加</button>' +
+      '</div>' +
     '</div>';
+
+  // Attach change listeners for bulk preview
+  ['admin-bulk-start','admin-bulk-end'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('change', updateBulkPreview);
+  });
+}
+
+function switchSlotMode(mode) {
+  adminSlotMode = mode;
+  var singleForm = document.getElementById('admin-single-form');
+  var bulkForm = document.getElementById('admin-bulk-form');
+  if (singleForm) singleForm.style.display = mode === 'single' ? 'block' : 'none';
+  if (bulkForm) bulkForm.style.display = mode === 'bulk' ? 'block' : 'none';
+
+  var toggleBtns = document.querySelectorAll('.admin-mode-toggle button');
+  toggleBtns.forEach(function(btn, i) {
+    btn.classList.toggle('active', (i === 0 && mode === 'single') || (i === 1 && mode === 'bulk'));
+  });
+}
+
+function toggleDow(btn) {
+  btn.classList.toggle('selected');
+  updateBulkPreview();
+}
+
+function getSelectedDows() {
+  var btns = document.querySelectorAll('.admin-dow-btn.selected');
+  var dows = [];
+  btns.forEach(function(b) { dows.push(parseInt(b.getAttribute('data-dow'))); });
+  return dows; // 0=月, 1=火, ..., 6=日
+}
+
+function getBulkDates() {
+  var startEl = document.getElementById('admin-bulk-start');
+  var endEl = document.getElementById('admin-bulk-end');
+  if (!startEl || !endEl) return [];
+
+  var start = new Date(startEl.value);
+  var end = new Date(endEl.value);
+  if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) return [];
+
+  var dows = getSelectedDows();
+  if (dows.length === 0) return [];
+
+  // Convert our dow (0=月..6=日) to JS dow (0=日,1=月..6=土)
+  var jsDowMap = [1, 2, 3, 4, 5, 6, 0]; // 月=1, 火=2, ..., 日=0
+  var targetJsDows = dows.map(function(d) { return jsDowMap[d]; });
+
+  var dates = [];
+  var cur = new Date(start);
+  while (cur <= end) {
+    if (targetJsDows.indexOf(cur.getDay()) !== -1) {
+      dates.push(new Date(cur));
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+  return dates;
+}
+
+function updateBulkPreview() {
+  var previewEl = document.getElementById('admin-bulk-preview');
+  if (!previewEl) return;
+
+  var dates = getBulkDates();
+  if (dates.length === 0) {
+    previewEl.innerHTML = '曜日を選んで日程を確認';
+    return;
+  }
+
+  var dowNames = ['日','月','火','水','木','金','土'];
+  var list = dates.map(function(d) {
+    return (d.getMonth()+1) + '/' + d.getDate() + '(' + dowNames[d.getDay()] + ')';
+  }).join('、');
+
+  previewEl.innerHTML = '<strong>' + dates.length + '件</strong>追加されます：' + list;
 }
 
 function adminAddSlot() {
@@ -2383,6 +2566,57 @@ function adminAddSlot() {
     date: dateStr, studio: studio, time: time, class_name: className, max: max, category: category
   });
   apiCall(params, function() { alert('追加しました'); fetchSlotsFromAPI(function() { renderCalendar(); }); });
+}
+
+function adminBulkAddSlots() {
+  var dates = getBulkDates();
+  if (dates.length === 0) {
+    alert('曜日と期間を設定してください');
+    return;
+  }
+
+  var studio = document.getElementById('admin-bulk-studio').value;
+  var time = document.getElementById('admin-bulk-time').value.trim();
+  var className = document.getElementById('admin-bulk-class').value.trim();
+  var max = parseInt(document.getElementById('admin-bulk-max').value) || 8;
+  var category = document.getElementById('admin-bulk-category').value;
+
+  if (!studio || !time || !className) {
+    alert('スタジオ・時間・クラス名を入力してください');
+    return;
+  }
+
+  if (!confirm(dates.length + '件のレッスン枠を追加しますか？')) return;
+
+  if (DEMO_MODE) {
+    dates.forEach(function(d) {
+      var dateStr = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+      demoAdminSlots.push({ date: dateStr, studio: studio, time: time, class_name: className, max: max, booked: 0, available: max, category: category });
+    });
+    sessionStorage.setItem('btm_demo_admin_slots', JSON.stringify(demoAdminSlots));
+    alert(dates.length + '件追加しました');
+    renderCalendar();
+    return;
+  }
+
+  // Real mode: sequential API calls
+  var i = 0;
+  function addNext() {
+    if (i >= dates.length) {
+      alert(dates.length + '件追加しました');
+      fetchSlotsFromAPI(function() { renderCalendar(); });
+      return;
+    }
+    var d = dates[i];
+    var dateStr = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+    var params = new URLSearchParams({
+      action: 'addSlot', adminKey: ADMIN_PASSWORD,
+      date: dateStr, studio: studio, time: time, class_name: className, max: max, category: category
+    });
+    i++;
+    apiCall(params, addNext);
+  }
+  addNext();
 }
 
 function adminDeleteSlot(slot) {
