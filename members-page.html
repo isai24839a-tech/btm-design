@@ -300,6 +300,23 @@ body {
   text-transform: uppercase;
 }
 
+.navbar-signout {
+  background: none;
+  border: none;
+  color: var(--gray-400);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-signout:hover {
+  color: var(--coral);
+  background: rgba(255, 107, 53, 0.08);
+}
+
 /* ===== TABS ===== */
 .tabs-container {
   max-width: 1100px;
@@ -1650,6 +1667,9 @@ body {
       </a>
       <span class="navbar-brand">BEAT THE MIX</span>
       <span class="navbar-member-badge">Members</span>
+      <button class="navbar-signout" onclick="signOut()" title="サインアウト">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
     </div>
   </nav>
 
@@ -1830,6 +1850,11 @@ var demoAnnouncements = [
   });
 })();
 
+function signOut() {
+  sessionStorage.removeItem('btm_mode');
+  location.reload();
+}
+
 function showMainContent() {
   var mainContent = document.getElementById('main-content');
   mainContent.style.display = 'block';
@@ -1977,7 +2002,7 @@ function getFilteredSlots() {
       return {
         date: s.date, studio: s.studio, time: s.time, class_name: s.class_name,
         max: s.max, booked: (s.booked || 0) + extraBooked,
-        available: Math.max(0, (s.available != null ? s.available : s.max) - (s.booked || 0) - extraBooked),
+        available: (s.max === 0 || s.max === '0') ? 999 : Math.max(0, (s.available != null ? s.available : s.max) - (s.booked || 0) - extraBooked),
         category: s.category, members: s.members
       };
     });
@@ -2124,8 +2149,9 @@ function renderDayLessons(dateStr) {
   html += '<div class="day-lessons-grid">';
 
   slots.forEach(function(slot) {
-    var available = slot.available || 0;
-    var spotClass = available <= 0 ? 'full' : available <= 2 ? 'few' : '';
+    var isUnlimited = slot.max === 0 || slot.max === '0';
+    var available = isUnlimited ? 999 : (slot.available || 0);
+    var spotClass = isUnlimited ? '' : (available <= 0 ? 'full' : available <= 2 ? 'few' : '');
 
     html += '<div class="slot-card">';
     html += '<div class="slot-card-info">';
@@ -2134,7 +2160,11 @@ function renderDayLessons(dateStr) {
     html += '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
     html += '</div>';
     html += '<div class="slot-availability">';
-    html += '<span class="slot-spots ' + spotClass + '">残り <strong>' + available + '</strong> 枠</span>';
+    if (isUnlimited) {
+      html += '<span class="slot-spots" style="color:var(--coral)">予約受付中</span>';
+    } else {
+      html += '<span class="slot-spots ' + spotClass + '">残り <strong>' + available + '</strong> 枠</span>';
+    }
 
     if (isAdminMode) {
       html += '<button class="admin-delete-btn" onclick=\'adminDeleteSlot(' +
@@ -2152,7 +2182,8 @@ function renderDayLessons(dateStr) {
     var members = getSlotMembers(slot);
     if (members.length > 0) {
       html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--gray-100)">';
-      html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin-bottom:0.4rem;">予約者 (' + members.length + '/' + (slot.max || 10) + '名)</div>';
+      var capLabel = isUnlimited ? '無制限' : ((slot.max || 10) + '名');
+      html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin-bottom:0.4rem;">予約者 (' + members.length + '/' + capLabel + ')</div>';
       members.forEach(function(m) {
         html += '<div class="bklist-member">';
         html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
@@ -2437,7 +2468,12 @@ function initAdminSlotForm() {
           '<select id="admin-slot-studio">' + studioOptions + '</select>' +
           '<input type="text" id="admin-slot-time" placeholder="16:00〜17:00">' +
           '<input type="text" id="admin-slot-class" placeholder="KIDSクラス">' +
-          '<input type="number" id="admin-slot-max" value="8" min="1" max="30">' +
+          '<div style="display:flex;align-items:center;gap:8px">' +
+            '<input type="number" id="admin-slot-max" value="8" min="1" max="30" style="flex:1;margin:0">' +
+            '<label style="display:flex;align-items:center;gap:4px;font-size:0.8rem;color:var(--gray-600);white-space:nowrap;cursor:pointer">' +
+              '<input type="checkbox" id="admin-slot-unlimited" onchange="toggleUnlimited(\'single\')" style="width:auto;margin:0"> 無制限' +
+            '</label>' +
+          '</div>' +
           '<select id="admin-slot-category">' + categoryOptions + '</select>' +
         '</div>' +
         '<button class="admin-add-btn" onclick="adminAddSlot()" style="margin-top:0.75rem">追加する</button>' +
@@ -2453,7 +2489,12 @@ function initAdminSlotForm() {
           '<select id="admin-bulk-studio">' + studioOptions + '</select>' +
           '<input type="text" id="admin-bulk-time" placeholder="16:00〜17:00">' +
           '<input type="text" id="admin-bulk-class" placeholder="KIDSクラス">' +
-          '<input type="number" id="admin-bulk-max" value="8" min="1" max="30">' +
+          '<div style="display:flex;align-items:center;gap:8px">' +
+            '<input type="number" id="admin-bulk-max" value="8" min="1" max="30" style="flex:1;margin:0">' +
+            '<label style="display:flex;align-items:center;gap:4px;font-size:0.8rem;color:var(--gray-600);white-space:nowrap;cursor:pointer">' +
+              '<input type="checkbox" id="admin-bulk-unlimited" onchange="toggleUnlimited(\'bulk\')" style="width:auto;margin:0"> 無制限' +
+            '</label>' +
+          '</div>' +
           '<select id="admin-bulk-category">' + categoryOptions + '</select>' +
         '</div>' +
         '<div class="admin-bulk-info" id="admin-bulk-preview">曜日を選んで日程を確認</div>' +
@@ -2466,6 +2507,18 @@ function initAdminSlotForm() {
     var el = document.getElementById(id);
     if (el) el.addEventListener('change', updateBulkPreview);
   });
+}
+
+function toggleUnlimited(mode) {
+  var cbId = mode === 'single' ? 'admin-slot-unlimited' : 'admin-bulk-unlimited';
+  var numId = mode === 'single' ? 'admin-slot-max' : 'admin-bulk-max';
+  var cb = document.getElementById(cbId);
+  var num = document.getElementById(numId);
+  if (cb && num) {
+    num.disabled = cb.checked;
+    if (cb.checked) num.style.opacity = '0.4';
+    else num.style.opacity = '1';
+  }
 }
 
 function switchSlotMode(mode) {
@@ -2543,7 +2596,8 @@ function adminAddSlot() {
   var studio = document.getElementById('admin-slot-studio').value;
   var time = document.getElementById('admin-slot-time').value.trim();
   var className = document.getElementById('admin-slot-class').value.trim();
-  var max = parseInt(document.getElementById('admin-slot-max').value) || 8;
+  var unlimited = document.getElementById('admin-slot-unlimited').checked;
+  var max = unlimited ? 0 : (parseInt(document.getElementById('admin-slot-max').value) || 8);
   var category = document.getElementById('admin-slot-category').value;
 
   if (!date || !studio || !time || !className) {
@@ -2552,9 +2606,10 @@ function adminAddSlot() {
   }
 
   var dateStr = date.replace(/-/g, '/');
+  var avail = unlimited ? 999 : max;
 
   if (DEMO_MODE) {
-    demoAdminSlots.push({ date: dateStr, studio: studio, time: time, class_name: className, max: max, booked: 0, available: max, category: category });
+    demoAdminSlots.push({ date: dateStr, studio: studio, time: time, class_name: className, max: max, booked: 0, available: avail, category: category });
     sessionStorage.setItem('btm_demo_admin_slots', JSON.stringify(demoAdminSlots));
     alert('追加しました');
     renderCalendar();
@@ -2578,7 +2633,8 @@ function adminBulkAddSlots() {
   var studio = document.getElementById('admin-bulk-studio').value;
   var time = document.getElementById('admin-bulk-time').value.trim();
   var className = document.getElementById('admin-bulk-class').value.trim();
-  var max = parseInt(document.getElementById('admin-bulk-max').value) || 8;
+  var unlimited = document.getElementById('admin-bulk-unlimited').checked;
+  var max = unlimited ? 0 : (parseInt(document.getElementById('admin-bulk-max').value) || 8);
   var category = document.getElementById('admin-bulk-category').value;
 
   if (!studio || !time || !className) {
@@ -2588,10 +2644,12 @@ function adminBulkAddSlots() {
 
   if (!confirm(dates.length + '件のレッスン枠を追加しますか？')) return;
 
+  var avail = unlimited ? 999 : max;
+
   if (DEMO_MODE) {
     dates.forEach(function(d) {
       var dateStr = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
-      demoAdminSlots.push({ date: dateStr, studio: studio, time: time, class_name: className, max: max, booked: 0, available: max, category: category });
+      demoAdminSlots.push({ date: dateStr, studio: studio, time: time, class_name: className, max: max, booked: 0, available: avail, category: category });
     });
     sessionStorage.setItem('btm_demo_admin_slots', JSON.stringify(demoAdminSlots));
     alert(dates.length + '件追加しました');
