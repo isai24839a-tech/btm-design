@@ -1755,15 +1755,11 @@ body {
           <form id="booking-form">
             <div class="booking-field">
               <label>お名前 <span style="color:var(--coral)">*</span></label>
-              <input type="text" id="booking-name" required placeholder="山田 太郎">
-            </div>
-            <div class="booking-field">
-              <label>電話番号</label>
-              <input type="tel" id="booking-phone" placeholder="090-1234-5678">
+              <input type="text" id="booking-name" required placeholder="山田 太郎" autocomplete="name">
             </div>
             <div class="booking-field">
               <label>メールアドレス</label>
-              <input type="email" id="booking-email" placeholder="example@gmail.com">
+              <input type="email" id="booking-email" placeholder="example@gmail.com" autocomplete="email">
               <span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">予約確認メールをお送りします</span>
             </div>
             <div class="booking-modal-actions">
@@ -2259,15 +2255,11 @@ function openBookingModal(slot) {
     '<form id="booking-form" onsubmit="event.preventDefault();submitBooking()">' +
       '<div class="booking-field">' +
         '<label>お名前 <span style="color:var(--coral)">*</span></label>' +
-        '<input type="text" id="booking-name" required placeholder="山田 太郎">' +
-      '</div>' +
-      '<div class="booking-field">' +
-        '<label>電話番号</label>' +
-        '<input type="tel" id="booking-phone" placeholder="090-1234-5678">' +
+        '<input type="text" id="booking-name" required placeholder="山田 太郎" autocomplete="name">' +
       '</div>' +
       '<div class="booking-field">' +
         '<label>メールアドレス</label>' +
-        '<input type="email" id="booking-email" placeholder="example@gmail.com">' +
+        '<input type="email" id="booking-email" placeholder="example@gmail.com" autocomplete="email">' +
         '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">予約確認メールをお送りします</span>' +
       '</div>' +
       '<div class="booking-modal-actions">' +
@@ -2277,6 +2269,14 @@ function openBookingModal(slot) {
     '</form>';
 
   modal.classList.add('active');
+
+  // Restore saved name/email from localStorage
+  try {
+    var savedName = localStorage.getItem('btm_booking_name');
+    var savedEmail = localStorage.getItem('btm_booking_email');
+    if (savedName) document.getElementById('booking-name').value = savedName;
+    if (savedEmail) document.getElementById('booking-email').value = savedEmail;
+  } catch(e) {}
 }
 
 function closeBookingModal() {
@@ -2288,7 +2288,6 @@ function submitBooking() {
   if (!currentBookingSlot) return;
 
   var name = document.getElementById('booking-name').value.trim();
-  var phone = document.getElementById('booking-phone').value.trim();
   var emailEl = document.getElementById('booking-email');
   var email = emailEl ? emailEl.value.trim() : '';
 
@@ -2296,6 +2295,10 @@ function submitBooking() {
     document.getElementById('booking-name').focus();
     return;
   }
+
+  // Save name/email to localStorage for next time
+  try { localStorage.setItem('btm_booking_name', name); } catch(e) {}
+  if (email) { try { localStorage.setItem('btm_booking_email', email); } catch(e) {} }
 
   var btn = document.getElementById('booking-submit-btn');
   btn.disabled = true;
@@ -2309,7 +2312,6 @@ function submitBooking() {
         time: currentBookingSlot.time,
         class_name: currentBookingSlot.class_name,
         name: name,
-        phone: phone,
         bookedAt: new Date().toISOString()
       });
       sessionStorage.setItem('btm_demo_bookings', JSON.stringify(demoBookings));
@@ -2324,7 +2326,7 @@ function submitBooking() {
     studio: currentBookingSlot.studio || '',
     time: currentBookingSlot.time || '',
     class_name: currentBookingSlot.class_name || '',
-    name: name, phone: phone, email: email
+    name: name, email: email
   });
 
   var xhr = new XMLHttpRequest();
