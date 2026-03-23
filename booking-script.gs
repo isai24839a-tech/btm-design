@@ -1,64 +1,109 @@
 /**
- * BEAT THE MIX — 予約システム (Google Apps Script)
+ * BEAT THE MIX — 予約システム 完全版 (Google Apps Script)
  *
- * セットアップ手順:
- * 1. Google Spreadsheetを作成
- * 2. シート名「スケジュール」を作り、1行目に: 日付 | スタジオ | 時間 | クラス | 定員
- * 3. シート名「予約一覧」を作り、1行目に: 日付 | スタジオ | 時間 | クラス | お名前 | 電話番号 | メール | 予約日時
- * 4. スプレッドシートの「拡張機能」→「Apps Script」を開く
- * 5. このファイルの内容を全てコピーしてエディタに貼り付け
- * 6. 「デプロイ」→「新しいデプロイ」→ 種類「ウェブアプリ」
+ * ★セットアップ手順:
+ * 1. Google Spreadsheetを新規作成（空でOK）
+ * 2. 「拡張機能」→「Apps Script」を開く
+ * 3. このファイルの内容を全てコピーしてエディタに貼り付け
+ * 4. ★setupSheets()を1回だけ実行（上部メニューで関数選択→▶実行）
+ *    → 5シート + ヘッダーが自動作成される
+ * 5. 「デプロイ」→「新しいデプロイ」→ 種類「ウェブアプリ」
  *    - 実行ユーザー: 自分
  *    - アクセス権: 全員
- * 7. 表示されたURLをコピーして、members-page.html の APPS_SCRIPT_URL に設定
+ * 6. 表示されたURLをコピーして、members-page.html の APPS_SCRIPT_URL に設定
+ * 7. スプレッドシートのIDをコピーして、kids-news.html / future-news.html の SPREADSHEET_ID に設定
  */
 
 // ===== 設定 =====
-var ADMIN_EMAIL = 'beat.the.mix7386@gmail.com'; // 通知先メールアドレス
+var ADMIN_EMAIL = 'beat.the.mix7386@gmail.com';
+var ADMIN_KEY = 'btmadmin2026'; // members-page.htmlのADMIN_PASSWORDと合わせる
 
+// ===== 初期セットアップ（1回だけ実行）=====
+function setupSheets() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  var sheets = [
+    { name: 'スケジュール', headers: ['日付', 'スタジオ', '時間', 'クラス', '定員', 'category'] },
+    { name: '予約一覧', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時'] },
+    { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度'] },
+    { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
+    { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] }
+  ];
+
+  sheets.forEach(function(def) {
+    var sheet = ss.getSheetByName(def.name);
+    if (!sheet) {
+      sheet = ss.insertSheet(def.name);
+    }
+    // Set headers in row 1
+    var range = sheet.getRange(1, 1, 1, def.headers.length);
+    range.setValues([def.headers]);
+    range.setFontWeight('bold');
+    range.setBackground('#4285f4');
+    range.setFontColor('#ffffff');
+    // Auto-resize columns
+    for (var i = 1; i <= def.headers.length; i++) {
+      sheet.autoResizeColumn(i);
+    }
+  });
+
+  // Delete default "Sheet1" if empty
+  var sheet1 = ss.getSheetByName('Sheet1') || ss.getSheetByName('シート1');
+  if (sheet1 && sheet1.getLastRow() === 0) {
+    try { ss.deleteSheet(sheet1); } catch(e) {}
+  }
+
+  SpreadsheetApp.getUi().alert('セットアップ完了！ 5シート作成しました。\n\n次は「デプロイ」→「新しいデプロイ」→「ウェブアプリ」でデプロイしてください。');
+}
+
+// ===== メインルーター =====
 function doGet(e) {
   var action = (e.parameter.action || '').toLowerCase();
 
-  if (action === 'slots') {
-    return getAvailableSlots();
-  } else if (action === 'book') {
-    return bookSlot(e.parameter);
-  } else if (action === 'list') {
-    return getBookingList();
-  } else {
-    return jsonResponse({ error: 'Unknown action' });
-  }
+  // Public actions
+  if (action === 'slots') return getAvailableSlots();
+  if (action === 'book') return bookSlot(e.parameter);
+  if (action === 'list') return getBookingList();
+  if (action === 'announcements') return getAnnouncements();
+
+  // Admin actions (require adminKey)
+  if (action === 'addslot') return adminGuard(e, adminAddSlot);
+  if (action === 'deleteslot') return adminGuard(e, adminDeleteSlot);
+  if (action === 'cancelbooking') return adminGuard(e, adminCancelBooking);
+  if (action === 'addannouncement') return adminGuard(e, adminAddAnnouncement);
+  if (action === 'deleteannouncement') return adminGuard(e, adminDeleteAnnouncement);
+
+  return jsonResponse({ error: 'Unknown action' });
 }
 
-/**
- * 空きレッスン一覧を返す
- */
+function adminGuard(e, fn) {
+  if (e.parameter.adminKey !== ADMIN_KEY) {
+    return jsonResponse({ success: false, error: '管理者認証に失敗しました' });
+  }
+  return fn(e.parameter);
+}
+
+// ===== 空きレッスン一覧 =====
 function getAvailableSlots() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var scheduleSheet = ss.getSheetByName('スケジュール');
   var bookingSheet = ss.getSheetByName('予約一覧');
 
   if (!scheduleSheet || !bookingSheet) {
-    return jsonResponse({ error: 'シートが見つかりません。「スケジュール」と「予約一覧」シートを作成してください。' });
+    return jsonResponse({ error: 'シートが見つかりません' });
   }
 
-  // Get schedule data (skip header row)
   var scheduleData = scheduleSheet.getDataRange().getValues();
-  if (scheduleData.length <= 1) {
-    return jsonResponse([]);
-  }
+  if (scheduleData.length <= 1) return jsonResponse([]);
 
-  // Count existing bookings per slot
   var bookingData = bookingSheet.getDataRange().getValues();
   var bookingCounts = {};
-
   for (var i = 1; i < bookingData.length; i++) {
     var row = bookingData[i];
     var key = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
     bookingCounts[key] = (bookingCounts[key] || 0) + 1;
   }
 
-  // Build available slots
   var slots = [];
   var today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -70,14 +115,14 @@ function getAvailableSlots() {
     var time = row[2] || '';
     var className = row[3] || '';
     var maxCapacity = parseInt(row[4]) || 10;
+    var category = row[5] || '';
 
-    // Skip past dates
     if (date instanceof Date && date < today) continue;
 
     var dateStr = formatDate(date);
     var key = dateStr + '|' + studio + '|' + time + '|' + className;
     var booked = bookingCounts[key] || 0;
-    var available = maxCapacity - booked;
+    var available = (maxCapacity === 0) ? 999 : maxCapacity - booked;
 
     slots.push({
       date: dateStr,
@@ -86,16 +131,15 @@ function getAvailableSlots() {
       class_name: String(className),
       max: maxCapacity,
       booked: booked,
-      available: Math.max(0, available)
+      available: Math.max(0, available),
+      category: String(category)
     });
   }
 
   return jsonResponse(slots);
 }
 
-/**
- * 予約を登録する
- */
+// ===== 予約登録 =====
 function bookSlot(params) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var bookingSheet = ss.getSheetByName('予約一覧');
@@ -110,14 +154,12 @@ function bookSlot(params) {
   var time = params.time || '';
   var className = params.class_name || '';
   var name = params.name || '';
-  var phone = params.phone || '';
   var email = params.email || '';
 
   if (!name) {
     return jsonResponse({ success: false, error: 'お名前を入力してください' });
   }
 
-  // Check if slot still has availability
   var bookingData = bookingSheet.getDataRange().getValues();
   var key = date + '|' + studio + '|' + time + '|' + className;
   var currentBookings = 0;
@@ -128,10 +170,9 @@ function bookSlot(params) {
     if (rowKey === key) currentBookings++;
   }
 
-  // Find max capacity from schedule
+  // Find max capacity
   var scheduleData = scheduleSheet.getDataRange().getValues();
   var maxCapacity = 10;
-
   for (var i = 1; i < scheduleData.length; i++) {
     var row = scheduleData[i];
     var schedKey = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
@@ -141,11 +182,12 @@ function bookSlot(params) {
     }
   }
 
-  if (currentBookings >= maxCapacity) {
+  // maxCapacity=0 means unlimited
+  if (maxCapacity > 0 && currentBookings >= maxCapacity) {
     return jsonResponse({ success: false, error: 'このレッスンは満員です' });
   }
 
-  // Check for duplicate booking (same name + same slot)
+  // Duplicate check
   for (var i = 1; i < bookingData.length; i++) {
     var row = bookingData[i];
     var rowKey = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
@@ -154,31 +196,16 @@ function bookSlot(params) {
     }
   }
 
-  // Add booking
-  bookingSheet.appendRow([
-    date,
-    studio,
-    time,
-    className,
-    name,
-    phone,
-    email,
-    new Date()
-  ]);
+  bookingSheet.appendRow([date, studio, time, className, name, email, new Date()]);
 
-  // Send email notifications
-  sendBookingNotification(date, studio, time, className, name, phone, email);
-  if (email) {
-    sendBookingConfirmation(email, date, studio, time, className, name);
-  }
+  sendBookingNotification(date, studio, time, className, name, email);
+  if (email) sendBookingConfirmation(email, date, studio, time, className, name);
 
   return jsonResponse({ success: true, message: '予約が完了しました' });
 }
 
-/**
- * 予約通知メールを送信
- */
-function sendBookingNotification(date, studio, time, className, name, phone, email) {
+// ===== 予約通知メール =====
+function sendBookingNotification(date, studio, time, className, name, email) {
   try {
     var subject = '【BTM予約】' + name + 'さん — ' + date + ' ' + className;
     var body = '新しい予約が入りました\n\n'
@@ -188,7 +215,6 @@ function sendBookingNotification(date, studio, time, className, name, phone, ema
       + '時間: ' + time + '\n'
       + 'クラス: ' + className + '\n'
       + 'お名前: ' + name + '\n'
-      + '電話番号: ' + (phone || '未入力') + '\n'
       + 'メール: ' + (email || '未入力') + '\n'
       + '予約日時: ' + Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm') + '\n'
       + '━━━━━━━━━━━━━━━━━━━━\n\n'
@@ -196,14 +222,10 @@ function sendBookingNotification(date, studio, time, className, name, phone, ema
       + SpreadsheetApp.getActiveSpreadsheet().getUrl();
     GmailApp.sendEmail(ADMIN_EMAIL, subject, body);
   } catch (e) {
-    // メール送信失敗しても予約自体は成功させる
     Logger.log('メール送信エラー: ' + e.message);
   }
 }
 
-/**
- * 予約者に確認メールを送信
- */
 function sendBookingConfirmation(email, date, studio, time, className, name) {
   try {
     var subject = '【BEAT THE MIX】予約確認 — ' + date + ' ' + className;
@@ -227,22 +249,17 @@ function sendBookingConfirmation(email, date, studio, time, className, name) {
   }
 }
 
-/**
- * 予約一覧を日付別にグループ化して返す
- */
+// ===== 予約一覧（日付別グループ） =====
 function getBookingList() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var bookingSheet = ss.getSheetByName('予約一覧');
   var scheduleSheet = ss.getSheetByName('スケジュール');
 
-  if (!bookingSheet || !scheduleSheet) {
-    return jsonResponse({ error: 'シートが見つかりません' });
-  }
+  if (!bookingSheet || !scheduleSheet) return jsonResponse({ error: 'シートが見つかりません' });
 
   var bookingData = bookingSheet.getDataRange().getValues();
   var scheduleData = scheduleSheet.getDataRange().getValues();
 
-  // Build capacity map
   var capacityMap = {};
   for (var i = 1; i < scheduleData.length; i++) {
     var r = scheduleData[i];
@@ -250,7 +267,6 @@ function getBookingList() {
     capacityMap[k] = parseInt(r[4]) || 10;
   }
 
-  // Group bookings by date > slot
   var grouped = {};
   for (var i = 1; i < bookingData.length; i++) {
     var row = bookingData[i];
@@ -264,21 +280,17 @@ function getBookingList() {
     if (!grouped[dateStr]) grouped[dateStr] = {};
     if (!grouped[dateStr][slotKey]) {
       grouped[dateStr][slotKey] = {
-        studio: studio,
-        time: time,
-        class_name: className,
-        max: capacityMap[capKey] || 10,
-        members: []
+        studio: studio, time: time, class_name: className,
+        max: capacityMap[capKey] || 10, members: []
       };
     }
     grouped[dateStr][slotKey].members.push({
       name: String(row[4]),
-      phone: String(row[5] || ''),
+      email: String(row[5] || ''),
       booked_at: row[6] instanceof Date ? Utilities.formatDate(row[6], 'Asia/Tokyo', 'MM/dd HH:mm') : String(row[6])
     });
   }
 
-  // Convert to sorted array
   var result = [];
   var dates = Object.keys(grouped).sort();
   for (var d = 0; d < dates.length; d++) {
@@ -294,9 +306,127 @@ function getBookingList() {
   return jsonResponse(result);
 }
 
-/**
- * Date object を文字列に変換
- */
+// ===== お知らせ取得 =====
+function getAnnouncements() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('お知らせ');
+  if (!sheet || sheet.getLastRow() <= 1) return jsonResponse([]);
+
+  var data = sheet.getDataRange().getValues();
+  var items = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[1]) continue; // skip empty title
+    items.push({
+      date: formatDate(row[0]),
+      title: String(row[1]),
+      content: String(row[2] || ''),
+      importance: String(row[3] || ''),
+      row: i + 1 // 1-indexed row number for deletion
+    });
+  }
+  return jsonResponse(items);
+}
+
+// ===== 管理者: レッスン枠追加 =====
+function adminAddSlot(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('スケジュール');
+  if (!sheet) return jsonResponse({ success: false, error: 'スケジュールシートがありません' });
+
+  var date = params.date || '';
+  var studio = params.studio || '';
+  var time = params.time || '';
+  var className = params.class_name || '';
+  var max = parseInt(params.max) || 8;
+  var category = params.category || '';
+
+  if (!date || !studio || !className) {
+    return jsonResponse({ success: false, error: '必須項目が不足しています' });
+  }
+
+  sheet.appendRow([date, studio, time, className, max, category]);
+  return jsonResponse({ success: true, message: 'レッスン枠を追加しました' });
+}
+
+// ===== 管理者: レッスン枠削除 =====
+function adminDeleteSlot(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('スケジュール');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var date = params.date || '';
+  var studio = params.studio || '';
+  var time = params.time || '';
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = data.length - 1; i >= 1; i--) {
+    var row = data[i];
+    if (formatDate(row[0]) === date && String(row[1]) === studio && String(row[2]) === time) {
+      sheet.deleteRow(i + 1);
+      return jsonResponse({ success: true, message: '削除しました' });
+    }
+  }
+
+  return jsonResponse({ success: false, error: '該当するレッスン枠が見つかりません' });
+}
+
+// ===== 管理者: 予約キャンセル =====
+function adminCancelBooking(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('予約一覧');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var date = params.date || '';
+  var studio = params.studio || '';
+  var time = params.time || '';
+  var name = params.name || '';
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = data.length - 1; i >= 1; i--) {
+    var row = data[i];
+    if (formatDate(row[0]) === date && String(row[1]) === studio && String(row[2]) === time && String(row[4]) === name) {
+      sheet.deleteRow(i + 1);
+      return jsonResponse({ success: true, message: name + 'さんの予約をキャンセルしました' });
+    }
+  }
+
+  return jsonResponse({ success: false, error: '該当する予約が見つかりません' });
+}
+
+// ===== 管理者: お知らせ追加 =====
+function adminAddAnnouncement(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('お知らせ');
+  if (!sheet) return jsonResponse({ success: false, error: 'お知らせシートがありません' });
+
+  var date = params.date || formatDate(new Date());
+  var title = params.title || '';
+  var content = params.content || '';
+  var importance = params.importance || '';
+
+  if (!title) return jsonResponse({ success: false, error: 'タイトルを入力してください' });
+
+  sheet.appendRow([date, title, content, importance]);
+  return jsonResponse({ success: true, message: 'お知らせを追加しました' });
+}
+
+// ===== 管理者: お知らせ削除 =====
+function adminDeleteAnnouncement(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('お知らせ');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var row = parseInt(params.row);
+  if (!row || row < 2) return jsonResponse({ success: false, error: '無効な行番号です' });
+
+  if (row > sheet.getLastRow()) return jsonResponse({ success: false, error: '該当する行がありません' });
+
+  sheet.deleteRow(row);
+  return jsonResponse({ success: true, message: '削除しました' });
+}
+
+// ===== ユーティリティ =====
 function formatDate(date) {
   if (date instanceof Date) {
     var m = date.getMonth() + 1;
@@ -306,9 +436,6 @@ function formatDate(date) {
   return String(date);
 }
 
-/**
- * JSON レスポンスを返す
- */
 function jsonResponse(data) {
   return ContentService
     .createTextOutput(JSON.stringify(data))
