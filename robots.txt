@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /members-page.html
+
+Sitemap: https://isai24839a-tech.github.io/btm-design/sitemap.xml
