@@ -338,7 +338,7 @@ function adminAddSlot(params) {
   var studio = params.studio || '';
   var time = params.time || '';
   var className = params.class_name || '';
-  var max = parseInt(params.max) || 8;
+  var max = (params.max !== undefined && params.max !== '') ? parseInt(params.max) : 8;
   var category = params.category || '';
 
   if (!date || !studio || !className) {
