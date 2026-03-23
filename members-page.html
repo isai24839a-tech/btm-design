@@ -2455,12 +2455,15 @@ function initAdminSlotForm() {
     }
   }
 
-  var studioOptions =
-    '<option value="若葉studio">若葉studio</option>' +
-    '<option value="稲毛studio">稲毛studio</option>' +
-    '<option value="千葉studio">千葉studio</option>' +
-    '<option value="美浜studio">美浜studio</option>' +
-    '<option value="稲毛studio(穴川)">稲毛studio(穴川)</option>';
+  var studioMap = {
+    'KIDS': ['若葉studio', '稲毛studio'],
+    'FUTURE': ['千葉studio', '美浜studio', '稲毛studio(穴川)']
+  };
+
+  function buildStudioOptions(cat) {
+    var list = studioMap[cat] || [];
+    return list.map(function(s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
+  }
 
   var categoryOptions =
     '<option value="KIDS">KIDS</option>' +
@@ -2484,7 +2487,8 @@ function initAdminSlotForm() {
       '<div id="admin-single-form" style="display:' + (adminSlotMode === 'single' ? 'block' : 'none') + '">' +
         '<div class="admin-form-grid">' +
           '<input type="date" id="admin-slot-date" value="' + defaultDate + '">' +
-          '<select id="admin-slot-studio">' + studioOptions + '</select>' +
+          '<select id="admin-slot-category">' + categoryOptions + '</select>' +
+          '<select id="admin-slot-studio">' + buildStudioOptions('KIDS') + '</select>' +
           '<div class="admin-time-picker">' +
             '<select id="admin-slot-time-start">' + timeOptions + '</select>' +
             '<span class="admin-time-sep">〜</span>' +
@@ -2497,7 +2501,6 @@ function initAdminSlotForm() {
               '<input type="checkbox" id="admin-slot-unlimited" onchange="toggleUnlimited(\'single\')" style="width:auto;margin:0"> 無制限' +
             '</label>' +
           '</div>' +
-          '<select id="admin-slot-category">' + categoryOptions + '</select>' +
         '</div>' +
         '<button class="admin-add-btn" onclick="adminAddSlot()" style="margin-top:0.75rem">追加する</button>' +
       '</div>' +
@@ -2509,7 +2512,8 @@ function initAdminSlotForm() {
         '<div class="admin-form-grid" style="margin-top:0.75rem">' +
           '<div><label style="font-size:0.8rem;color:var(--gray-600)">開始日</label><input type="date" id="admin-bulk-start" value="' + defaultDate + '"></div>' +
           '<div><label style="font-size:0.8rem;color:var(--gray-600)">終了日</label><input type="date" id="admin-bulk-end" value="' + defaultEnd + '"></div>' +
-          '<select id="admin-bulk-studio">' + studioOptions + '</select>' +
+          '<select id="admin-bulk-category">' + categoryOptions + '</select>' +
+          '<select id="admin-bulk-studio">' + buildStudioOptions('KIDS') + '</select>' +
           '<div class="admin-time-picker">' +
             '<select id="admin-bulk-time-start">' + timeOptions + '</select>' +
             '<span class="admin-time-sep">〜</span>' +
@@ -2522,7 +2526,6 @@ function initAdminSlotForm() {
               '<input type="checkbox" id="admin-bulk-unlimited" onchange="toggleUnlimited(\'bulk\')" style="width:auto;margin:0"> 無制限' +
             '</label>' +
           '</div>' +
-          '<select id="admin-bulk-category">' + categoryOptions + '</select>' +
         '</div>' +
         '<div class="admin-bulk-info" id="admin-bulk-preview">曜日を選んで日程を確認</div>' +
         '<button class="admin-add-btn" onclick="adminBulkAddSlots()" style="margin-top:0.75rem">まとめて追加</button>' +
@@ -2534,6 +2537,18 @@ function initAdminSlotForm() {
     var el = document.getElementById(id);
     if (el) el.addEventListener('change', updateBulkPreview);
   });
+
+  // Filter studios by selected category
+  function filterStudios(catSelectId, studioSelectId) {
+    var catEl = document.getElementById(catSelectId);
+    var studioEl = document.getElementById(studioSelectId);
+    if (!catEl || !studioEl) return;
+    catEl.addEventListener('change', function() {
+      studioEl.innerHTML = buildStudioOptions(catEl.value);
+    });
+  }
+  filterStudios('admin-slot-category', 'admin-slot-studio');
+  filterStudios('admin-bulk-category', 'admin-bulk-studio');
 }
 
 function toggleUnlimited(mode) {
