@@ -1798,7 +1798,7 @@ body {
 
 <script>
 // ===== CONFIGURATION =====
-const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE';
+const SPREADSHEET_ID = '1M96QizLwfPFPwNXBJHteMCpiVXkV3FIAqXasHAY0Le4';
 const ANNOUNCE_SHEET = 'お知らせ';
 const MEMBER_PASSWORD = 'btm2025';
 const ADMIN_PASSWORD = 'btmadmin2026';
@@ -2040,16 +2040,10 @@ function initCalendar() {
 }
 
 function fetchSlotsFromAPI(callback) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', APPS_SCRIPT_URL + '?action=slots', true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      try { allSlots = JSON.parse(xhr.responseText); } catch(e) { allSlots = []; }
-    }
-    if (callback) callback();
-  };
-  xhr.onerror = function() { if (callback) callback(); };
-  xhr.send();
+  fetch(APPS_SCRIPT_URL + '?action=slots', { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { allSlots = data; if (callback) callback(); })
+    .catch(function() { allSlots = []; if (callback) callback(); });
 }
 
 function renderCalendar() {
@@ -2331,19 +2325,13 @@ function submitBooking() {
     name: name, email: email
   });
 
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', APPS_SCRIPT_URL + '?' + params.toString(), true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      try {
-        var result = JSON.parse(xhr.responseText);
-        if (result.success) { showBookingSuccess(name); }
-        else { btn.disabled = false; btn.textContent = '予約する'; alert(result.error || '予約に失敗しました'); }
-      } catch (e) { showBookingSuccess(name); }
-    } else { btn.disabled = false; btn.textContent = '予約する'; alert('通信エラーが発生しました'); }
-  };
-  xhr.onerror = function() { showBookingSuccess(name); };
-  xhr.send();
+  fetch(APPS_SCRIPT_URL + '?' + params.toString(), { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) { showBookingSuccess(name); }
+      else { btn.disabled = false; btn.textContent = '予約する'; alert(result.error || '予約に失敗しました'); }
+    })
+    .catch(function() { btn.disabled = false; btn.textContent = '予約する'; alert('通信エラーが発生しました'); });
 }
 
 function showBookingSuccess(name) {
@@ -2381,7 +2369,7 @@ function fetchAnnouncements() {
     return;
   }
 
-  if (!SPREADSHEET_ID || SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
+  if (!SPREADSHEET_ID || SPREADSHEET_ID === '1M96QizLwfPFPwNXBJHteMCpiVXkV3FIAqXasHAY0Le4') {
     container.innerHTML =
       '<div class="setup-card"><h3>お知らせセットアップ</h3>' +
       '<p class="setup-subtitle">Googleスプレッドシートに「お知らせ」シートを追加してください</p>' +
@@ -2397,20 +2385,16 @@ function fetchAnnouncements() {
   container.innerHTML = '<div class="loading-container"><div class="spinner"></div><span class="loading-text">お知らせを読み込み中...</span></div>';
 
   var url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(ANNOUNCE_SHEET);
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
+  fetch(url, { redirect: 'follow' })
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
       try {
-        var text = xhr.responseText;
         var data = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
         if (data.status === 'ok' && data.table) { renderAnnouncements(data.table, container); }
         else { showAnnounceEmpty(container); }
       } catch (e) { showAnnounceEmpty(container); }
-    } else { showAnnounceEmpty(container); }
-  };
-  xhr.onerror = function() { showAnnounceEmpty(container); };
-  xhr.send();
+    })
+    .catch(function() { showAnnounceEmpty(container); });
 }
 
 function renderAnnouncements(table, container) {
@@ -2777,14 +2761,10 @@ function fetchAdminAnnouncements() {
   }
 
   container.innerHTML = '<div class="loading-container"><div class="spinner"></div><span class="loading-text">読み込み中...</span></div>';
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', APPS_SCRIPT_URL + '?action=announcements', true);
-  xhr.onload = function() {
-    try { var data = JSON.parse(xhr.responseText); renderAdminAnnouncements(data, container); }
-    catch(e) { renderAdminAnnouncements([], container); }
-  };
-  xhr.onerror = function() { renderAdminAnnouncements([], container); };
-  xhr.send();
+  fetch(APPS_SCRIPT_URL + '?action=announcements', { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { renderAdminAnnouncements(data, container); })
+    .catch(function() { renderAdminAnnouncements([], container); });
 }
 
 function renderAdminAnnouncements(items, container) {
@@ -2856,17 +2836,13 @@ function adminDeleteAnnouncement(rowOrIndex, title) {
 }
 
 function apiCall(params, onSuccess) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', APPS_SCRIPT_URL + '?' + params.toString(), true);
-  xhr.onload = function() {
-    try {
-      var result = JSON.parse(xhr.responseText);
+  fetch(APPS_SCRIPT_URL + '?' + params.toString(), { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
       if (result.success) { if (onSuccess) onSuccess(result); }
       else { alert(result.error || 'エラーが発生しました'); }
-    } catch(e) { alert('通信エラー'); }
-  };
-  xhr.onerror = function() { alert('通信エラー'); };
-  xhr.send();
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
 }
 
 // ===== UTILITIES =====
