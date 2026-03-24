@@ -468,6 +468,74 @@ section {
 .reveal-delay-3 { transition-delay: 0.45s; }
 .reveal-delay-4 { transition-delay: 0.6s; }
 
+/* ===== 3 REASONS (NOA-inspired step reveal) ===== */
+.reasons {
+  background: var(--navy-light);
+  padding: clamp(80px, 10vw, 120px) 0;
+  text-align: center;
+  overflow: hidden;
+}
+
+.reasons-list {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 5vw, 4rem);
+}
+
+.reason-item {
+  position: relative;
+}
+
+.reason-number {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+.reason-title {
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  color: var(--white);
+  letter-spacing: 0.05em;
+}
+
+.reason-desc {
+  font-size: clamp(0.88rem, 1.5vw, 0.95rem);
+  color: var(--text-body);
+  line-height: 1.9;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.reason-item::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--gold);
+  margin: 2rem auto 0;
+  opacity: 0.25;
+}
+
+.reason-item:last-child::after {
+  display: none;
+}
+
+.reasons .reason-item.reveal {
+  transform: translateY(60px);
+}
+.reasons .reason-item.reveal-delay-1 { transition-delay: 0.2s; }
+.reasons .reason-item.reveal-delay-2 { transition-delay: 0.45s; }
+.reasons .reason-item.reveal-delay-3 { transition-delay: 0.7s; }
+
 /* ===== WAVE DIVIDER ===== */
 .wave-divider {
   position: relative;
@@ -1703,6 +1771,41 @@ section {
     <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="#162A3E" opacity="0.5"/>
     <path d="M0,50 C320,20 640,70 960,40 C1200,15 1360,55 1440,50 L1440,80 L0,80 Z" fill="#162A3E"/>
   </svg>
+</div>
+
+<!-- ===== 3 REASONS ===== -->
+<section class="reasons" id="reasons">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">Why BTM?</p>
+      <h2 class="section-heading">BTM FUTUREが選ばれる<br>3つの理由</h2>
+      <div class="gold-line"></div>
+    </div>
+    <div class="reasons-list">
+      <div class="reason-item reveal reveal-delay-1">
+        <div class="reason-number">01</div>
+        <h3 class="reason-title">同世代だけの安心空間</h3>
+        <p class="reason-desc">40歳以上限定だから、周りもみんな同世代。<br>「ついていけるかな」という不安なく、気兼ねなく始められます。</p>
+      </div>
+      <div class="reason-item reveal reveal-delay-2">
+        <div class="reason-number">02</div>
+        <h3 class="reason-title">ゼロからでも大丈夫</h3>
+        <p class="reason-desc">ストレッチから始めて、無理なくステップアップ。<br>男女問わず、未経験の方がほとんどです。</p>
+      </div>
+      <div class="reason-item reveal reveal-delay-3">
+        <div class="reason-number">03</div>
+        <h3 class="reason-title">あなた自身が主役になれる</h3>
+        <p class="reason-desc">JUNJUN先生（Dance歴32年）が、一人ひとりの輝きを引き出す。<br>誰かを支えるあなたが、自分自身で輝く場所です。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DIVIDER ===== -->
+<div class="elegant-divider reveal">
+  <div class="line"></div>
+  <div class="diamond"></div>
+  <div class="line"></div>
 </div>
 
 <!-- ===== CONCEPT ===== -->

@@ -599,6 +599,78 @@ body {
 .delay-4 { transition-delay: 0.4s; }
 
 /* ============================================
+   3 REASONS (NOA-inspired step reveal)
+   ============================================ */
+.reasons-section {
+  background: var(--white);
+  padding: clamp(80px, 10vw, 120px) 0;
+  text-align: center;
+  overflow: hidden;
+}
+
+.reasons-list {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 5vw, 4rem);
+}
+
+.reason-item {
+  position: relative;
+}
+
+.reason-number {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.05em;
+}
+
+.reason-title {
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  color: var(--dark-text);
+  letter-spacing: 0.02em;
+}
+
+.reason-desc {
+  font-size: clamp(0.88rem, 1.5vw, 0.95rem);
+  color: var(--gray-text);
+  line-height: 1.9;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.reason-item::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--orange), var(--coral));
+  margin: 2rem auto 0;
+  opacity: 0.3;
+}
+
+.reason-item:last-child::after {
+  display: none;
+}
+
+.reasons-section .reason-item.fade-in {
+  transform: translateY(60px);
+}
+.reasons-section .reason-item.delay-1 { transition-delay: 0.15s; }
+.reasons-section .reason-item.delay-2 { transition-delay: 0.35s; }
+.reasons-section .reason-item.delay-3 { transition-delay: 0.55s; }
+
+/* ============================================
    ABOUT / CLASSES SECTION
    ============================================ */
 .about-section {
@@ -2135,6 +2207,40 @@ body {
 <div class="wave-separator wave-hero">
   <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
     <path d="M0,60 C240,120 480,0 720,60 C960,120 1200,0 1440,60 L1440,120 L0,120 Z" fill="#FFF9F5"/>
+  </svg>
+</div>
+
+<!-- ===================== 3 REASONS ===================== -->
+<section class="section reasons-section" id="reasons">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="section-label">WHY BTM?</div>
+      <h2 class="section-title">BTM KIDSが選ばれる<br>3つの理由</h2>
+    </div>
+    <div class="reasons-list">
+      <div class="reason-item fade-in delay-1">
+        <div class="reason-number">01</div>
+        <h3 class="reason-title">千葉市で20年の実績</h3>
+        <p class="reason-desc">2005年の開校以来、地域に根差して20年。<br>千葉市内7スタジオで、延べ数千人のお子さまが巣立っていきました。</p>
+      </div>
+      <div class="reason-item fade-in delay-2">
+        <div class="reason-number">02</div>
+        <h3 class="reason-title">技術だけじゃない、心も育つ</h3>
+        <p class="reason-desc">ダンスの技術はもちろん、挨拶・礼儀・仲間づくりまで。<br>保護者の方が「一番変わった」と感じるのは、お子さまの心の成長です。</p>
+      </div>
+      <div class="reason-item fade-in delay-3">
+        <div class="reason-number">03</div>
+        <h3 class="reason-title">一人ひとりに向き合うレッスン</h3>
+        <p class="reason-desc">NANAMI先生（ダンス歴20年）が一人ひとりの個性を見極め、<br>それぞれのペースに合わせた指導で成長をサポートします。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Wave: Reasons to Concept -->
+<div class="wave-separator">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <path d="M0,40 C360,100 720,0 1080,60 C1260,90 1380,40 1440,50 L1440,120 L0,120 Z" fill="#FFF9F5"/>
   </svg>
 </div>
 
