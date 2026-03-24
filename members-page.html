@@ -119,9 +119,42 @@ body {
   max-width: 300px;
 }
 
+.gate-toggle-pw {
+  position: absolute;
+  right: 52px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  padding: 0;
+}
+
+.gate-toggle-pw:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.gate-toggle-pw svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .gate-input {
   width: 100%;
-  padding: 14px 50px 14px 20px;
+  padding: 14px 84px 14px 20px;
   border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 50px;
   background: rgba(255, 255, 255, 0.05);
@@ -610,6 +643,54 @@ body {
 
 .calendar-day.selected .day-dot {
   background: rgba(255,255,255,0.7);
+}
+
+/* Regular lesson day - solid filled background */
+.calendar-day.has-regular {
+  background: var(--coral);
+  border: none;
+}
+
+.calendar-day.has-regular .day-number {
+  color: #fff !important;
+}
+
+.calendar-day.has-regular .day-dot {
+  background: rgba(255,255,255,0.7);
+}
+
+.category-future .calendar-day.has-regular {
+  background: var(--navy);
+}
+
+.calendar-day.has-regular.selected {
+  opacity: 0.85;
+}
+
+/* Regular lesson card */
+.slot-card.regular-lesson {
+  border-left: 4px solid var(--coral);
+  background: rgba(255, 107, 53, 0.06);
+}
+
+.category-future .slot-card.regular-lesson {
+  border-left-color: var(--navy);
+  background: rgba(13, 27, 42, 0.04);
+}
+
+.regular-lesson-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--coral);
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.03em;
+}
+
+.category-future .regular-lesson-badge {
+  background: var(--navy);
 }
 
 /* ===== DAY LESSONS ===== */
@@ -1704,6 +1785,9 @@ body {
           autocomplete="off"
           autofocus
         >
+        <button type="button" class="gate-toggle-pw" id="gate-toggle-pw" aria-label="パスワードを表示">
+          <svg viewBox="0 0 24 24" id="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </button>
         <button type="submit" class="gate-submit" aria-label="Enter">
           <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
@@ -1837,6 +1921,7 @@ const ANNOUNCE_SHEET = 'お知らせ';
 const MEMBER_PASSWORD = 'btm2025';
 const ADMIN_PASSWORD = 'btmadmin2026';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_j23qQkb6hhZ90wkwLUdwWFXLUpS5KWweJORvp0Z1EOXl0AuPkCAO1CUVQOpAXcoAQg/exec';
+const REGULAR_LESSON_SHEET = '定期レッスン';
 const DEMO_MODE = false;
 // =========================
 
@@ -1846,6 +1931,7 @@ var currentCategory = 'kids';
 var currentMonth = new Date();
 var selectedDate = null;
 var allSlots = []; // Populated from demo or API
+var regularLessons = []; // { dayOfWeek: 0-6, studio, time, class_name, category }
 
 // ===== DEMO DATA =====
 var demoSlots = [
@@ -1884,6 +1970,18 @@ var demoAnnouncements = [
     showMainContent();
     return;
   }
+
+  // Password visibility toggle
+  var toggleBtn = document.getElementById('gate-toggle-pw');
+  var eyeOpen = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+  var eyeClosed = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+  toggleBtn.addEventListener('click', function() {
+    var isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    document.getElementById('eye-icon').innerHTML = isPassword ? eyeClosed : eyeOpen;
+    toggleBtn.setAttribute('aria-label', isPassword ? 'パスワードを隠す' : 'パスワードを表示');
+    input.focus();
+  });
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -2067,11 +2165,65 @@ function getFilteredSlots() {
 }
 
 function initCalendar() {
-  if (!DEMO_MODE && APPS_SCRIPT_URL) {
-    fetchSlotsFromAPI(function() { renderCalendar(); });
-  } else {
-    renderCalendar();
+  var slotsReady = false;
+  var regularsReady = false;
+
+  function tryRender() {
+    if (slotsReady && regularsReady) renderCalendar();
   }
+
+  if (!DEMO_MODE && APPS_SCRIPT_URL) {
+    fetchSlotsFromAPI(function() { slotsReady = true; tryRender(); });
+  } else {
+    slotsReady = true;
+  }
+
+  fetchRegularLessons(function() { regularsReady = true; tryRender(); });
+
+  if (DEMO_MODE) tryRender();
+}
+
+// ===== REGULAR LESSONS =====
+var DAY_NAME_MAP = { '日': 0, '月': 1, '火': 2, '水': 3, '木': 4, '金': 5, '土': 6 };
+
+function fetchRegularLessons(callback) {
+  if (!APPS_SCRIPT_URL) {
+    if (callback) callback();
+    return;
+  }
+
+  fetch(APPS_SCRIPT_URL + '?action=regularLessons', { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && data.length > 0) {
+        regularLessons = [];
+        data.forEach(function(item) {
+          var dow = DAY_NAME_MAP[item.dayOfWeek];
+          if (dow !== undefined && item.class_name) {
+            regularLessons.push({
+              dayOfWeek: dow,
+              studio: item.studio || '',
+              time: item.time || '',
+              class_name: item.class_name,
+              category: (item.category || 'KIDS').toUpperCase()
+            });
+          }
+        });
+      }
+      if (callback) callback();
+    })
+    .catch(function() { if (callback) callback(); });
+}
+
+function getRegularLessonsForDate(dateStr) {
+  var parts = dateStr.split('/');
+  var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  var dow = dateObj.getDay();
+  var filterFn = currentCategory === 'kids' ? isKidsSlot : isFutureSlot;
+
+  return regularLessons.filter(function(r) {
+    return r.dayOfWeek === dow && filterFn(r);
+  });
 }
 
 function fetchSlotsFromAPI(callback) {
@@ -2108,14 +2260,16 @@ function renderCalendar() {
 
   for (var d = 1; d <= daysInMonth; d++) {
     var dateStr = year + '/' + String(month + 1).padStart(2, '0') + '/' + String(d).padStart(2, '0');
+    var hasRegular = getRegularLessonsForDate(dateStr).length > 0;
     var classes = ['calendar-day'];
     if (dateStr === todayStr) classes.push('today');
     if (dateStr === selectedDate) classes.push('selected');
     if (lessonDates[dateStr]) classes.push('has-lessons');
+    if (hasRegular) classes.push('has-regular');
 
     html += '<div class="' + classes.join(' ') + '" onclick="selectDate(\'' + dateStr + '\')">';
     html += '<span class="day-number">' + d + '</span>';
-    if (lessonDates[dateStr]) html += '<span class="day-dot"></span>';
+    if (lessonDates[dateStr] || hasRegular) html += '<span class="day-dot"></span>';
     html += '</div>';
   }
 
@@ -2181,13 +2335,14 @@ function getSlotMembers(slot) {
 function renderDayLessons(dateStr) {
   var container = document.getElementById('day-lessons');
   var slots = getFilteredSlots().filter(function(s) { return s.date === dateStr; });
+  var regulars = getRegularLessonsForDate(dateStr);
 
   var parts = dateStr.split('/');
   var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
   var days = ['日', '月', '火', '水', '木', '金', '土'];
   var dateLabel = parseInt(parts[1]) + '/' + parseInt(parts[2]) + '（' + days[dateObj.getDay()] + '）';
 
-  if (slots.length === 0) {
+  if (slots.length === 0 && regulars.length === 0) {
     container.innerHTML =
       '<div class="day-lessons-header">' + escapeHtml(dateLabel) + '</div>' +
       '<div class="day-lessons-empty">この日のレッスンはありません</div>';
@@ -2196,6 +2351,18 @@ function renderDayLessons(dateStr) {
 
   var html = '<div class="day-lessons-header">' + escapeHtml(dateLabel) + ' のレッスン</div>';
   html += '<div class="day-lessons-grid">';
+
+  // Regular lessons first
+  regulars.forEach(function(r) {
+    html += '<div class="slot-card regular-lesson">';
+    html += '<div class="slot-card-info">';
+    html += '<span class="regular-lesson-badge">定期レッスン</span>';
+    if (r.studio) html += '<span class="slot-tag studio">' + escapeHtml(r.studio) + '</span>';
+    html += '<span class="slot-tag time">' + escapeHtml(r.time || '') + '</span>';
+    html += '<span class="slot-tag">' + escapeHtml(r.class_name || '') + '</span>';
+    html += '</div>';
+    html += '</div>';
+  });
 
   slots.forEach(function(slot) {
     var isUnlimited = slot.max === 0 || slot.max === '0';
@@ -2406,59 +2573,33 @@ function fetchAnnouncements() {
     return;
   }
 
-  if (!SPREADSHEET_ID || SPREADSHEET_ID === '1M96QizLwfPFPwNXBJHteMCpiVXkV3FIAqXasHAY0Le4') {
-    container.innerHTML =
-      '<div class="setup-card"><h3>お知らせセットアップ</h3>' +
-      '<p class="setup-subtitle">Googleスプレッドシートに「お知らせ」シートを追加してください</p>' +
-      '<ol class="setup-steps">' +
-        '<li>スプレッドシートに新しいシートを追加</li>' +
-        '<li>シート名を「お知らせ」に変更</li>' +
-        '<li>列を追加: <div class="setup-columns"><span class="setup-column-tag">日付</span><span class="setup-column-tag">タイトル</span><span class="setup-column-tag">内容</span><span class="setup-column-tag">重要度</span></div></li>' +
-        '<li>重要度は「重要」と入力すると赤バッジが付きます</li>' +
-      '</ol></div>';
+  if (!APPS_SCRIPT_URL) {
+    showAnnounceEmpty(container);
     return;
   }
 
   container.innerHTML = '<div class="loading-container"><div class="spinner"></div><span class="loading-text">お知らせを読み込み中...</span></div>';
 
-  var url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(ANNOUNCE_SHEET);
-  fetch(url, { redirect: 'follow' })
-    .then(function(r) { return r.text(); })
-    .then(function(text) {
-      try {
-        var data = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
-        if (data.status === 'ok' && data.table) { renderAnnouncements(data.table, container); }
-        else { showAnnounceEmpty(container); }
-      } catch (e) { showAnnounceEmpty(container); }
+  fetch(APPS_SCRIPT_URL + '?action=announcements', { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data || data.length === 0) { showAnnounceEmpty(container); return; }
+      var html = '';
+      for (var i = data.length - 1; i >= 0; i--) {
+        var a = data[i];
+        var isImportant = (a.importance || '').indexOf('重要') !== -1;
+        html += '<div class="' + (isImportant ? 'announce-card important' : 'announce-card') + '">';
+        html += '<div class="announce-card-header">';
+        html += '<span class="announce-date">' + escapeHtml(a.date || '') + '</span>';
+        if (isImportant) html += '<span class="announce-badge-important">重要</span>';
+        html += '</div>';
+        html += '<h4>' + escapeHtml(a.title || '') + '</h4>';
+        html += '<p>' + escapeHtml(a.content || '') + '</p>';
+        html += '</div>';
+      }
+      container.innerHTML = html;
     })
     .catch(function() { showAnnounceEmpty(container); });
-}
-
-function renderAnnouncements(table, container) {
-  var rows = table.rows || [];
-  if (rows.length === 0) { showAnnounceEmpty(container); return; }
-
-  var html = '';
-  for (var i = rows.length - 1; i >= 0; i--) {
-    var cells = rows[i].c || [];
-    var date = cells[0] ? (cells[0].f || cells[0].v || '') : '';
-    var title = cells[1] ? (cells[1].f || cells[1].v || '') : '';
-    var content = cells[2] ? (cells[2].f || cells[2].v || '') : '';
-    var importance = cells[3] ? (cells[3].f || cells[3].v || '') : '';
-
-    var isImportant = String(importance).indexOf('重要') !== -1;
-    var cardClass = isImportant ? 'announce-card important' : 'announce-card';
-
-    html += '<div class="' + cardClass + '">';
-    html += '<div class="announce-card-header">';
-    html += '<span class="announce-date">' + escapeHtml(String(date)) + '</span>';
-    if (isImportant) html += '<span class="announce-badge-important">重要</span>';
-    html += '</div>';
-    html += '<h4>' + escapeHtml(String(title)) + '</h4>';
-    html += '<p>' + escapeHtml(String(content)) + '</p>';
-    html += '</div>';
-  }
-  container.innerHTML = html;
 }
 
 function showAnnounceEmpty(container) {

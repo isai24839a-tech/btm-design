@@ -26,6 +26,7 @@ function setupSheets() {
     { name: 'スケジュール', headers: ['日付', 'スタジオ', '時間', 'クラス', '定員', 'category'] },
     { name: '予約一覧', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時'] },
     { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度'] },
+    { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ'] },
     { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] }
   ];
@@ -65,6 +66,7 @@ function doGet(e) {
   if (action === 'book') return bookSlot(e.parameter);
   if (action === 'list') return getBookingList();
   if (action === 'announcements') return getAnnouncements();
+  if (action === 'regularlessons') return getRegularLessons();
 
   // Admin actions (require adminKey)
   if (action === 'addslot') return adminGuard(e, adminAddSlot);
@@ -72,6 +74,7 @@ function doGet(e) {
   if (action === 'cancelbooking') return adminGuard(e, adminCancelBooking);
   if (action === 'addannouncement') return adminGuard(e, adminAddAnnouncement);
   if (action === 'deleteannouncement') return adminGuard(e, adminDeleteAnnouncement);
+  if (action === 'formatsheets') return adminGuard(e, adminFormatSheets);
 
   return jsonResponse({ error: 'Unknown action' });
 }
@@ -239,10 +242,13 @@ function sendBookingConfirmation(email, date, studio, time, className, name) {
       + 'クラス: ' + className + '\n'
       + '━━━━━━━━━━━━━━━━━━━━\n\n'
       + 'キャンセル・変更のご連絡:\n'
-      + '電話: 090-1817-9501\n'
-      + 'メール: beat.the.mix7386@gmail.com\n\n'
+      + 'LINEにてご連絡ください。\n\n'
       + '当日お会いできることを楽しみにしています！\n\n'
-      + 'BEAT THE MIX ダンススタジオ';
+      + 'BEAT THE MIX ダンススタジオ\n\n'
+      + '─────────────────────\n'
+      + '※このメールは送信専用です。\n'
+      + '　このメールに返信しても届きませんので\n'
+      + '　ご了承ください。';
     GmailApp.sendEmail(email, subject, body);
   } catch (e) {
     Logger.log('確認メール送信エラー: ' + e.message);
@@ -323,6 +329,28 @@ function getAnnouncements() {
       content: String(row[2] || ''),
       importance: String(row[3] || ''),
       row: i + 1 // 1-indexed row number for deletion
+    });
+  }
+  return jsonResponse(items);
+}
+
+// ===== 定期レッスン取得 =====
+function getRegularLessons() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('定期レッスン');
+  if (!sheet || sheet.getLastRow() <= 1) return jsonResponse([]);
+
+  var data = sheet.getDataRange().getValues();
+  var items = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue;
+    items.push({
+      dayOfWeek: String(row[0]),
+      studio: String(row[1] || ''),
+      time: String(row[2] || ''),
+      class_name: String(row[3] || ''),
+      category: String(row[4] || 'KIDS').toUpperCase()
     });
   }
   return jsonResponse(items);
@@ -424,6 +452,27 @@ function adminDeleteAnnouncement(params) {
 
   sheet.deleteRow(row);
   return jsonResponse({ success: true, message: '削除しました' });
+}
+
+// ===== 管理者: シート列幅自動調整 =====
+function adminFormatSheets() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheets = ss.getSheets();
+  for (var s = 0; s < sheets.length; s++) {
+    var sheet = sheets[s];
+    var lastCol = sheet.getLastColumn();
+    if (lastCol > 0) {
+      for (var c = 1; c <= lastCol; c++) {
+        sheet.autoResizeColumn(c);
+      }
+      // Add padding (minimum 120px)
+      for (var c = 1; c <= lastCol; c++) {
+        var w = sheet.getColumnWidth(c);
+        if (w < 120) sheet.setColumnWidth(c, 120);
+      }
+    }
+  }
+  return jsonResponse({ success: true, message: '全シートの列幅を調整しました' });
 }
 
 // ===== ユーティリティ =====
