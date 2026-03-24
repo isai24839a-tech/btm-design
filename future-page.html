@@ -256,6 +256,15 @@ body {
   background-size: 80px 80px, 120px 120px, 100px 100px;
 }
 
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('images/LINE_ALBUM_hp_260324_23.jpg') center/cover no-repeat;
+  opacity: 0.12;
+  z-index: 0;
+}
+
 .hero-vignette {
   position: absolute;
   inset: 0;
@@ -1280,40 +1289,35 @@ section {
   margin-bottom: 40px;
 }
 
-.gallery-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 280px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(212, 168, 83, 0.2);
-  margin-top: 48px;
-  gap: 16px;
-  padding: 40px;
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 900px;
+  margin: 32px auto 40px;
 }
 
-.gallery-placeholder-icon svg {
-  width: 48px;
-  height: 48px;
-  stroke: var(--gold);
-  fill: none;
-  stroke-width: 1.2;
-  opacity: 0.4;
+.photo-item {
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 1;
 }
 
-.gallery-placeholder-text {
-  font-size: 15px;
-  color: var(--white-muted);
-  text-align: center;
+.photo-item.photo-featured {
+  grid-column: span 2;
+  grid-row: span 2;
 }
 
-.gallery-placeholder-note {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.3);
-  text-align: center;
-  font-family: 'Oswald', sans-serif;
-  letter-spacing: 1px;
+.photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  display: block;
+}
+
+.photo-item:hover img {
+  transform: scale(1.05);
 }
 
 .gallery-follow-btn {
@@ -1617,6 +1621,9 @@ section {
   }
 
   .pricing-table td:first-child { width: 50%; }
+
+  .photo-grid { grid-template-columns: repeat(2, 1fr); }
+  .photo-item.photo-featured { grid-column: span 2; grid-row: auto; aspect-ratio: 16/9; }
 
   /* Floating banner: full-width bar at bottom on mobile */
   .trial-float-banner {
@@ -2165,18 +2172,14 @@ section {
       <h2 class="section-heading">ギャラリー</h2>
       <div class="gold-line" style="margin-left:auto;margin-right:auto;"></div>
     </div>
-    <p class="section-subtitle reveal reveal-delay-1">レッスンの雰囲気をInstagramでチェック</p>
+    <p class="section-subtitle reveal reveal-delay-1">レッスンの雰囲気をご覧ください</p>
 
-    <div class="gallery-placeholder reveal reveal-delay-2">
-      <div class="gallery-placeholder-icon">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="20" height="20" rx="5"/>
-          <circle cx="12" cy="12" r="5"/>
-          <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/>
-        </svg>
-      </div>
-      <p class="gallery-placeholder-text">Instagramの投稿がここに表示されます</p>
-      <p class="gallery-placeholder-note">@beat_the_mix_future</p>
+    <div class="photo-grid reveal reveal-delay-2">
+      <div class="photo-item photo-featured"><img src="images/LINE_ALBUM_hp_260324_11.jpg" alt="FUTUREクラス集合写真" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_23.jpg" alt="レッスン風景" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_15.jpg" alt="練習風景" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_7.jpg" alt="ダンスレッスン" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_14.jpg" alt="FUTURE & KIDS" loading="lazy"></div>
     </div>
 
     <a href="https://www.instagram.com/beat_the_mix_future/" target="_blank" rel="noopener" class="gallery-follow-btn reveal reveal-delay-3">

@@ -280,16 +280,11 @@ html, body {
   mix-blend-mode: difference;
 }
 
-.center-logo .logo-text {
-  margin: 0;
-  font-family: 'Oswald', sans-serif;
-  font-size: clamp(0.65rem, 1.2vw, 0.85rem);
-  font-weight: 500;
-  letter-spacing: 0.35em;
-  color: var(--white);
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  opacity: 0.5;
+.center-logo .logo-img {
+  max-width: 120px;
+  height: auto;
+  opacity: 0.7;
+  filter: brightness(1.2);
 }
 
 /* === TOP BAR === */
@@ -434,6 +429,20 @@ html, body {
   50% { opacity: 0.6; transform: scale(1.5); }
 }
 
+/* === SIDE BACKGROUND PHOTOS === */
+.side-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.25;
+  z-index: 0;
+  transition: opacity 0.7s ease;
+}
+.split-side:hover .side-bg {
+  opacity: 0.4;
+}
+
 /* === LOAD ANIMATION === */
 .split-side .side-content {
   opacity: 0;
@@ -499,7 +508,7 @@ html, body {
 
 <!-- CENTER LOGO -->
 <div class="center-logo">
-  <h1 class="logo-text">B T M</h1>
+  <img src="images/LINE_ALBUM_hp_260324_12.jpg" alt="BTM DANCE STUDIO" class="logo-img">
 </div>
 
 <!-- SPLIT -->
@@ -507,6 +516,7 @@ html, body {
 
   <!-- KIDS SIDE -->
   <a href="kids-page.html" class="split-side side-kids">
+    <div class="side-bg" style="background-image: url('images/LINE_ALBUM_hp_260324_50.jpg');"></div>
     <div class="shape shape-1"></div>
     <div class="shape shape-2"></div>
     <div class="shape shape-3"></div>
@@ -525,6 +535,7 @@ html, body {
 
   <!-- FUTURE SIDE -->
   <a href="future-page.html" class="split-side side-future">
+    <div class="side-bg" style="background-image: url('images/LINE_ALBUM_hp_260324_11.jpg');"></div>
     <div class="particle"></div>
     <div class="particle"></div>
     <div class="particle"></div>

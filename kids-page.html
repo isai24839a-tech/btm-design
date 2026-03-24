@@ -248,17 +248,18 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--orange) 0%, var(--coral) 40%, var(--orange) 70%, var(--yellow) 100%);
-  background-size: 300% 300%;
+  background-image: linear-gradient(135deg, rgba(255,107,53,0.88) 0%, rgba(255,77,109,0.85) 50%, rgba(255,107,53,0.88) 100%), url('images/LINE_ALBUM_hp_260324_50.jpg');
+  background-size: 200% 200%, cover;
+  background-position: center, center;
   animation: heroGradient 8s ease infinite;
 }
 
 @keyframes heroGradient {
-  0% { background-position: 0% 50%; }
-  25% { background-position: 50% 0%; }
-  50% { background-position: 100% 50%; }
-  75% { background-position: 50% 100%; }
-  100% { background-position: 0% 50%; }
+  0% { background-position: 0% 50%, center; }
+  25% { background-position: 50% 0%, center; }
+  50% { background-position: 100% 50%, center; }
+  75% { background-position: 50% 100%, center; }
+  100% { background-position: 0% 50%, center; }
 }
 
 .hero-shapes {
@@ -1509,47 +1510,36 @@ body {
   position: relative;
 }
 
-.gallery-placeholder {
-  max-width: 800px;
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  max-width: 1000px;
   margin: 0 auto 2.5rem;
-  background: var(--light-bg);
-  border: 2px dashed rgba(255, 107, 53, 0.2);
-  border-radius: var(--radius);
-  padding: 4rem 2rem;
-  text-align: center;
 }
 
-.gallery-placeholder-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--orange), var(--coral));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.5rem;
+.photo-item {
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 1;
 }
 
-.gallery-placeholder-icon svg {
-  width: 30px;
-  height: 30px;
-  stroke: var(--white);
-  stroke-width: 2;
-  fill: none;
+.photo-item.photo-featured {
+  grid-column: span 2;
+  grid-row: span 2;
 }
 
-.gallery-placeholder-text {
-  font-size: 1rem;
-  color: var(--gray-text);
-  margin-bottom: 0.5rem;
+.photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  display: block;
 }
 
-.gallery-placeholder-note {
-  font-size: 0.75rem;
-  color: var(--orange);
-  opacity: 0.7;
-  font-family: 'Oswald', sans-serif;
-  letter-spacing: 0.05em;
+.photo-item:hover img {
+  transform: scale(1.05);
 }
 
 .gallery-follow-btn {
@@ -1894,8 +1884,13 @@ body {
     padding: 0 1.3rem 1.3rem 1.3rem;
   }
 
-  .gallery-placeholder {
-    padding: 3rem 1.5rem;
+  .photo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .photo-item.photo-featured {
+    grid-column: span 2;
+    grid-row: span 2;
   }
 
   .contact-items {
@@ -2690,15 +2685,20 @@ body {
       <div class="section-label">GALLERY</div>
       <h2 class="section-title">ギャラリー</h2>
       <p class="section-desc">
-        レッスンの様子をInstagramでチェック！
+        ステージ・レッスンの様子をご覧ください
       </p>
     </div>
-    <div class="gallery-placeholder fade-in delay-1">
-      <div class="gallery-placeholder-icon">
-        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
-      </div>
-      <p class="gallery-placeholder-text">Instagramの投稿がここに表示されます</p>
-      <p class="gallery-placeholder-note">@beat_the_mix_kids</p>
+    <div class="photo-grid fade-in delay-1">
+      <div class="photo-item photo-featured"><img src="images/LINE_ALBUM_hp_260324_50.jpg" alt="ステージパフォーマンス" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_13.jpg" alt="発表会" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_19.jpg" alt="ステージ" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_1.jpg" alt="パフォーマンス" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_24.jpg" alt="レッスン" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_10.jpg" alt="フィナーレ" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_16.jpg" alt="イベント出演" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_40.jpg" alt="レッスン風景" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_9.jpg" alt="グループレッスン" loading="lazy"></div>
+      <div class="photo-item"><img src="images/LINE_ALBUM_hp_260324_27.jpg" alt="ダンスパフォーマンス" loading="lazy"></div>
     </div>
     <div class="gallery-follow-wrap fade-in delay-2">
       <a href="https://www.instagram.com/beat_the_mix_kids/" target="_blank" rel="noopener" class="gallery-follow-btn">
