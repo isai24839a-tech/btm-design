@@ -804,6 +804,28 @@ body {
   border-left-color: var(--navy);
 }
 
+.category-future .slot-book-btn {
+  background: var(--navy);
+}
+
+.category-future .slot-book-btn:hover {
+  background: #1a3a5c;
+}
+
+.category-future .slot-tag.time {
+  background: rgba(13,27,42,0.08);
+  color: var(--navy);
+}
+
+.category-future .calendar-nav-btn:hover {
+  border-color: var(--navy);
+  color: var(--navy);
+}
+
+.category-future .calendar-day.today {
+  background: rgba(13, 27, 42, 0.06);
+}
+
 .slot-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
@@ -1001,6 +1023,18 @@ body {
   background: var(--gray-200);
   color: var(--gray-500);
   cursor: not-allowed;
+}
+
+.modal-future .booking-field input:focus {
+  border-color: var(--navy);
+}
+
+.modal-future .booking-submit-btn {
+  background: var(--navy);
+}
+
+.modal-future .booking-submit-btn:hover {
+  background: #1a3a5c;
 }
 
 .booking-success {
@@ -1984,6 +2018,7 @@ function initCategoryToggle() {
       selectedDate = null;
       document.getElementById('day-lessons').innerHTML = '';
       renderCalendar();
+      initAdminSlotForm(); // Re-render admin form with new category's studios
     });
   });
 }
@@ -2250,7 +2285,7 @@ function openBookingModal(slot) {
     '<div class="booking-modal-slot">' + slotHtml + '</div>' +
     '<form id="booking-form" onsubmit="event.preventDefault();submitBooking()">' +
       '<div class="booking-field">' +
-        '<label>お名前 <span style="color:var(--coral)">*</span></label>' +
+        '<label>お名前 <span class="required-mark" style="color:' + (currentCategory === 'future' ? 'var(--navy)' : 'var(--coral)') + '">*</span></label>' +
         '<input type="text" id="booking-name" required placeholder="山田 太郎" autocomplete="name">' +
       '</div>' +
       '<div class="booking-field">' +
@@ -2264,6 +2299,8 @@ function openBookingModal(slot) {
       '</div>' +
     '</form>';
 
+  modal.classList.remove('modal-future');
+  if (currentCategory === 'future') modal.classList.add('modal-future');
   modal.classList.add('active');
 
   // Restore saved name/email from localStorage
@@ -2455,19 +2492,22 @@ function initAdminSlotForm() {
     }
   }
 
-  var studioMap = {
+  // studioMap and buildStudioOptions are global for onchange access
+  window._studioMap = {
     'KIDS': ['若葉studio', '稲毛studio'],
     'FUTURE': ['千葉studio', '美浜studio', '稲毛studio(穴川)']
   };
 
-  function buildStudioOptions(cat) {
-    var list = studioMap[cat] || [];
+  window._buildStudioOptions = function(cat) {
+    var list = window._studioMap[cat] || [];
     return list.map(function(s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
-  }
+  };
 
-  var categoryOptions =
-    '<option value="KIDS">KIDS</option>' +
-    '<option value="FUTURE">FUTURE</option>';
+  var buildStudioOptions = window._buildStudioOptions;
+
+  // Use current category from KIDS/FUTURE toggle
+  var activeCat = currentCategory.toUpperCase();
+  var catLabel = activeCat === 'FUTURE' ? 'FUTURE' : 'KIDS';
 
   var dowLabels = ['月','火','水','木','金','土','日'];
   var dowButtons = '';
@@ -2477,7 +2517,7 @@ function initAdminSlotForm() {
 
   container.innerHTML =
     '<div class="admin-add-form" style="margin-top:1.5rem">' +
-      '<h3>レッスン枠を追加</h3>' +
+      '<h3>' + catLabel + ' レッスン枠を追加</h3>' +
       '<div class="admin-mode-toggle">' +
         '<button class="' + (adminSlotMode === 'single' ? 'active' : '') + '" onclick="switchSlotMode(\'single\')">単発追加</button>' +
         '<button class="' + (adminSlotMode === 'bulk' ? 'active' : '') + '" onclick="switchSlotMode(\'bulk\')">まとめて追加</button>' +
@@ -2487,14 +2527,13 @@ function initAdminSlotForm() {
       '<div id="admin-single-form" style="display:' + (adminSlotMode === 'single' ? 'block' : 'none') + '">' +
         '<div class="admin-form-grid">' +
           '<input type="date" id="admin-slot-date" value="' + defaultDate + '">' +
-          '<select id="admin-slot-category">' + categoryOptions + '</select>' +
-          '<select id="admin-slot-studio">' + buildStudioOptions('KIDS') + '</select>' +
+          '<select id="admin-slot-studio">' + buildStudioOptions(activeCat) + '</select>' +
           '<div class="admin-time-picker">' +
             '<select id="admin-slot-time-start">' + timeOptions + '</select>' +
             '<span class="admin-time-sep">〜</span>' +
             '<select id="admin-slot-time-end">' + timeOptions + '</select>' +
           '</div>' +
-          '<input type="text" id="admin-slot-class" placeholder="KIDSクラス">' +
+          '<input type="text" id="admin-slot-class" placeholder="' + catLabel + 'クラス">' +
           '<div style="display:flex;align-items:center;gap:8px">' +
             '<input type="number" id="admin-slot-max" value="8" min="1" max="30" style="flex:1;margin:0">' +
             '<label style="display:flex;align-items:center;gap:4px;font-size:0.8rem;color:var(--gray-600);white-space:nowrap;cursor:pointer">' +
@@ -2512,14 +2551,13 @@ function initAdminSlotForm() {
         '<div class="admin-form-grid" style="margin-top:0.75rem">' +
           '<div><label style="font-size:0.8rem;color:var(--gray-600)">開始日</label><input type="date" id="admin-bulk-start" value="' + defaultDate + '"></div>' +
           '<div><label style="font-size:0.8rem;color:var(--gray-600)">終了日</label><input type="date" id="admin-bulk-end" value="' + defaultEnd + '"></div>' +
-          '<select id="admin-bulk-category">' + categoryOptions + '</select>' +
-          '<select id="admin-bulk-studio">' + buildStudioOptions('KIDS') + '</select>' +
+          '<select id="admin-bulk-studio">' + buildStudioOptions(activeCat) + '</select>' +
           '<div class="admin-time-picker">' +
             '<select id="admin-bulk-time-start">' + timeOptions + '</select>' +
             '<span class="admin-time-sep">〜</span>' +
             '<select id="admin-bulk-time-end">' + timeOptions + '</select>' +
           '</div>' +
-          '<input type="text" id="admin-bulk-class" placeholder="KIDSクラス">' +
+          '<input type="text" id="admin-bulk-class" placeholder="' + catLabel + 'クラス">' +
           '<div style="display:flex;align-items:center;gap:8px">' +
             '<input type="number" id="admin-bulk-max" value="8" min="1" max="30" style="flex:1;margin:0">' +
             '<label style="display:flex;align-items:center;gap:4px;font-size:0.8rem;color:var(--gray-600);white-space:nowrap;cursor:pointer">' +
@@ -2538,17 +2576,7 @@ function initAdminSlotForm() {
     if (el) el.addEventListener('change', updateBulkPreview);
   });
 
-  // Filter studios by selected category
-  function filterStudios(catSelectId, studioSelectId) {
-    var catEl = document.getElementById(catSelectId);
-    var studioEl = document.getElementById(studioSelectId);
-    if (!catEl || !studioEl) return;
-    catEl.addEventListener('change', function() {
-      studioEl.innerHTML = buildStudioOptions(catEl.value);
-    });
-  }
-  filterStudios('admin-slot-category', 'admin-slot-studio');
-  filterStudios('admin-bulk-category', 'admin-bulk-studio');
+  // Studio filtering now handled via inline onchange on select elements
 }
 
 function toggleUnlimited(mode) {
@@ -2642,7 +2670,7 @@ function adminAddSlot() {
   var className = document.getElementById('admin-slot-class').value.trim();
   var unlimited = document.getElementById('admin-slot-unlimited').checked;
   var max = unlimited ? 0 : (parseInt(document.getElementById('admin-slot-max').value) || 8);
-  var category = document.getElementById('admin-slot-category').value;
+  var category = currentCategory.toUpperCase();
 
   if (!date || !studio || !tStart || !tEnd || !className) {
     alert('すべての項目を入力してください');
@@ -2681,7 +2709,7 @@ function adminBulkAddSlots() {
   var className = document.getElementById('admin-bulk-class').value.trim();
   var unlimited = document.getElementById('admin-bulk-unlimited').checked;
   var max = unlimited ? 0 : (parseInt(document.getElementById('admin-bulk-max').value) || 8);
-  var category = document.getElementById('admin-bulk-category').value;
+  var category = currentCategory.toUpperCase();
 
   if (!studio || !tStart || !tEnd || !className) {
     alert('スタジオ・時間・クラス名を入力してください');
