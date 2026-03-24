@@ -114,7 +114,7 @@ function getAvailableSlots() {
     var studio = row[1] || '';
     var time = row[2] || '';
     var className = row[3] || '';
-    var maxCapacity = parseInt(row[4]) || 10;
+    var maxCapacity = (row[4] !== '' && row[4] != null) ? parseInt(row[4]) : 10;
     var category = row[5] || '';
 
     if (date instanceof Date && date < today) continue;
@@ -177,7 +177,7 @@ function bookSlot(params) {
     var row = scheduleData[i];
     var schedKey = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
     if (schedKey === key) {
-      maxCapacity = parseInt(row[4]) || 10;
+      maxCapacity = (row[4] !== '' && row[4] != null) ? parseInt(row[4]) : 10;
       break;
     }
   }
@@ -264,7 +264,7 @@ function getBookingList() {
   for (var i = 1; i < scheduleData.length; i++) {
     var r = scheduleData[i];
     var k = formatDate(r[0]) + '|' + r[1] + '|' + r[2] + '|' + r[3];
-    capacityMap[k] = parseInt(r[4]) || 10;
+    capacityMap[k] = (r[4] !== '' && r[4] != null) ? parseInt(r[4]) : 10;
   }
 
   var grouped = {};
