@@ -280,11 +280,13 @@ html, body {
   mix-blend-mode: difference;
 }
 
-.center-logo .logo-img {
-  max-width: 180px;
-  height: auto;
-  opacity: 0.95;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+.center-logo .logo-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--white);
+  opacity: 0.7;
 }
 
 /* === TOP BAR === */
@@ -348,18 +350,25 @@ html, body {
   z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   padding: 1.5rem 2.5rem;
   pointer-events: none;
 }
 
 .bottom-tagline {
   font-family: 'DM Serif Display', serif;
-  font-size: clamp(0.7rem, 1.2vw, 0.9rem);
-  letter-spacing: 0.1em;
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  letter-spacing: 0.12em;
   color: var(--white);
-  opacity: 0.4;
+  opacity: 0.6;
   text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.bottom-logo {
+  width: 60px;
+  height: auto;
+  opacity: 0.5;
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.3));
 }
 
 /* === FLOATING SHAPES (KIDS) === */
@@ -511,7 +520,7 @@ html, body {
 
 <!-- CENTER LOGO -->
 <div class="center-logo">
-  <img src="images/btm_logo.png" alt="BTM BEAT THE MIX - HIP HOP DANCE SCHOOL" class="logo-img">
+  <h1 class="logo-text">B T M</h1>
 </div>
 
 <!-- SPLIT -->
@@ -565,6 +574,7 @@ html, body {
 <!-- BOTTOM BAR -->
 <div class="bottom-bar">
   <span class="bottom-tagline">Since 2005 &mdash; 千葉市でずっと、20年。</span>
+  <img src="images/btm_logo.png" alt="BTM" class="bottom-logo">
 </div>
 
 </body>
