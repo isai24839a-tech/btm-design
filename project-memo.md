@@ -60,14 +60,45 @@ split-landing.html (トップ)
 - [x] **インストラクター充実** — 実績・メッセージ追加、1人フォーカスレイアウト
 - [x] **先生割り当て修正** — KIDS=NANAMI先生 / FUTURE=JUNJUN先生
 
-## 次にやること
-- [ ] 家族にデザイン確認してもらう（GitHub Pagesプレビュー）
-- [ ] 写真素材をフォルダで受け取り → ギャラリーに配置
-- [ ] Google Spreadsheetを作成してシート5つ作る
-- [ ] Google Apps Scriptをデプロイ（booking-script.gs）
-- [ ] SPREADSHEET_ID / APPS_SCRIPT_URL を各HTMLに設定
-- [ ] DEMO_MODE = false に変更
-- [ ] Cloudflare Pagesにデプロイ
+## 完了済み（SEO対策 2026-03-23）
+- [x] **JSON-LD構造化データ追加**: 全公開ページにDanceSchoolスキーマ（トップ/KIDS/FUTURE）、Blogスキーマ（ニュース2ページ）
+  - Googleが「ダンス教室」として認識できる。教室名/住所/電話/料金/講師/Instagram/サービスエリア等を構造化
+- [x] **OGPタグ追加**: og:title/description/type/url/site_name/locale + Twitter Card（全6ページ）
+  - LINEやTwitterでシェアされた時にタイトル・説明文が表示される
+- [x] **metaタグ強化**:
+  - title改善（「千葉市」「4〜18歳」「40歳以上」等のキーワード追加）
+  - description追加/改善（split-landing.htmlに新規追加）
+  - robots明示（公開ページ=index,follow / 会員ページ=noindex,nofollow）
+  - canonical URL設定
+- [x] **セマンティックHTML**: split-landing.htmlのロゴを`<h1>`タグ化
+- [x] **注意**: canonical/OGP URLは現在GitHub Pages（isai24839a-tech.github.io）→ tibadance.com移行時に要変更
+
+## 完了済み（GAS本番化+管理改善 2026-03-23〜24）
+- [x] **GAS本番接続**: スプレッドシート作成→GASデプロイ→DEMO_MODE=false
+- [x] **スマホ予約テスト**: スマホ→予約→スプレッドシート反映→メール通知 全て動作確認済み
+- [x] **スタジオフィルター**: 管理者フォームのカテゴリ選択廃止→KIDS/FUTUREトグル自動連動
+- [x] **FUTURE色テーマ**: 予約ボタン/タグ/モーダル等をネイビーに分離
+- [x] **予約確認メール改善**: 返信不可の注記+キャンセルはLINE連絡に変更
+- [x] **スプレッドシート列幅**: GAS API経由で全シート自動調整
+
+## 完了済み（デザイン改善+会員ページ修正 2026-03-24）
+- [x] **NOA風3REASONSセクション**: KIDS/FUTURE両ページにスクロールリビール付き「選ばれる3つの理由」追加
+- [x] **お知らせGAS API化**: Visualization API→GAS API経由に変更（スプレッドシート公開設定不要）
+- [x] **定期レッスンGAS API化**: 同上+GASに`regularLessons`エンドポイント追加
+- [x] **パスワード表示ボタン改善**: 目のアイコンの透明度を上げて視認性向上
+- [x] **Instagram埋め込み**: KIDS3件/FUTURE3件の手動埋め込み
+- [x] **公式ロゴ配置**: トップ右下にBTMロゴ（控えめ配置）
+- [x] **先生写真配置**: NANAMI先生(nanami_profile.png)/JUNJUN先生(32.jpg)
+
+## 次にやること（家族確認が最優先）
+- [ ] **★家族にデザイン確認**: GitHub PagesのURLを送って確認してもらう
+- [ ] デザインフィードバック反映
+- [x] **写真素材配置完了** (2026-03-24): 51枚JPG+1PNG+1MP4を`images/`に格納。トップ(背景写真+ロゴ画像化)、KIDS(10枚ギャラリー)、FUTURE(5枚ギャラリー)に配置
+- [ ] **★OGP画像**: og:image用の1200x630画像を作成（KIDS/FUTURE/トップ各1枚）
+- [ ] **Google Search Console登録**: サイトマップ送信（家族確認後）
+- [ ] **★GAS再デプロイ**: booking-script.gsにregularLessonsアクション追加済み→コピペ+再デプロイ必要
+- [ ] **★定期レッスンデータ入力**: スプレッドシートの「定期レッスン」シートに曜日/スタジオ/時間/クラス/カテゴリを入力
+- [ ] tibadance.com移行（canonical/OGP URL一括置換 + Cloudflare Pages）
 - [ ] tibadance.comドメイン移管（Jimdo → Cloudflare）
 - [ ] 実データでの動作確認テスト
 - [ ] 旧サイト停止
@@ -86,6 +117,7 @@ C:\Users\shirasaki910\Desktop\dance-studio\
 ├── design-[a-i]-*.html     # デザイン案A〜I
 ├── site-info.md            # 既存サイト情報
 ├── wp-plan-analysis.md     # WPプラン分析（参考）
+├── images/                 # 写真素材（51JPG+1PNG+1MP4）
 ├── project-memo.md         # このファイル
 ├── scrape.js / scrape2.js  # スクレイピングスクリプト
 └── scraped/                # 取得データ
