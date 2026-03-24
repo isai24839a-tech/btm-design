@@ -607,27 +607,30 @@ body {
   background: var(--navy);
 }
 
-/* Lesson day highlight - border + background */
+/* Slot lesson day - solid filled background */
 .calendar-day.has-lessons {
-  background: rgba(255, 107, 53, 0.08);
-  border: 2px solid var(--coral);
+  background: var(--coral);
+  border: none;
+}
+
+.calendar-day.has-lessons .day-number {
+  color: #fff !important;
+}
+
+.calendar-day.has-lessons .day-dot {
+  background: rgba(255,255,255,0.7);
 }
 
 .category-future .calendar-day.has-lessons {
-  background: rgba(13, 27, 42, 0.06);
-  border-color: var(--navy);
+  background: var(--navy);
 }
 
 .calendar-day.has-lessons.today {
-  background: rgba(255, 107, 53, 0.18);
-}
-
-.category-future .calendar-day.has-lessons.today {
-  background: rgba(13, 27, 42, 0.12);
+  opacity: 0.9;
 }
 
 .calendar-day.has-lessons.selected {
-  border-color: transparent;
+  opacity: 0.85;
 }
 
 .day-dot {
@@ -645,26 +648,19 @@ body {
   background: rgba(255,255,255,0.7);
 }
 
-/* Regular lesson day - solid filled background */
+/* Regular lesson day - border + light background */
 .calendar-day.has-regular {
-  background: var(--coral);
-  border: none;
-}
-
-.calendar-day.has-regular .day-number {
-  color: #fff !important;
-}
-
-.calendar-day.has-regular .day-dot {
-  background: rgba(255,255,255,0.7);
+  background: rgba(255, 107, 53, 0.08);
+  border: 2px solid var(--coral);
 }
 
 .category-future .calendar-day.has-regular {
-  background: var(--navy);
+  background: rgba(13, 27, 42, 0.06);
+  border-color: var(--navy);
 }
 
 .calendar-day.has-regular.selected {
-  opacity: 0.85;
+  border-color: transparent;
 }
 
 /* Regular lesson card */
@@ -971,6 +967,18 @@ body {
   background: var(--gray-200);
   color: var(--gray-500);
   cursor: not-allowed;
+}
+
+/* Full slot card - grayed out */
+.slot-card.slot-full {
+  background: var(--gray-100);
+  border-left-color: var(--gray-300);
+  opacity: 0.6;
+}
+
+.slot-card.slot-full:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
 }
 
 /* ===== BOOKING MODAL ===== */
@@ -2482,7 +2490,8 @@ function renderDayLessons(dateStr) {
     var available = isUnlimited ? 999 : (slot.available || 0);
     var spotClass = isUnlimited ? '' : (available <= 0 ? 'full' : available <= 2 ? 'few' : '');
 
-    html += '<div class="slot-card" id="slot-card-' + idx + '">';
+    var isFull = !isUnlimited && available <= 0;
+    html += '<div class="slot-card' + (isFull ? ' slot-full' : '') + '" id="slot-card-' + idx + '">';
     html += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
     html += '<div class="slot-card-info">';
     html += '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>';
