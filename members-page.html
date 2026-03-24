@@ -1617,6 +1617,110 @@ body {
   margin-bottom: 0;
 }
 
+.admin-edit-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: var(--gray-100);
+  color: var(--gray-500);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+}
+.admin-edit-btn:hover {
+  background: var(--coral);
+  color: #fff;
+}
+.category-future .admin-edit-btn:hover {
+  background: var(--navy);
+}
+.admin-edit-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.slot-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0.5rem;
+}
+
+.inline-edit-form {
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed var(--gray-200);
+}
+
+.inline-edit-form .admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.inline-edit-form select,
+.inline-edit-form input {
+  padding: 6px 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-family: 'Noto Sans JP', sans-serif;
+  background: #fff;
+}
+
+.inline-edit-form .edit-time-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  grid-column: 1 / -1;
+}
+
+.inline-edit-form .edit-time-row select {
+  flex: 1;
+}
+
+.inline-edit-form .edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.inline-edit-form .edit-save-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 20px;
+  background: var(--coral);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.inline-edit-form .edit-save-btn:hover { opacity: 0.8; }
+.category-future .inline-edit-form .edit-save-btn { background: var(--navy); }
+
+.inline-edit-form .edit-cancel-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--gray-300);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--gray-500);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.inline-edit-form .edit-cancel-btn:hover { background: var(--gray-100); }
+
 .admin-delete-btn {
   padding: 6px 14px;
   border: 2px solid #e53935;
@@ -2356,27 +2460,39 @@ function renderDayLessons(dateStr) {
   html += '<div class="day-lessons-grid">';
 
   // Regular lessons first
-  regulars.forEach(function(r) {
-    html += '<div class="slot-card regular-lesson">';
+  regulars.forEach(function(r, idx) {
+    html += '<div class="slot-card regular-lesson" id="regular-card-' + idx + '">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
     html += '<div class="slot-card-info">';
     html += '<span class="regular-lesson-badge">定期レッスン</span>';
     if (r.studio) html += '<span class="slot-tag studio">' + escapeHtml(r.studio) + '</span>';
     html += '<span class="slot-tag time">' + escapeHtml(r.time || '') + '</span>';
     html += '<span class="slot-tag">' + escapeHtml(r.class_name || '') + '</span>';
     html += '</div>';
+    if (isAdminMode) {
+      html += '<button class="admin-edit-btn" onclick=\'showEditRegularForm(' + JSON.stringify(r).replace(/'/g, "\\'") + ',"regular-card-' + idx + '")\'>' +
+        '<svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>';
+    }
+    html += '</div>';
     html += '</div>';
   });
 
-  slots.forEach(function(slot) {
+  slots.forEach(function(slot, idx) {
     var isUnlimited = slot.max === 0 || slot.max === '0';
     var available = isUnlimited ? 999 : (slot.available || 0);
     var spotClass = isUnlimited ? '' : (available <= 0 ? 'full' : available <= 2 ? 'few' : '');
 
-    html += '<div class="slot-card">';
+    html += '<div class="slot-card" id="slot-card-' + idx + '">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
     html += '<div class="slot-card-info">';
     html += '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>';
     html += '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>';
     html += '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
+    html += '</div>';
+    if (isAdminMode) {
+      html += '<button class="admin-edit-btn" onclick=\'showEditSlotForm(' + JSON.stringify(slot).replace(/'/g, "\\'") + ',"slot-card-' + idx + '")\'>' +
+        '<svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>';
+    }
     html += '</div>';
     html += '<div class="slot-availability">';
     if (isUnlimited) {
@@ -3045,6 +3161,129 @@ function adminDeleteAnnouncement(rowOrIndex, title) {
 
   var params = new URLSearchParams({ action: 'deleteAnnouncement', adminKey: ADMIN_PASSWORD, row: rowOrIndex });
   apiCall(params, function() { fetchAdminAnnouncements(); });
+}
+
+// ===== INLINE EDIT HELPERS =====
+function generateTimeOpts(selected) {
+  var html = '<option value="">--:--</option>';
+  for (var h = 9; h <= 22; h++) {
+    for (var m = 0; m < 60; m += 10) {
+      var tv = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+      html += '<option value="' + tv + '"' + (tv === selected ? ' selected' : '') + '>' + tv + '</option>';
+    }
+  }
+  return html;
+}
+
+function buildStudioOpts(cat, selected) {
+  var list = (window._studioMap && window._studioMap[cat]) || [];
+  return list.map(function(s) {
+    return '<option value="' + s + '"' + (s === selected ? ' selected' : '') + '>' + s + '</option>';
+  }).join('');
+}
+
+function parseTime(timeStr) {
+  var parts = (timeStr || '').split('〜');
+  return { start: (parts[0] || '').trim(), end: (parts[1] || '').trim() };
+}
+
+function showEditRegularForm(r, cardId) {
+  var card = document.getElementById(cardId);
+  if (!card) return;
+  var t = parseTime(r.time);
+  var cat = currentCategory.toUpperCase();
+  var dowLabels = ['月','火','水','木','金','土','日'];
+  var dowOpts = dowLabels.map(function(d) {
+    return '<option value="' + d + '"' + (d === r.dayOfWeek ? ' selected' : '') + '>' + d + '曜</option>';
+  }).join('');
+
+  var formHtml = '<div class="inline-edit-form">' +
+    '<div class="admin-form-grid">' +
+      '<select id="edit-reg-dow-' + cardId + '">' + dowOpts + '</select>' +
+      '<select id="edit-reg-studio-' + cardId + '">' + buildStudioOpts(cat, r.studio) + '</select>' +
+      '<div class="edit-time-row">' +
+        '<select id="edit-reg-ts-' + cardId + '">' + generateTimeOpts(t.start) + '</select>' +
+        '<span style="color:var(--gray-500)">〜</span>' +
+        '<select id="edit-reg-te-' + cardId + '">' + generateTimeOpts(t.end) + '</select>' +
+      '</div>' +
+      '<input id="edit-reg-class-' + cardId + '" value="' + escapeHtml(r.class_name || '') + '" placeholder="クラス名">' +
+    '</div>' +
+    '<div class="edit-actions">' +
+      '<button class="edit-save-btn" onclick=\'saveEditRegular(' + (r.row || 0) + ',"' + cardId + '")\'>保存</button>' +
+      '<button class="edit-cancel-btn" onclick="if(selectedDate)renderDayLessons(selectedDate)">キャンセル</button>' +
+    '</div>' +
+  '</div>';
+
+  // Append form below existing content
+  var existing = card.querySelector('.inline-edit-form');
+  if (existing) existing.remove();
+  card.insertAdjacentHTML('beforeend', formHtml);
+}
+
+function saveEditRegular(row, cardId) {
+  var dow = document.getElementById('edit-reg-dow-' + cardId).value;
+  var studio = document.getElementById('edit-reg-studio-' + cardId).value;
+  var ts = document.getElementById('edit-reg-ts-' + cardId).value;
+  var te = document.getElementById('edit-reg-te-' + cardId).value;
+  var time = ts && te ? ts + '〜' + te : '';
+  var className = document.getElementById('edit-reg-class-' + cardId).value.trim();
+  var category = currentCategory.toUpperCase();
+
+  if (!dow || !className) { alert('曜日とクラス名を入力してください'); return; }
+
+  var params = new URLSearchParams({
+    action: 'editRegularLesson', adminKey: ADMIN_PASSWORD,
+    row: row, dayOfWeek: dow, studio: studio, time: time, class_name: className, category: category
+  });
+  apiCall(params, function() {
+    fetchRegularLessons(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); });
+    fetchAdminRegularLessons();
+  });
+}
+
+function showEditSlotForm(slot, cardId) {
+  var card = document.getElementById(cardId);
+  if (!card) return;
+  var t = parseTime(slot.time);
+  var cat = currentCategory.toUpperCase();
+
+  var formHtml = '<div class="inline-edit-form">' +
+    '<div class="admin-form-grid">' +
+      '<select id="edit-slot-studio-' + cardId + '">' + buildStudioOpts(cat, slot.studio) + '</select>' +
+      '<input id="edit-slot-class-' + cardId + '" value="' + escapeHtml(slot.class_name || '') + '" placeholder="クラス名">' +
+      '<div class="edit-time-row">' +
+        '<select id="edit-slot-ts-' + cardId + '">' + generateTimeOpts(t.start) + '</select>' +
+        '<span style="color:var(--gray-500)">〜</span>' +
+        '<select id="edit-slot-te-' + cardId + '">' + generateTimeOpts(t.end) + '</select>' +
+      '</div>' +
+    '</div>' +
+    '<div class="edit-actions">' +
+      '<button class="edit-save-btn" onclick=\'saveEditSlot(' + JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time}).replace(/'/g, "\\'") + ',"' + cardId + '")\'>保存</button>' +
+      '<button class="edit-cancel-btn" onclick="if(selectedDate)renderDayLessons(selectedDate)">キャンセル</button>' +
+    '</div>' +
+  '</div>';
+
+  var existing = card.querySelector('.inline-edit-form');
+  if (existing) existing.remove();
+  card.insertAdjacentHTML('beforeend', formHtml);
+}
+
+function saveEditSlot(oldSlot, cardId) {
+  var studio = document.getElementById('edit-slot-studio-' + cardId).value;
+  var ts = document.getElementById('edit-slot-ts-' + cardId).value;
+  var te = document.getElementById('edit-slot-te-' + cardId).value;
+  var time = ts && te ? ts + '〜' + te : '';
+  var className = document.getElementById('edit-slot-class-' + cardId).value.trim();
+  var category = currentCategory.toUpperCase();
+
+  var params = new URLSearchParams({
+    action: 'editSlot', adminKey: ADMIN_PASSWORD,
+    old_date: oldSlot.date, old_studio: oldSlot.studio, old_time: oldSlot.time,
+    studio: studio, time: time, class_name: className, date: oldSlot.date, category: category
+  });
+  apiCall(params, function() {
+    fetchSlotsFromAPI(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); });
+  });
 }
 
 // ===== ADMIN: REGULAR LESSONS =====

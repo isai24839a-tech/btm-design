@@ -76,6 +76,8 @@ function doGet(e) {
   if (action === 'deleteannouncement') return adminGuard(e, adminDeleteAnnouncement);
   if (action === 'addregularlesson') return adminGuard(e, adminAddRegularLesson);
   if (action === 'deleteregularlesson') return adminGuard(e, adminDeleteRegularLesson);
+  if (action === 'editregularlesson') return adminGuard(e, adminEditRegularLesson);
+  if (action === 'editslot') return adminGuard(e, adminEditSlot);
   if (action === 'formatsheets') return adminGuard(e, adminFormatSheets);
 
   return jsonResponse({ error: 'Unknown action' });
@@ -487,6 +489,52 @@ function adminDeleteRegularLesson(params) {
 
   sheet.deleteRow(row);
   return jsonResponse({ success: true, message: '削除しました' });
+}
+
+// ===== 管理者: 定期レッスン編集 =====
+function adminEditRegularLesson(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('定期レッスン');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var row = parseInt(params.row);
+  if (!row || row < 2 || row > sheet.getLastRow()) return jsonResponse({ success: false, error: '無効な行番号です' });
+
+  var dayOfWeek = params.dayOfWeek || '';
+  var studio = params.studio || '';
+  var time = params.time || '';
+  var className = params.class_name || '';
+  var category = params.category || 'KIDS';
+
+  sheet.getRange(row, 1, 1, 5).setValues([[dayOfWeek, studio, time, className, category]]);
+  return jsonResponse({ success: true, message: '更新しました' });
+}
+
+// ===== 管理者: 予約枠編集 =====
+function adminEditSlot(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('スケジュール');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var oldDate = params.old_date || '';
+  var oldStudio = params.old_studio || '';
+  var oldTime = params.old_time || '';
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = data.length - 1; i >= 1; i--) {
+    var r = data[i];
+    if (formatDate(r[0]) === oldDate && String(r[1]) === oldStudio && String(r[2]) === oldTime) {
+      var newDate = params.date || oldDate;
+      var newStudio = params.studio || oldStudio;
+      var newTime = params.time || oldTime;
+      var newClass = params.class_name || String(r[3]);
+      var newMax = params.max !== undefined ? parseInt(params.max) : r[4];
+      var newCat = params.category || String(r[5] || '');
+      sheet.getRange(i + 1, 1, 1, 6).setValues([[newDate, newStudio, newTime, newClass, newMax, newCat]]);
+      return jsonResponse({ success: true, message: '更新しました' });
+    }
+  }
+  return jsonResponse({ success: false, error: '該当するレッスン枠が見つかりません' });
 }
 
 // ===== 管理者: シート列幅自動調整 =====
