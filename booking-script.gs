@@ -74,6 +74,8 @@ function doGet(e) {
   if (action === 'cancelbooking') return adminGuard(e, adminCancelBooking);
   if (action === 'addannouncement') return adminGuard(e, adminAddAnnouncement);
   if (action === 'deleteannouncement') return adminGuard(e, adminDeleteAnnouncement);
+  if (action === 'addregularlesson') return adminGuard(e, adminAddRegularLesson);
+  if (action === 'deleteregularlesson') return adminGuard(e, adminDeleteRegularLesson);
   if (action === 'formatsheets') return adminGuard(e, adminFormatSheets);
 
   return jsonResponse({ error: 'Unknown action' });
@@ -350,7 +352,8 @@ function getRegularLessons() {
       studio: String(row[1] || ''),
       time: String(row[2] || ''),
       class_name: String(row[3] || ''),
-      category: String(row[4] || 'KIDS').toUpperCase()
+      category: String(row[4] || 'KIDS').toUpperCase(),
+      row: i + 1
     });
   }
   return jsonResponse(items);
@@ -448,6 +451,38 @@ function adminDeleteAnnouncement(params) {
   var row = parseInt(params.row);
   if (!row || row < 2) return jsonResponse({ success: false, error: '無効な行番号です' });
 
+  if (row > sheet.getLastRow()) return jsonResponse({ success: false, error: '該当する行がありません' });
+
+  sheet.deleteRow(row);
+  return jsonResponse({ success: true, message: '削除しました' });
+}
+
+// ===== 管理者: 定期レッスン追加 =====
+function adminAddRegularLesson(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('定期レッスン');
+  if (!sheet) return jsonResponse({ success: false, error: '定期レッスンシートがありません' });
+
+  var dayOfWeek = params.dayOfWeek || '';
+  var studio = params.studio || '';
+  var time = params.time || '';
+  var className = params.class_name || '';
+  var category = params.category || 'KIDS';
+
+  if (!dayOfWeek || !className) return jsonResponse({ success: false, error: '曜日とクラス名は必須です' });
+
+  sheet.appendRow([dayOfWeek, studio, time, className, category]);
+  return jsonResponse({ success: true, message: '定期レッスンを追加しました' });
+}
+
+// ===== 管理者: 定期レッスン削除 =====
+function adminDeleteRegularLesson(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('定期レッスン');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var row = parseInt(params.row);
+  if (!row || row < 2) return jsonResponse({ success: false, error: '無効な行番号です' });
   if (row > sheet.getLastRow()) return jsonResponse({ success: false, error: '該当する行がありません' });
 
   sheet.deleteRow(row);

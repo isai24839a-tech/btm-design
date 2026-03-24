@@ -2023,6 +2023,7 @@ function showMainContent() {
     tabsEl.innerHTML =
       '<div class="tab-slider" id="tab-slider"></div>' +
       '<button class="tab-button active" data-tab="schedule">スケジュール管理</button>' +
+      '<button class="tab-button" data-tab="admin-regular">定期レッスン</button>' +
       '<button class="tab-button" data-tab="admin-announce">お知らせ管理</button>';
 
     // Add admin panels
@@ -2051,6 +2052,53 @@ function showMainContent() {
       '</div>';
     panels.appendChild(adminAnnouncePanel);
 
+    // Add admin regular lessons panel
+    var adminRegularPanel = document.createElement('div');
+    adminRegularPanel.className = 'tab-panel';
+    adminRegularPanel.id = 'panel-admin-regular';
+    var catForRegular = currentCategory.toUpperCase();
+    adminRegularPanel.innerHTML =
+      '<div class="announcements-container">' +
+        '<div class="schedule-header">' +
+          '<h2 class="announcements-title">定期レッスン管理</h2>' +
+          '<button class="refresh-button" onclick="fetchAdminRegularLessons()">' +
+            '<svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>' +
+            '更新' +
+          '</button>' +
+        '</div>' +
+        '<p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:1.5rem;">毎週繰り返される定期レッスンを登録します。カレンダーに塗りつぶしで表示されます。</p>' +
+        '<div class="admin-add-form" style="margin-bottom:1.5rem">' +
+          '<h3>定期レッスンを追加</h3>' +
+          '<div class="admin-form-grid">' +
+            '<select id="admin-regular-dow">' +
+              '<option value="月">月曜</option><option value="火">火曜</option><option value="水">水曜</option>' +
+              '<option value="木">木曜</option><option value="金">金曜</option><option value="土">土曜</option><option value="日">日曜</option>' +
+            '</select>' +
+            '<select id="admin-regular-studio"><option value="">スタジオを選択</option></select>' +
+            '<input type="text" id="admin-regular-time" placeholder="例: 16:00〜17:00">' +
+            '<input type="text" id="admin-regular-class" placeholder="クラス名">' +
+            '<select id="admin-regular-category"><option value="KIDS">KIDS</option><option value="FUTURE">FUTURE</option></select>' +
+          '</div>' +
+          '<button class="admin-add-btn" onclick="adminAddRegularLesson()" style="margin-top:0.75rem">追加する</button>' +
+        '</div>' +
+        '<div id="admin-regular-list"></div>' +
+      '</div>';
+    panels.appendChild(adminRegularPanel);
+
+    // Populate studio options for regular lesson form
+    if (window._studioMap) {
+      var regStudioSelect = adminRegularPanel.querySelector('#admin-regular-studio');
+      var regCatSelect = adminRegularPanel.querySelector('#admin-regular-category');
+      function updateRegularStudios() {
+        var cat = regCatSelect.value;
+        var studios = window._studioMap[cat] || [];
+        regStudioSelect.innerHTML = '<option value="">スタジオを選択</option>' +
+          studios.map(function(s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
+      }
+      regCatSelect.addEventListener('change', updateRegularStudios);
+      updateRegularStudios();
+    }
+
     // Set default date for announce form
     var today = new Date();
     var dateInput = adminAnnouncePanel.querySelector('#admin-announce-date');
@@ -2064,6 +2112,7 @@ function showMainContent() {
   if (isAdminMode) {
     initAdminSlotForm();
     fetchAdminAnnouncements();
+    fetchAdminRegularLessons();
   } else {
     fetchAnnouncements();
   }
@@ -3017,6 +3066,83 @@ function adminDeleteAnnouncement(rowOrIndex, title) {
 
   var params = new URLSearchParams({ action: 'deleteAnnouncement', adminKey: ADMIN_PASSWORD, row: rowOrIndex });
   apiCall(params, function() { fetchAdminAnnouncements(); });
+}
+
+// ===== ADMIN: REGULAR LESSONS =====
+function fetchAdminRegularLessons() {
+  var container = document.getElementById('admin-regular-list');
+  if (!container) return;
+
+  if (!APPS_SCRIPT_URL) {
+    container.innerHTML = '<div class="day-lessons-empty">定期レッスンはまだありません</div>';
+    return;
+  }
+
+  container.innerHTML = '<div class="loading-container"><div class="spinner"></div><span class="loading-text">読み込み中...</span></div>';
+  fetch(APPS_SCRIPT_URL + '?action=regularLessons', { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { renderAdminRegularLessons(data, container); })
+    .catch(function() { container.innerHTML = '<div class="day-lessons-empty">定期レッスンはまだありません</div>'; });
+}
+
+function renderAdminRegularLessons(items, container) {
+  if (!items || items.length === 0) {
+    container.innerHTML = '<div class="day-lessons-empty">定期レッスンはまだありません</div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < items.length; i++) {
+    var r = items[i];
+    var catClass = (r.category || '').toUpperCase() === 'FUTURE' ? 'navy' : 'coral';
+    html += '<div class="slot-card regular-lesson" style="position:relative">';
+    html += '<div class="slot-card-info">';
+    html += '<span class="regular-lesson-badge" style="background:var(--' + catClass + ')">' + escapeHtml(r.category || 'KIDS') + '</span>';
+    html += '<span class="slot-tag" style="font-weight:600">毎週' + escapeHtml(r.dayOfWeek || '') + '曜</span>';
+    if (r.studio) html += '<span class="slot-tag studio">' + escapeHtml(r.studio) + '</span>';
+    if (r.time) html += '<span class="slot-tag time">' + escapeHtml(r.time) + '</span>';
+    html += '<span class="slot-tag">' + escapeHtml(r.class_name || '') + '</span>';
+    html += '</div>';
+    html += '<button class="admin-delete-btn" style="margin-top:0.5rem" onclick=\'adminDeleteRegularLesson(' +
+      (r.row ? r.row : (i + 2)) + ')\'>削除</button>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function adminAddRegularLesson() {
+  var dow = document.getElementById('admin-regular-dow').value;
+  var studio = document.getElementById('admin-regular-studio').value;
+  var time = document.getElementById('admin-regular-time').value.trim();
+  var className = document.getElementById('admin-regular-class').value.trim();
+  var category = document.getElementById('admin-regular-category').value;
+
+  if (!dow || !className) { alert('曜日とクラス名を入力してください'); return; }
+
+  var params = new URLSearchParams({
+    action: 'addRegularLesson', adminKey: ADMIN_PASSWORD,
+    dayOfWeek: dow, studio: studio, time: time, class_name: className, category: category
+  });
+
+  apiCall(params, function() {
+    document.getElementById('admin-regular-class').value = '';
+    document.getElementById('admin-regular-time').value = '';
+    fetchAdminRegularLessons();
+    // Also refresh calendar regular lessons
+    fetchRegularLessons(function() { renderCalendar(); });
+  });
+}
+
+function adminDeleteRegularLesson(row) {
+  if (!confirm('この定期レッスンを削除しますか？')) return;
+
+  var params = new URLSearchParams({
+    action: 'deleteRegularLesson', adminKey: ADMIN_PASSWORD, row: row
+  });
+
+  apiCall(params, function() {
+    fetchAdminRegularLessons();
+    fetchRegularLessons(function() { renderCalendar(); });
+  });
 }
 
 function apiCall(params, onSuccess) {
