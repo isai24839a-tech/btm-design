@@ -6,7 +6,7 @@
 - 作業ディレクトリ: `C:\Users\shirasaki910\Desktop\dance-studio\`
 
 ## 現在のステータス
-**Phase**: サイト機能ほぼ完成 — 家族デザイン確認待ち → 写真素材 → 本番化
+**Phase**: デザイン確定・パフォーマンス最適化完了 → GAS再デプロイ → tibadance.com本番化
 
 ## 技術方針（2026-03-18 変更）
 - **ホスティング**: Cloudflare Pages（無料）← WordPress.com廃止
@@ -90,14 +90,24 @@ split-landing.html (トップ)
 - [x] **公式ロゴ配置**: トップ右下にBTMロゴ（控えめ配置）
 - [x] **先生写真配置**: NANAMI先生(nanami_profile.png)/JUNJUN先生(32.jpg)
 
-## 次にやること（家族確認が最優先）
-- [ ] **★家族にデザイン確認**: GitHub PagesのURLを送って確認してもらう
-- [ ] デザインフィードバック反映
-- [x] **写真素材配置完了** (2026-03-24): 51枚JPG+1PNG+1MP4を`images/`に格納。トップ(背景写真+ロゴ画像化)、KIDS(10枚ギャラリー)、FUTURE(5枚ギャラリー)に配置
-- [ ] **★OGP画像**: og:image用の1200x630画像を作成（KIDS/FUTURE/トップ各1枚）
-- [ ] **Google Search Console登録**: サイトマップ送信（家族確認後）
-- [ ] **★GAS再デプロイ**: booking-script.gsにregularLessonsアクション追加済み→コピペ+再デプロイ必要
+## 完了済み（パフォーマンス最適化+ファビコン+OGP 2026-03-25）
+- [x] **家族デザイン確認OK**: このデザインで確定
+- [x] **WebP画像変換**: 使用中の7画像をWebPに変換（2,794KB→610KB、78%削減）。nanami_profile 92%削減
+- [x] **Google Fonts非同期読み込み**: `rel="preload"` + `onload`パターンで全6ページ適用。レンダーブロック3.7秒を完全排除
+- [x] **Instagram遅延読み込み**: IntersectionObserverでギャラリー表示時のみembed.js読み込み
+- [x] **content-visibility: auto**: 画面外セクションのレンダリングをスキップ
+- [x] **モバイル軽量化（半分キープ）**: blob 2/5残し、dot 3/7残し、パーティクル半減、wave全高維持
+- [x] **PC限定キラキラエフェクト**: トップ（マウス追従グロー、ホバーシャイン）、KIDS（タイトルシマー、カードシャイン、CTAグロー）、FUTURE（ゴールドスウィープ、パーティクル倍増max120）
+- [x] **PageSpeedスコア**: モバイル70→97、PC98達成（FCP 4.3s→0.8s）
+- [x] **btm_logo.webpリサイズ**: 640x640→120x120（60KB→6KB）
+- [x] **ファビコン**: 6サイズ生成（ico/16/32/180/192/512）、全6ページにlink追加
+- [x] **OGP画像**: トップ/KIDS/FUTURE各1枚（1200x630）作成、og:image+twitter:image設定
+- [x] **GAS再デプロイ手順書**: `GAS_REDEPLOY_INSTRUCTIONS.md` 作成（完全なコード+手順）
+
+## 次にやること
+- [ ] **★GAS再デプロイ**: GAS_REDEPLOY_INSTRUCTIONS.mdの手順に従い手動でコピペ+再デプロイ
 - [ ] **★定期レッスンデータ入力**: スプレッドシートの「定期レッスン」シートに曜日/スタジオ/時間/クラス/カテゴリを入力
+- [ ] **Google Search Console登録**: サイトマップ送信
 - [ ] tibadance.com移行（canonical/OGP URL一括置換 + Cloudflare Pages）
 - [ ] tibadance.comドメイン移管（Jimdo → Cloudflare）
 - [ ] 実データでの動作確認テスト
@@ -106,21 +116,31 @@ split-landing.html (トップ)
 ## ファイル構成
 ```
 C:\Users\shirasaki910\Desktop\dance-studio\
-├── split-landing.html     # ★トップ: KIDS/FUTURE振り分け
-├── kids-page.html          # KIDSメインサイト
-├── future-page.html        # FUTUREメインサイト
-├── kids-news.html          # KIDSニュース/ブログ
-├── future-news.html        # FUTUREニュース/ブログ
-├── members-page.html       # 会員専用(パスワード認証)
-├── booking-script.gs       # 予約システム用Apps Scriptコード
-├── index.html              # デザイン比較ページ（全9案一覧）
-├── design-[a-i]-*.html     # デザイン案A〜I
-├── site-info.md            # 既存サイト情報
-├── wp-plan-analysis.md     # WPプラン分析（参考）
-├── images/                 # 写真素材（51JPG+1PNG+1MP4）
-├── project-memo.md         # このファイル
-├── scrape.js / scrape2.js  # スクレイピングスクリプト
-└── scraped/                # 取得データ
+├── split-landing.html      # ★トップ: KIDS/FUTURE振り分け
+├── kids-page.html           # KIDSメインサイト
+├── future-page.html         # FUTUREメインサイト
+├── kids-news.html           # KIDSニュース/ブログ
+├── future-news.html         # FUTUREニュース/ブログ
+├── members-page.html        # 会員専用(パスワード認証)
+├── booking-script.gs        # 予約システム用Apps Scriptコード
+├── GAS_REDEPLOY_INSTRUCTIONS.md  # GAS再デプロイ手順書
+├── favicon.ico              # ファビコン（16+32+48マルチサイズ）
+├── favicon-16x16.png        # ファビコン16px
+├── favicon-32x32.png        # ファビコン32px
+├── apple-touch-icon.png     # Apple用180px
+├── android-chrome-192x192.png  # Android用192px
+├── android-chrome-512x512.png  # Android用512px
+├── index.html               # デザイン比較ページ（全9案一覧）
+├── design-[a-i]-*.html      # デザイン案A〜I
+├── site-info.md             # 既存サイト情報
+├── wp-plan-analysis.md      # WPプラン分析（参考）
+├── images/                  # 写真素材+WebP+OGP
+│   ├── *.jpg / *.png        # オリジナル写真（51JPG+1PNG+1MP4）
+│   ├── *.webp               # WebP変換済み（7ファイル）
+│   └── ogp-*.png            # OGP画像（3ファイル: top/kids/future）
+├── project-memo.md          # このファイル
+├── scrape.js / scrape2.js   # スクレイピングスクリプト
+└── scraped/                 # 取得データ
 ```
 
 ## スタジオ基本情報
