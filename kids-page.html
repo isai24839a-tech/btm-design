@@ -60,6 +60,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" type="image/webp" href="images/LINE_ALBUM_hp_260324_10.webp">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Oswald:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 /* ============================================
@@ -248,7 +249,7 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background-image: linear-gradient(135deg, rgba(255,107,53,0.88) 0%, rgba(255,77,109,0.85) 50%, rgba(255,107,53,0.88) 100%), url('images/LINE_ALBUM_hp_260324_10.jpg');
+  background-image: linear-gradient(135deg, rgba(255,107,53,0.88) 0%, rgba(255,77,109,0.85) 50%, rgba(255,107,53,0.88) 100%), url('images/LINE_ALBUM_hp_260324_10.webp');
   background-size: 200% 200%, cover;
   background-position: center, center;
   animation: heroGradient 8s ease infinite;
@@ -2160,6 +2161,37 @@ body {
   stroke-width: 2.5;
   fill: none;
 }
+
+/* === PERFORMANCE: Content Visibility === */
+.studios-section,
+.pricing-section,
+.faq-section,
+.voices-section,
+.gallery-section,
+.contact-section,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
+/* === MOBILE PERFORMANCE === */
+@media (max-width: 768px) {
+  /* Keep 2 large blobs, hide the rest */
+  .hero-blob:nth-child(n+3) { display: none; }
+  .hero-blob { opacity: 0.10; filter: blur(4px); }
+  /* Keep 3 dots, hide the rest */
+  .hero-dot:nth-child(n+9) { display: none; }
+  /* Keep 1 contact blob */
+  .contact-blob:nth-child(n+2) { display: none; }
+  /* Wave separators: keep full height */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-blob, .hero-dot, .contact-blob { display: none; }
+  .hero { animation: none; background-position: 50% 50%, center; }
+  .fade-in, .fade-in-left, .fade-in-right { opacity: 1; transform: none; transition: none; }
+  .wave-separator { display: none; }
+}
 </style>
 </head>
 <body>
@@ -2370,7 +2402,10 @@ body {
       <!-- NANAMI -->
       <div class="instructor-card fade-in delay-1">
         <div class="instructor-visual">
-          <img src="images/nanami_profile.png" alt="NANAMI - KIDSクラス インストラクター" class="instructor-photo-img" loading="lazy">
+          <picture>
+            <source srcset="images/nanami_profile.webp" type="image/webp">
+            <img src="images/nanami_profile.png" alt="NANAMI - KIDSクラス インストラクター" class="instructor-photo-img" loading="lazy" decoding="async">
+          </picture>
           <div class="instructor-name-overlay">
             <h3>NANAMI</h3>
             <div class="role">KIDS Division Instructor</div>
@@ -2795,7 +2830,21 @@ body {
       <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DUnBOdQCWTt/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:500px;min-width:300px;padding:0;width:calc(50% - 1rem);"></blockquote>
       <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DUfG0U_k3kc/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:500px;min-width:300px;padding:0;width:calc(50% - 1rem);"></blockquote>
     </div>
-    <script async src="//www.instagram.com/embed.js"></script>
+    <script>
+// Lazy-load Instagram embeds when gallery section is visible
+if ('IntersectionObserver' in window) {
+  var igObserver = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting) {
+      var s = document.createElement('script');
+      s.src = '//www.instagram.com/embed.js';
+      s.async = true;
+      document.body.appendChild(s);
+      igObserver.disconnect();
+    }
+  }, { rootMargin: '200px' });
+  igObserver.observe(document.getElementById('gallery'));
+}
+</script>
     <div class="gallery-follow-wrap fade-in delay-2">
       <a href="https://www.instagram.com/beat_the_mix_kids/" target="_blank" rel="noopener" class="gallery-follow-btn">
         <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
@@ -2950,13 +2999,14 @@ body {
     });
   }
 
-  // --- Parallax-like scroll effect on hero blobs ---
+  // --- Parallax-like scroll effect on hero blobs (lighter on mobile) ---
   var heroBlobs = document.querySelectorAll('.hero-blob');
+  var parallaxSpeed = window.innerWidth <= 768 ? 0.5 : 1;
   window.addEventListener('scroll', function() {
     var scrollY = window.pageYOffset;
     if (scrollY < window.innerHeight) {
       heroBlobs.forEach(function(blob, i) {
-        var speed = 0.05 + (i * 0.02);
+        var speed = (0.05 + (i * 0.02)) * parallaxSpeed;
         blob.style.transform = 'translateY(' + (scrollY * speed) + 'px)';
       });
     }

@@ -60,6 +60,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" type="image/webp" href="images/LINE_ALBUM_hp_260324_9.webp">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Oswald:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -260,7 +261,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: url('images/LINE_ALBUM_hp_260324_9.jpg') center/cover no-repeat;
+  background: url('images/LINE_ALBUM_hp_260324_9.webp') center/cover no-repeat;
   opacity: 0.12;
   z-index: 0;
 }
@@ -1705,6 +1706,37 @@ section {
   .trial-float-text { font-size: 12px; }
   .trial-float-cta { font-size: 11px; padding: 7px 14px; }
 }
+
+/* === PERFORMANCE: Content Visibility === */
+.studios,
+.pricing,
+.faq,
+.voices,
+.gallery,
+.contact-section,
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
+/* === MOBILE PERFORMANCE === */
+@media (max-width: 768px) {
+  /* Keep background pattern but lighter */
+  .hero-bg-pattern { opacity: 0.02; }
+  /* Particles reduced via JS (count halved), keep canvas visible */
+  /* Keep diamond decorations */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg-pattern { display: none; }
+  canvas#particles { display: none; }
+  .hero-label, .hero-title, .hero-subtitle, .hero-buttons, .hero-scroll-hint {
+    opacity: 1; transform: none; animation: none;
+  }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .hero-title { animation: none; background-size: 100%; }
+  .elegant-divider { display: none; }
+}
 </style>
 </head>
 <body>
@@ -1910,7 +1942,10 @@ section {
     <div class="instructor-content">
       <div class="instructor-photo reveal reveal-delay-1">
         <div class="instructor-photo-inner">
-          <img src="images/LINE_ALBUM_hp_260324_32.jpg" alt="JUNJUN - FUTUREクラス インストラクター" class="instructor-real-photo" loading="lazy">
+          <picture>
+            <source srcset="images/LINE_ALBUM_hp_260324_32.webp" type="image/webp">
+            <img src="images/LINE_ALBUM_hp_260324_32.jpg" alt="JUNJUN - FUTUREクラス インストラクター" class="instructor-real-photo" loading="lazy" decoding="async">
+          </picture>
         </div>
       </div>
 
@@ -2253,7 +2288,21 @@ section {
       <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DU-bGxgj1XV/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:500px;min-width:300px;padding:0;width:calc(50% - 1rem);"></blockquote>
       <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DU7PahXD4y6/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:1px;max-width:500px;min-width:300px;padding:0;width:calc(50% - 1rem);"></blockquote>
     </div>
-    <script async src="//www.instagram.com/embed.js"></script>
+    <script>
+// Lazy-load Instagram embeds when gallery section is visible
+if ('IntersectionObserver' in window) {
+  var igObserver = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting) {
+      var s = document.createElement('script');
+      s.src = '//www.instagram.com/embed.js';
+      s.async = true;
+      document.body.appendChild(s);
+      igObserver.disconnect();
+    }
+  }, { rootMargin: '200px' });
+  igObserver.observe(document.getElementById('gallery'));
+}
+</script>
 
     <a href="https://www.instagram.com/beat_the_mix_future/" target="_blank" rel="noopener" class="gallery-follow-btn reveal reveal-delay-3">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -2394,7 +2443,8 @@ section {
 
   function initParticles() {
     resizeCanvas();
-    const count = Math.min(Math.floor(w * h / 15000), 60);
+    const maxCount = Math.min(Math.floor(w * h / 15000), 60);
+    const count = window.innerWidth <= 768 ? Math.floor(maxCount / 2) : maxCount;
     particles = [];
     for (let i = 0; i < count; i++) {
       particles.push(new Particle());

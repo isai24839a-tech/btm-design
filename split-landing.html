@@ -79,6 +79,8 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" type="image/webp" href="images/LINE_ALBUM_hp_260324_50.webp">
+<link rel="preload" as="image" type="image/webp" href="images/LINE_ALBUM_hp_260324_47.webp">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -508,6 +510,22 @@ html, body {
   .top-right { gap: 0.8rem; }
   .top-link { font-size: 0.65rem; }
 }
+
+/* === MOBILE PERFORMANCE === */
+@media (max-width: 768px) {
+  /* Keep 1 shape on KIDS, 4 particles on FUTURE */
+  .shape:nth-child(n+2) { display: none; }
+  .particle:nth-child(n+5) { display: none; }
+  .particle { opacity: 0.3; }
+  .side-bg { will-change: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shape, .particle { display: none; }
+  .side-kids, .side-future { animation: none; }
+  .side-arrow svg { animation: none; }
+  .side-content { animation: none; opacity: 1; transform: none; }
+}
 </style>
 </head>
 <body>
@@ -534,7 +552,7 @@ html, body {
 
   <!-- KIDS SIDE -->
   <a href="kids-page.html" class="split-side side-kids">
-    <div class="side-bg" style="background-image: url('images/LINE_ALBUM_hp_260324_50.jpg');"></div>
+    <div class="side-bg" style="background-image: url('images/LINE_ALBUM_hp_260324_50.webp');"></div>
     <div class="shape shape-1"></div>
     <div class="shape shape-2"></div>
     <div class="shape shape-3"></div>
@@ -553,7 +571,7 @@ html, body {
 
   <!-- FUTURE SIDE -->
   <a href="future-page.html" class="split-side side-future">
-    <div class="side-bg" style="background-image: url('images/LINE_ALBUM_hp_260324_47.jpg');"></div>
+    <div class="side-bg" style="background-image: url('images/LINE_ALBUM_hp_260324_47.webp');"></div>
     <div class="particle"></div>
     <div class="particle"></div>
     <div class="particle"></div>
@@ -580,7 +598,10 @@ html, body {
 <!-- BOTTOM BAR -->
 <div class="bottom-bar">
   <span class="bottom-tagline">Since 2005 &mdash; 千葉市でずっと、20年。</span>
-  <img src="images/btm_logo.png" alt="BTM" class="bottom-logo">
+  <picture>
+    <source srcset="images/btm_logo.webp" type="image/webp">
+    <img src="images/btm_logo.png" alt="BTM" class="bottom-logo" decoding="async">
+  </picture>
 </div>
 
 </body>
