@@ -512,6 +512,56 @@ html, body {
   .top-link { font-size: 0.65rem; }
 }
 
+/* === DESKTOP SPARKLE EFFECTS === */
+@media (hover: hover) and (min-width: 769px) {
+  .mouse-glow {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.4s ease;
+  }
+  .side-kids .mouse-glow {
+    background: radial-gradient(circle, rgba(255,210,63,0.25) 0%, rgba(255,107,53,0.08) 40%, transparent 70%);
+  }
+  .side-future .mouse-glow {
+    background: radial-gradient(circle, rgba(212,168,83,0.3) 0%, rgba(45,27,105,0.1) 40%, transparent 70%);
+  }
+
+  /* Enhanced hover: side content shine sweep */
+  .split-side::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.12) 45%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.12) 55%, transparent 60%);
+    background-size: 250% 100%;
+    background-position: 200% 0;
+    transition: background-position 0.8s ease;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .split-side:hover::after {
+    background-position: -50% 0;
+  }
+
+  /* Arrow glow on hover */
+  .split-side:hover .side-arrow svg {
+    filter: drop-shadow(0 0 12px rgba(255,255,255,0.6));
+  }
+
+  /* Bottom logo subtle glow */
+  .bottom-logo {
+    transition: filter 0.3s ease;
+  }
+  .bottom-logo:hover {
+    filter: drop-shadow(0 0 20px rgba(212,168,83,0.5));
+  }
+}
+
 /* === MOBILE PERFORMANCE === */
 @media (max-width: 768px) {
   /* Keep 1 shape on KIDS, 4 particles on FUTURE */
@@ -604,6 +654,26 @@ html, body {
     <img src="images/btm_logo.png" alt="BTM" class="bottom-logo" decoding="async">
   </picture>
 </div>
+
+<script>
+// Desktop-only: mouse-following glow effect
+if (window.matchMedia('(hover: hover) and (min-width: 769px)').matches) {
+  document.querySelectorAll('.split-side').forEach(function(side) {
+    var glow = document.createElement('div');
+    glow.className = 'mouse-glow';
+    side.appendChild(glow);
+    side.addEventListener('mousemove', function(e) {
+      var rect = side.getBoundingClientRect();
+      glow.style.left = (e.clientX - rect.left) + 'px';
+      glow.style.top = (e.clientY - rect.top) + 'px';
+      glow.style.opacity = '1';
+    });
+    side.addEventListener('mouseleave', function() {
+      glow.style.opacity = '0';
+    });
+  });
+}
+</script>
 
 </body>
 </html>

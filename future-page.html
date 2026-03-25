@@ -1708,6 +1708,135 @@ section {
   .trial-float-cta { font-size: 11px; padding: 7px 14px; }
 }
 
+/* === DESKTOP SPARKLE EFFECTS === */
+@media (hover: hover) and (min-width: 769px) {
+  /* Gold shimmer sweep on section headings */
+  .section-heading {
+    position: relative;
+    overflow: hidden;
+  }
+  .section-heading::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212,168,83,0.35), transparent);
+    animation: goldSweep 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes goldSweep {
+    0%, 75% { left: -100%; }
+    100% { left: 200%; }
+  }
+
+  /* Card hover: elegant gold glow + lift */
+  .program-card,
+  .studio-card,
+  .voice-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+  }
+  .program-card::before,
+  .studio-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(212,168,83,0.1) 45%, rgba(212,168,83,0.2) 50%, rgba(212,168,83,0.1) 55%, transparent 60%);
+    background-size: 250% 100%;
+    background-position: 200% 0;
+    transition: background-position 0.7s ease;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+  .program-card:hover::before,
+  .studio-card:hover::before {
+    background-position: -50% 0;
+  }
+  .program-card:hover,
+  .studio-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(212, 168, 83, 0.15);
+  }
+
+  /* CTA buttons: gold glow */
+  .hero-btn-primary,
+  .cta-btn {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light), #fff8e7, var(--gold));
+    background-size: 300% 300%;
+    animation: goldBtnGlow 3s ease infinite;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    filter: blur(10px);
+  }
+  .hero-btn-primary:hover::after {
+    opacity: 1;
+  }
+  @keyframes goldBtnGlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Instructor photo: gold ring glow on hover */
+  .instructor-real-photo {
+    transition: filter 0.4s ease, box-shadow 0.4s ease;
+  }
+  .instructor-real-photo:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 0 40px rgba(212,168,83,0.35);
+  }
+
+  /* Elegant divider: shimmer animation */
+  .elegant-divider .line {
+    position: relative;
+    overflow: hidden;
+  }
+  .elegant-divider .line::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212,168,83,0.6), transparent);
+    animation: dividerShimmer 4s ease-in-out infinite;
+  }
+  @keyframes dividerShimmer {
+    0%, 60% { left: -100%; }
+    100% { left: 200%; }
+  }
+
+  /* Section label sparkle */
+  .section-label {
+    position: relative;
+    overflow: hidden;
+  }
+  .section-label::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -60%;
+    width: 30%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212,168,83,0.5), transparent);
+    animation: labelGoldSpark 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes labelGoldSpark {
+    0%, 80% { left: -60%; }
+    100% { left: 160%; }
+  }
+}
+
 /* === PERFORMANCE: Content Visibility === */
 .studios,
 .pricing,
@@ -2444,8 +2573,8 @@ if ('IntersectionObserver' in window) {
 
   function initParticles() {
     resizeCanvas();
-    const maxCount = Math.min(Math.floor(w * h / 15000), 60);
-    const count = window.innerWidth <= 768 ? Math.floor(maxCount / 2) : maxCount;
+    const baseCount = Math.min(Math.floor(w * h / 15000), 60);
+    const count = window.innerWidth <= 768 ? Math.floor(baseCount / 2) : Math.min(baseCount * 2, 120);
     particles = [];
     for (let i = 0; i < count; i++) {
       particles.push(new Particle());

@@ -2163,6 +2163,118 @@ body {
   fill: none;
 }
 
+/* === DESKTOP SPARKLE EFFECTS === */
+@media (hover: hover) and (min-width: 769px) {
+  /* Hero title shimmer sweep */
+  .hero-title {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-title::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: titleShimmer 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes titleShimmer {
+    0%, 70% { left: -100%; }
+    100% { left: 200%; }
+  }
+
+  /* Card hover: shine sweep + lift */
+  .class-card,
+  .studio-card,
+  .voice-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+  .class-card::before,
+  .studio-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.15) 55%, transparent 60%);
+    background-size: 250% 100%;
+    background-position: 200% 0;
+    transition: background-position 0.7s ease;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+  .class-card:hover::before,
+  .studio-card:hover::before {
+    background-position: -50% 0;
+  }
+  .class-card:hover,
+  .studio-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(255, 107, 53, 0.15);
+  }
+
+  /* CTA buttons glow pulse */
+  .hero-btn-primary,
+  .contact-trial-btn,
+  .trial-float-cta {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-btn-primary::after,
+  .contact-trial-btn::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, var(--orange), var(--coral), var(--yellow), var(--orange));
+    background-size: 300% 300%;
+    animation: btnGlow 3s ease infinite;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    filter: blur(8px);
+  }
+  .hero-btn-primary:hover::after,
+  .contact-trial-btn:hover::after {
+    opacity: 1;
+  }
+  @keyframes btnGlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Instructor photo hover glow */
+  .instructor-photo-img {
+    transition: filter 0.4s ease;
+  }
+  .instructor-photo-img:hover {
+    filter: drop-shadow(0 0 25px rgba(255,107,53,0.4));
+  }
+
+  /* Section label sparkle */
+  .section-label {
+    position: relative;
+    overflow: hidden;
+  }
+  .section-label::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -60%;
+    width: 30%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,107,53,0.4), transparent);
+    animation: labelSpark 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes labelSpark {
+    0%, 80% { left: -60%; }
+    100% { left: 160%; }
+  }
+}
+
 /* === PERFORMANCE: Content Visibility === */
 .studios-section,
 .pricing-section,
