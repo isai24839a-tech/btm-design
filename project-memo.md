@@ -104,14 +104,22 @@ split-landing.html (トップ)
 - [x] **OGP画像**: トップ/KIDS/FUTURE各1枚（1200x630）作成、og:image+twitter:image設定
 - [x] **GAS再デプロイ手順書**: `GAS_REDEPLOY_INSTRUCTIONS.md` 作成（完全なコード+手順）
 
+## 完了済み（Cloudflare Pages移行+画像添付機能 2026-03-27）
+- [x] **Cloudflare Pages デプロイ**: `btm-design.pages.dev` で公開中（GitHub push自動デプロイ）
+- [x] **URL一括置換**: GitHub Pages → tibadance.com（43箇所）
+- [x] **split-landing.html → index.html**: トップページとしてリネーム
+- [x] **.gitignore整備**: node_modules/scraped/開発ツール除外
+- [x] **お知らせ画像添付機能**: 管理者が最大5枚の画像を添付可能。Google Drive自動保存。削除時もDriveから自動削除
+
 ## 次にやること
-- [ ] **★GAS再デプロイ**: GAS_REDEPLOY_INSTRUCTIONS.mdの手順に従い手動でコピペ+再デプロイ
+- [ ] **★GAS再デプロイ**: GAS_REDEPLOY_INSTRUCTIONS.mdの手順に従い手動でコピペ+再デプロイ（セキュリティ修正+画像添付機能）
+- [ ] **★GAS再デプロイ後**: お知らせシートE1に「画像」ヘッダー追加 or setupSheets()再実行
 - [ ] **★定期レッスンデータ入力**: スプレッドシートの「定期レッスン」シートに曜日/スタジオ/時間/クラス/カテゴリを入力
 - [ ] **Google Search Console登録**: サイトマップ送信
-- [ ] tibadance.com移行（canonical/OGP URL一括置換 + Cloudflare Pages）
-- [ ] tibadance.comドメイン移管（Jimdo → Cloudflare）
+- [ ] tibadance.comドメイン移管（Jimdo → Cloudflare DNS）
+- [ ] tibadance.comをCloudflare Pagesにカスタムドメイン追加
 - [ ] 実データでの動作確認テスト
-- [ ] 旧サイト停止
+- [ ] 旧サイト（GitHub Pages / Jimdo）停止
 
 ## ファイル構成
 ```
