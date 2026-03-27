@@ -2165,7 +2165,16 @@ function showMainContent() {
             '<option value="">通常</option>' +
             '<option value="重要">重要</option>' +
           '</select>' +
-          '<button class="admin-add-btn" onclick="adminAddAnnouncement()">追加する</button>' +
+          '<label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0;cursor:pointer;font-size:0.9rem">' +
+            '<input type="checkbox" id="admin-announce-attach" onchange="toggleImageAttach()" style="width:18px;height:18px">' +
+            '<span>画像を添付</span>' +
+          '</label>' +
+          '<div id="admin-announce-image-area" style="display:none">' +
+            '<input type="file" id="admin-announce-images" multiple accept="image/*" onchange="previewImages(this)" style="display:none">' +
+            '<button type="button" style="background:#666;color:#fff;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-size:0.85rem;margin-bottom:0.5rem" onclick="document.getElementById(\'admin-announce-images\').click()">写真を選択（最大5枚）</button>' +
+            '<div id="admin-announce-preview" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem"></div>' +
+          '</div>' +
+          '<button class="admin-add-btn" id="admin-announce-submit" onclick="adminAddAnnouncement()">追加する</button>' +
         '</div>' +
         '<div id="admin-announce-list"></div>' +
       '</div>';
@@ -2700,6 +2709,13 @@ function fetchAnnouncements() {
       html += '</div>';
       html += '<h4>' + escapeHtml(a.title) + '</h4>';
       html += '<p>' + escapeHtml(a.content) + '</p>';
+      if (a.images && a.images.length > 0) {
+        html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem">';
+        for (var j = 0; j < a.images.length; j++) {
+          html += '<a href="' + a.images[j] + '" target="_blank" style="display:block"><img src="' + a.images[j] + '" style="width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid #e0d8cc" loading="lazy"></a>';
+        }
+        html += '</div>';
+      }
       html += '</div>';
     }
     container.innerHTML = html;
@@ -2728,6 +2744,13 @@ function fetchAnnouncements() {
         html += '</div>';
         html += '<h4>' + escapeHtml(a.title || '') + '</h4>';
         html += '<p>' + escapeHtml(a.content || '') + '</p>';
+        if (a.images && a.images.length > 0) {
+          html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem">';
+          for (var j = 0; j < a.images.length; j++) {
+            html += '<a href="' + a.images[j] + '" target="_blank" style="display:block"><img src="' + a.images[j] + '" style="width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid #e0d8cc" loading="lazy"></a>';
+          }
+          html += '</div>';
+        }
         html += '</div>';
       }
       container.innerHTML = html;
@@ -3125,11 +3148,85 @@ function renderAdminAnnouncements(items, container) {
     html += '</div>';
     html += '<h4>' + escapeHtml(a.title || '') + '</h4>';
     html += '<p>' + escapeHtml(a.content || '') + '</p>';
+    if (a.images && a.images.length > 0) {
+      html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem">';
+      for (var j = 0; j < a.images.length; j++) {
+        html += '<a href="' + a.images[j] + '" target="_blank"><img src="' + a.images[j] + '" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #ddd" loading="lazy"></a>';
+      }
+      html += '</div>';
+    }
     html += '<button class="admin-delete-btn" style="margin-top:0.8rem" onclick=\'adminDeleteAnnouncement(' +
       (a.row ? a.row : i) + ',' + JSON.stringify(a.title||'').replace(/'/g, "\\'") + ')\'">削除</button>';
     html += '</div>';
   }
   container.innerHTML = html;
+}
+
+var _removedImageIndexes = [];
+
+function toggleImageAttach() {
+  var checked = document.getElementById('admin-announce-attach').checked;
+  document.getElementById('admin-announce-image-area').style.display = checked ? 'block' : 'none';
+  if (!checked) {
+    document.getElementById('admin-announce-images').value = '';
+    document.getElementById('admin-announce-preview').innerHTML = '';
+    _removedImageIndexes = [];
+  }
+}
+
+function previewImages(input) {
+  var preview = document.getElementById('admin-announce-preview');
+  preview.innerHTML = '';
+  _removedImageIndexes = [];
+  var files = Array.from(input.files).slice(0, 5);
+  if (input.files.length > 5) alert('最大5枚まで。最初の5枚を使用します。');
+  files.forEach(function(file, i) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var div = document.createElement('div');
+      div.style.cssText = 'position:relative;width:80px;height:80px;flex-shrink:0';
+      div.setAttribute('data-index', i);
+      div.innerHTML = '<img src="' + e.target.result + '" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #ddd">' +
+        '<button style="position:absolute;top:-6px;right:-6px;background:#e55;color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:12px;line-height:20px;text-align:center" onclick="removeImagePreview(this,' + i + ')">×</button>';
+      preview.appendChild(div);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeImagePreview(btn, index) {
+  _removedImageIndexes.push(index);
+  btn.parentElement.style.display = 'none';
+}
+
+function compressImage(file) {
+  return new Promise(function(resolve) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var canvas = document.createElement('canvas');
+        var maxW = 1200;
+        var w = img.width, h = img.height;
+        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function clearAnnounceForm() {
+  document.getElementById('admin-announce-title').value = '';
+  document.getElementById('admin-announce-content').value = '';
+  document.getElementById('admin-announce-importance').value = '';
+  var attachCb = document.getElementById('admin-announce-attach');
+  if (attachCb) { attachCb.checked = false; toggleImageAttach(); }
+  _removedImageIndexes = [];
 }
 
 function adminAddAnnouncement() {
@@ -3143,25 +3240,64 @@ function adminAddAnnouncement() {
   var dateStr = dateInput ? dateInput.replace(/-/g, '/') : '';
 
   if (DEMO_MODE) {
-    demoAnnouncements.push({ date: dateStr, title: title, content: content, importance: importance });
-    document.getElementById('admin-announce-title').value = '';
-    document.getElementById('admin-announce-content').value = '';
-    document.getElementById('admin-announce-importance').value = '';
+    demoAnnouncements.push({ date: dateStr, title: title, content: content, importance: importance, images: [] });
+    clearAnnounceForm();
     fetchAdminAnnouncements();
     alert('追加しました');
     return;
   }
 
-  var params = new URLSearchParams({
-    action: 'addAnnouncement', adminKey: ADMIN_PASSWORD,
-    date: dateStr, title: title, content: content, importance: importance
-  });
-  apiCall(params, function() {
-    document.getElementById('admin-announce-title').value = '';
-    document.getElementById('admin-announce-content').value = '';
-    alert('追加しました');
-    fetchAdminAnnouncements();
-  });
+  var attachChecked = document.getElementById('admin-announce-attach').checked;
+  var fileInput = document.getElementById('admin-announce-images');
+  var hasImages = attachChecked && fileInput && fileInput.files.length > 0;
+
+  if (hasImages) {
+    var btn = document.getElementById('admin-announce-submit');
+    btn.disabled = true;
+    btn.textContent = '画像をアップロード中...';
+
+    var files = Array.from(fileInput.files).slice(0, 5).filter(function(_, i) {
+      return _removedImageIndexes.indexOf(i) === -1;
+    });
+
+    Promise.all(files.map(compressImage)).then(function(base64Images) {
+      var body = {
+        action: 'addAnnouncement',
+        adminKey: ADMIN_PASSWORD,
+        date: dateStr, title: title, content: content, importance: importance,
+        images: base64Images
+      };
+
+      fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+        .then(function(r) { return r.json(); })
+        .then(function(result) {
+          btn.disabled = false;
+          btn.textContent = '追加する';
+          if (result.success) {
+            clearAnnounceForm();
+            alert('追加しました');
+            fetchAdminAnnouncements();
+          } else {
+            alert(result.error || 'エラーが発生しました');
+          }
+        })
+        .catch(function(e) {
+          btn.disabled = false;
+          btn.textContent = '追加する';
+          alert('通信エラー: ' + e.message);
+        });
+    });
+  } else {
+    var params = new URLSearchParams({
+      action: 'addAnnouncement', adminKey: ADMIN_PASSWORD,
+      date: dateStr, title: title, content: content, importance: importance
+    });
+    apiCall(params, function() {
+      clearAnnounceForm();
+      alert('追加しました');
+      fetchAdminAnnouncements();
+    });
+  }
 }
 
 function adminDeleteAnnouncement(rowOrIndex, title) {
