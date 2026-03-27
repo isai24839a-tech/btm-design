@@ -6,6 +6,10 @@
 - `editRegularLesson` / `editSlot` エンドポイント追加
 - 予約確認メール文面更新（返信不可の注記 + キャンセルはLINE連絡）
 - `定期レッスン` シートをsetupSheets()に追加
+- **★セキュリティ強化: 管理者操作をPOST専用に変更**
+  - `doPost(e)` 追加 — 管理者APIはPOSTリクエストのみ受付
+  - `doGet(e)` から管理者アクション削除 — URLにadminKeyが載らなくなった
+  - adminKeyはリクエストbody（JSON）に含めて送信
 
 ---
 
@@ -42,6 +46,8 @@
 - [ ] 確認メールに「返信不可」「キャンセルはLINE」の文言がある
 - [ ] 予約一覧タブで予約が表示される
 - [ ] 管理者モードでレッスン枠追加/削除/編集ができる
+- [ ] ★ブラウザのDevTools→Networkタブで、管理者操作がPOSTで送信されていること確認
+- [ ] ★URLにadminKeyが含まれていないこと確認
 
 ---
 
@@ -113,33 +119,46 @@ function setupSheets() {
 function doGet(e) {
   var action = (e.parameter.action || '').toLowerCase();
 
-  // Public actions
+  // Public actions (read-only)
   if (action === 'slots') return getAvailableSlots();
   if (action === 'book') return bookSlot(e.parameter);
   if (action === 'list') return getBookingList();
   if (action === 'announcements') return getAnnouncements();
   if (action === 'regularlessons') return getRegularLessons();
 
-  // Admin actions (require adminKey)
-  if (action === 'addslot') return adminGuard(e, adminAddSlot);
-  if (action === 'deleteslot') return adminGuard(e, adminDeleteSlot);
-  if (action === 'cancelbooking') return adminGuard(e, adminCancelBooking);
-  if (action === 'addannouncement') return adminGuard(e, adminAddAnnouncement);
-  if (action === 'deleteannouncement') return adminGuard(e, adminDeleteAnnouncement);
-  if (action === 'addregularlesson') return adminGuard(e, adminAddRegularLesson);
-  if (action === 'deleteregularlesson') return adminGuard(e, adminDeleteRegularLesson);
-  if (action === 'editregularlesson') return adminGuard(e, adminEditRegularLesson);
-  if (action === 'editslot') return adminGuard(e, adminEditSlot);
-  if (action === 'formatsheets') return adminGuard(e, adminFormatSheets);
+  return jsonResponse({ error: 'Unknown action' });
+}
+
+// Admin actions are POST-only (adminKey is in the request body, not the URL)
+function doPost(e) {
+  var payload;
+  try {
+    payload = JSON.parse(e.postData.contents);
+  } catch (err) {
+    return jsonResponse({ error: 'Invalid request body' });
+  }
+
+  var action = (payload.action || '').toLowerCase();
+
+  if (action === 'addslot') return adminGuardPost(payload, adminAddSlot);
+  if (action === 'deleteslot') return adminGuardPost(payload, adminDeleteSlot);
+  if (action === 'cancelbooking') return adminGuardPost(payload, adminCancelBooking);
+  if (action === 'addannouncement') return adminGuardPost(payload, adminAddAnnouncement);
+  if (action === 'deleteannouncement') return adminGuardPost(payload, adminDeleteAnnouncement);
+  if (action === 'addregularlesson') return adminGuardPost(payload, adminAddRegularLesson);
+  if (action === 'deleteregularlesson') return adminGuardPost(payload, adminDeleteRegularLesson);
+  if (action === 'editregularlesson') return adminGuardPost(payload, adminEditRegularLesson);
+  if (action === 'editslot') return adminGuardPost(payload, adminEditSlot);
+  if (action === 'formatsheets') return adminGuardPost(payload, adminFormatSheets);
 
   return jsonResponse({ error: 'Unknown action' });
 }
 
-function adminGuard(e, fn) {
-  if (e.parameter.adminKey !== ADMIN_KEY) {
+function adminGuardPost(payload, fn) {
+  if (payload.adminKey !== ADMIN_KEY) {
     return jsonResponse({ success: false, error: '管理者認証に失敗しました' });
   }
-  return fn(e.parameter);
+  return fn(payload);
 }
 
 // ===== 空きレッスン一覧 =====

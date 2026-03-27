@@ -1,0 +1,10 @@
+node_modules/
+scraped/
+*.py
+package.json
+package-lock.json
+scrape.js
+scrape2.js
+test-studio-filter.md
+wp-plan-analysis.md
+site-info.md

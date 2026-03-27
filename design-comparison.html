@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEAT THE MIX - デザイン案比較</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', 'Noto Sans JP', sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  min-height: 100vh;
+}
+.header {
+  background: #fff;
+  padding: 40px 20px;
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+.header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.header p {
+  color: #86868b;
+  font-size: 0.95rem;
+}
+.section-label {
+  max-width: 1200px;
+  margin: 40px auto 16px;
+  padding: 0 20px;
+}
+.section-label h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #86868b;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label h2::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e5e5e5;
+}
+.new-badge {
+  background: #FF2D6B;
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.grid {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+.card-preview {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  position: relative;
+  border-bottom: 1px solid #f0f0f0;
+}
+.card-preview iframe {
+  width: 200%;
+  height: 200%;
+  transform: scale(0.5);
+  transform-origin: top left;
+  border: none;
+  pointer-events: none;
+}
+.card-body {
+  padding: 24px;
+}
+.card-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+.badge-a { background: #FFF0E8; color: #FF6B35; }
+.badge-b { background: #E8F5F1; color: #16C79A; }
+.badge-c { background: #FFE8EE; color: #FF2D6B; }
+.badge-d { background: #F5F0E0; color: #C9A84C; }
+.badge-e { background: #EDE8F5; color: #764ba2; }
+.badge-f { background: #F0EBE5; color: #E8654A; }
+.badge-g { background: #1a1a1a; color: #FF4D00; }
+.badge-h { background: #E8ECFF; color: #4D65FF; }
+.badge-i { background: #FBF7F0; color: #E85D3A; }
+.card-body h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.card-body p {
+  font-size: 0.85rem;
+  color: #86868b;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0066cc;
+}
+.info-section {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 0 20px;
+}
+.info-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+}
+.info-card h2 {
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+}
+.info-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.info-card th, .info-card td {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+.info-card th {
+  font-weight: 600;
+  color: #86868b;
+  font-size: 0.8rem;
+}
+.rec { color: #16C79A; font-weight: 700; }
+@media (max-width: 768px) {
+  .grid { grid-template-columns: 1fr; }
+  .card-preview { height: 250px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>BEAT THE MIX 新HP デザイン案</h1>
+  <p>9つのデザイン案を作成しました。クリックして全画面で確認できます。</p>
+</div>
+
+<!-- NEW DESIGNS -->
+<div class="section-label">
+  <h2><span class="new-badge">NEW</span> v3 - 実サイトリサーチ版（本格デザイン）</h2>
+</div>
+
+<div class="grid">
+  <!-- Design G -->
+  <a href="design-g-premium.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-g-premium.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-g">DESIGN G</span>
+      <h2>Studio Premium</h2>
+      <p>NOA/En Dance Studio風。ダーク×ビビッドオレンジ、擬似動画ヒーロー、ギャラリーセクション、カウンターアニメーション付き。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+
+  <!-- Design H -->
+  <a href="design-h-dynamic.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-h-dynamic.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-h">DESIGN H</span>
+      <h2>Split Dynamic</h2>
+      <p>EXPG/STEEZY風。スプリットレイアウト、ブルー×マゼンタ、水平スクロール、マーキー演出、タブ切替。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+
+  <!-- Design I -->
+  <a href="design-i-warm.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-i-warm.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-i">DESIGN I</span>
+      <h2>Warm Creative</h2>
+      <p>温かみのあるクリーム×コーラル。有機的ブロブ形状、ウェーブ区切り、ギャラリー付き。親しみやすさと洗練を両立。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+</div>
+
+<!-- V2 DESIGNS -->
+<div class="section-label">
+  <h2>v2 - おしゃれ強化デザイン</h2>
+</div>
+
+<div class="grid">
+  <!-- Design D -->
+  <a href="design-d-cinematic.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-d-cinematic.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-d">DESIGN D</span>
+      <h2>Cinematic Gold</h2>
+      <p>ブラック×ゴールドのシネマティック・スタイル。文字アニメーション、マーキー、パララックス効果。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+
+  <!-- Design E -->
+  <a href="design-e-glass.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-e-glass.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-e">DESIGN E</span>
+      <h2>Glassmorphism Aurora</h2>
+      <p>オーロラ背景にすりガラスカード。3Dティルト、シマーボタン、浮遊パーティクル。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+
+  <!-- Design F -->
+  <a href="design-f-editorial.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-f-editorial.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-f">DESIGN F</span>
+      <h2>Magazine Editorial</h2>
+      <p>ハイファッション誌風。タイポグラフィと余白の美学、非対称グリッド。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+</div>
+
+<!-- ORIGINAL DESIGNS -->
+<div class="section-label">
+  <h2>v1 - 初期デザイン</h2>
+</div>
+
+<div class="grid">
+  <!-- Design A -->
+  <a href="design-a-energy.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-a-energy.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-a">DESIGN A</span>
+      <h2>Energy Pop</h2>
+      <p>現サイトのオレンジ基調を進化させた、エネルギッシュで明るいデザイン。親しみやすく、活気が伝わるスタイル。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+
+  <!-- Design B -->
+  <a href="design-b-modern.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-b-modern.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-b">DESIGN B</span>
+      <h2>Clean Modern</h2>
+      <p>洗練されたミニマルデザイン。余白を活かした上品で信頼感のあるスタイル。大人向けの印象。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+
+  <!-- Design C -->
+  <a href="design-c-dark.html" class="card">
+    <div class="card-preview">
+      <iframe src="design-c-dark.html" loading="lazy"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-badge badge-c">DESIGN C</span>
+      <h2>Street Vibe</h2>
+      <p>ストリートダンスの世界観を表現したダークテーマ。ネオンカラーが映えるクールなデザイン。</p>
+      <span class="card-link">全画面で見る &rarr;</span>
+    </div>
+  </a>
+</div>
+
+<div class="info-section">
+  <div class="info-card">
+    <h2>WordPress.com プラン＆予約システム提案</h2>
+    <table>
+      <tr>
+        <th>項目</th>
+        <th>提案内容</th>
+        <th>月額コスト</th>
+      </tr>
+      <tr>
+        <td>HP ホスティング</td>
+        <td>WordPress.com <strong>Personal プラン</strong>（最安有料プラン）</td>
+        <td>約500円（$4/月・2年払い）</td>
+      </tr>
+      <tr>
+        <td>予約システム</td>
+        <td><strong>STORES予約</strong>（旧Coubic）無料プラン<span class="rec"> &larr; おすすめ</span></td>
+        <td>0円</td>
+      </tr>
+      <tr>
+        <td>会員管理</td>
+        <td>STORES予約の会員機能で対応</td>
+        <td>0円</td>
+      </tr>
+      <tr>
+        <td>独自ドメイン</td>
+        <td>1年目無料（WPプラン付帯）、2年目〜約1,500円/年</td>
+        <td>0〜125円</td>
+      </tr>
+      <tr>
+        <th colspan="2" style="text-align:right;">合計</th>
+        <th>約500円/月〜</th>
+      </tr>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>
