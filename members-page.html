@@ -3211,8 +3211,22 @@ function compressImage(file) {
         if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
         canvas.width = w;
         canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.7));
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        var logo = new Image();
+        logo.crossOrigin = 'anonymous';
+        logo.onload = function() {
+          var logoSize = Math.max(48, Math.round(w * 0.08));
+          var margin = 12;
+          ctx.globalAlpha = 0.3;
+          ctx.drawImage(logo, w - logoSize - margin, h - logoSize - margin, logoSize, logoSize);
+          ctx.globalAlpha = 1.0;
+          resolve(canvas.toDataURL('image/jpeg', 0.7));
+        };
+        logo.onerror = function() {
+          resolve(canvas.toDataURL('image/jpeg', 0.7));
+        };
+        logo.src = 'images/btm_logo.webp';
       };
       img.src = e.target.result;
     };
