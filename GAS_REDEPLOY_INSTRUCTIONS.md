@@ -63,11 +63,16 @@
 
 ## 最新コード（booking-script.gs）
 
-以下のGitHub URLから最新コードを全てコピーしてApps Scriptエディタに貼り付ける:
+以下のいずれかの方法で最新コードを取得してApps Scriptエディタに貼り付ける:
 
-**GitHub（Raw）**: https://raw.githubusercontent.com/isai24839a-tech/btm-design/master/booking-script.gs
+**方法1: GitHub Raw URL**（推奨）
+https://raw.githubusercontent.com/isai24839a-tech/btm-design/master/booking-script.gs
+→ ブラウザで開いて Ctrl+A → Ctrl+C
 
-または、以下のコードを全てコピー:
+**方法2: ローカルファイル**
+`C:\Users\shirasaki910\Desktop\dance-studio\booking-script.gs` をテキストエディタで開いてコピー
+
+**注意**: 以下の埋め込みコードは画像添付機能+セキュリティ修正を含む最新版です:
 
 ```javascript
 /**
@@ -89,6 +94,13 @@
 // ===== 設定 =====
 var ADMIN_EMAIL = 'beat.the.mix7386@gmail.com';
 var ADMIN_KEY = 'btmadmin2026'; // members-page.htmlのADMIN_PASSWORDと合わせる
+var IMAGE_FOLDER_NAME = 'BTM_お知らせ画像';
+
+function getOrCreateImageFolder() {
+  var folders = DriveApp.getFoldersByName(IMAGE_FOLDER_NAME);
+  if (folders.hasNext()) return folders.next();
+  return DriveApp.createFolder(IMAGE_FOLDER_NAME);
+}
 
 // ===== 初期セットアップ（1回だけ実行）=====
 function setupSheets() {
@@ -97,7 +109,7 @@ function setupSheets() {
   var sheets = [
     { name: 'スケジュール', headers: ['日付', 'スタジオ', '時間', 'クラス', '定員', 'category'] },
     { name: '予約一覧', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時'] },
-    { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度'] },
+    { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像'] },
     { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ'] },
     { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] }
@@ -412,12 +424,15 @@ function getAnnouncements() {
   for (var i = 1; i < data.length; i++) {
     var row = data[i];
     if (!row[1]) continue; // skip empty title
+    var imageIds = String(row[4] || '').split(',').filter(function(s) { return s.trim(); });
+    var imageUrls = imageIds.map(function(id) { return 'https://lh3.googleusercontent.com/d/' + id.trim(); });
     items.push({
       date: formatDate(row[0]),
       title: String(row[1]),
       content: String(row[2] || ''),
       importance: String(row[3] || ''),
-      row: i + 1 // 1-indexed row number for deletion
+      images: imageUrls,
+      row: i + 1
     });
   }
   return jsonResponse(items);
@@ -525,7 +540,24 @@ function adminAddAnnouncement(params) {
 
   if (!title) return jsonResponse({ success: false, error: 'タイトルを入力してください' });
 
-  sheet.appendRow([date, title, content, importance]);
+  var imageIds = [];
+  if (params.images && params.images.length > 0) {
+    var folder = getOrCreateImageFolder();
+    for (var i = 0; i < Math.min(params.images.length, 5); i++) {
+      var imgData = params.images[i];
+      var match = imgData.match(/^data:image\/(.*?);base64,(.*)$/);
+      if (match) {
+        var ext = match[1].replace('jpeg', 'jpg');
+        var bytes = Utilities.base64Decode(match[2]);
+        var blob = Utilities.newBlob(bytes, 'image/' + match[1], 'btm_' + Date.now() + '_' + i + '.' + ext);
+        var file = folder.createFile(blob);
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        imageIds.push(file.getId());
+      }
+    }
+  }
+
+  sheet.appendRow([date, title, content, importance, imageIds.join(',')]);
   return jsonResponse({ success: true, message: 'お知らせを追加しました' });
 }
 
@@ -539,6 +571,15 @@ function adminDeleteAnnouncement(params) {
   if (!row || row < 2) return jsonResponse({ success: false, error: '無効な行番号です' });
 
   if (row > sheet.getLastRow()) return jsonResponse({ success: false, error: '該当する行がありません' });
+
+  // Delete associated images from Drive
+  var imageCol = sheet.getRange(row, 5).getValue();
+  if (imageCol) {
+    var ids = String(imageCol).split(',').filter(function(s) { return s.trim(); });
+    for (var i = 0; i < ids.length; i++) {
+      try { DriveApp.getFileById(ids[i].trim()).setTrashed(true); } catch(e) {}
+    }
+  }
 
   sheet.deleteRow(row);
   return jsonResponse({ success: true, message: '削除しました' });
