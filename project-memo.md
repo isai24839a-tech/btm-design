@@ -111,14 +111,18 @@ split-landing.html (トップ)
 - [x] **.gitignore整備**: node_modules/scraped/開発ツール除外
 - [x] **お知らせ画像添付機能**: 管理者が最大5枚の画像を添付可能。Google Drive自動保存。削除時もDriveから自動削除
 
+## 完了済み（GAS再デプロイ+新機能 2026-03-28）
+- [x] **GAS再デプロイ完了**: セキュリティ修正（POST化）+画像添付+カテゴリ機能
+- [x] **setupSheets()実行**: 画像列+カテゴリ列ヘッダー追加
+- [x] **お知らせ画像透かし**: BTMロゴを右下に30%透明度で焼き込み（ダウンロード対策）
+- [x] **お知らせKIDS/FUTUREタグ**: 管理画面にトグル追加、バッジ表示（KIDS=コーラル/FUTURE=ネイビー）
+- [x] **PC+スマホ動作確認OK**
+
 ## 次にやること
-- [ ] **★GAS再デプロイ**: GAS_REDEPLOY_INSTRUCTIONS.mdの手順に従い手動でコピペ+再デプロイ（セキュリティ修正+画像添付機能）
-- [ ] **★GAS再デプロイ後**: お知らせシートE1に「画像」ヘッダー追加 or setupSheets()再実行
 - [ ] **★定期レッスンデータ入力**: スプレッドシートの「定期レッスン」シートに曜日/スタジオ/時間/クラス/カテゴリを入力
 - [ ] **Google Search Console登録**: サイトマップ送信
 - [ ] tibadance.comドメイン移管（Jimdo → Cloudflare DNS）
 - [ ] tibadance.comをCloudflare Pagesにカスタムドメイン追加
-- [ ] 実データでの動作確認テスト
 - [ ] 旧サイト（GitHub Pages / Jimdo）停止
 
 ## ファイル構成
