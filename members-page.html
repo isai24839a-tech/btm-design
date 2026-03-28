@@ -1443,6 +1443,24 @@ body {
   color: #fff;
   letter-spacing: 0.05em;
 }
+.announce-badge-kids {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: var(--coral);
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+.announce-badge-future {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: var(--navy);
+  color: #fff;
+  letter-spacing: 0.05em;
+}
 
 .announce-card h4 {
   font-size: 1.05rem;
@@ -2165,6 +2183,10 @@ function showMainContent() {
             '<option value="">通常</option>' +
             '<option value="重要">重要</option>' +
           '</select>' +
+          '<div class="category-toggle" style="margin:0.8rem 0 0.5rem">' +
+            '<button type="button" class="category-btn active" data-category="kids" onclick="setAnnounceCategory(this,\'KIDS\')">KIDS</button>' +
+            '<button type="button" class="category-btn" data-category="future" onclick="setAnnounceCategory(this,\'FUTURE\')">FUTURE</button>' +
+          '</div>' +
           '<label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0;cursor:pointer;font-size:0.9rem">' +
             '<input type="checkbox" id="admin-announce-attach" onchange="toggleImageAttach()" style="width:18px;height:18px">' +
             '<span>画像を添付</span>' +
@@ -2705,6 +2727,8 @@ function fetchAnnouncements() {
       html += '<div class="' + cardClass + '">';
       html += '<div class="announce-card-header">';
       html += '<span class="announce-date">' + escapeHtml(a.date) + '</span>';
+      if (a.category === 'KIDS') html += '<span class="announce-badge-kids">KIDS</span>';
+      if (a.category === 'FUTURE') html += '<span class="announce-badge-future">FUTURE</span>';
       if (isImportant) html += '<span class="announce-badge-important">重要</span>';
       html += '</div>';
       html += '<h4>' + escapeHtml(a.title) + '</h4>';
@@ -2740,6 +2764,8 @@ function fetchAnnouncements() {
         html += '<div class="' + (isImportant ? 'announce-card important' : 'announce-card') + '">';
         html += '<div class="announce-card-header">';
         html += '<span class="announce-date">' + escapeHtml(a.date || '') + '</span>';
+        if ((a.category||'') === 'KIDS') html += '<span class="announce-badge-kids">KIDS</span>';
+        if ((a.category||'') === 'FUTURE') html += '<span class="announce-badge-future">FUTURE</span>';
         if (isImportant) html += '<span class="announce-badge-important">重要</span>';
         html += '</div>';
         html += '<h4>' + escapeHtml(a.title || '') + '</h4>';
@@ -3144,6 +3170,8 @@ function renderAdminAnnouncements(items, container) {
     html += '<div class="' + (isImportant ? 'announce-card important' : 'announce-card') + '" style="position:relative">';
     html += '<div class="announce-card-header">';
     html += '<span class="announce-date">' + escapeHtml(a.date || '') + '</span>';
+    if ((a.category||'') === 'KIDS') html += '<span class="announce-badge-kids">KIDS</span>';
+    if ((a.category||'') === 'FUTURE') html += '<span class="announce-badge-future">FUTURE</span>';
     if (isImportant) html += '<span class="announce-badge-important">重要</span>';
     html += '</div>';
     html += '<h4>' + escapeHtml(a.title || '') + '</h4>';
@@ -3163,6 +3191,14 @@ function renderAdminAnnouncements(items, container) {
 }
 
 var _removedImageIndexes = [];
+var _announceCategory = 'KIDS';
+
+function setAnnounceCategory(btn, cat) {
+  _announceCategory = cat;
+  var btns = btn.parentElement.querySelectorAll('.category-btn');
+  btns.forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+}
 
 function toggleImageAttach() {
   var checked = document.getElementById('admin-announce-attach').checked;
@@ -3241,6 +3277,10 @@ function clearAnnounceForm() {
   var attachCb = document.getElementById('admin-announce-attach');
   if (attachCb) { attachCb.checked = false; toggleImageAttach(); }
   _removedImageIndexes = [];
+  _announceCategory = 'KIDS';
+  var catBtns = document.querySelectorAll('#panel-admin-announce .category-btn');
+  catBtns.forEach(function(b) { b.classList.remove('active'); });
+  if (catBtns[0]) catBtns[0].classList.add('active');
 }
 
 function adminAddAnnouncement() {
@@ -3254,7 +3294,7 @@ function adminAddAnnouncement() {
   var dateStr = dateInput ? dateInput.replace(/-/g, '/') : '';
 
   if (DEMO_MODE) {
-    demoAnnouncements.push({ date: dateStr, title: title, content: content, importance: importance, images: [] });
+    demoAnnouncements.push({ date: dateStr, title: title, content: content, importance: importance, category: _announceCategory, images: [] });
     clearAnnounceForm();
     fetchAdminAnnouncements();
     alert('追加しました');
@@ -3279,6 +3319,7 @@ function adminAddAnnouncement() {
         action: 'addAnnouncement',
         adminKey: ADMIN_PASSWORD,
         date: dateStr, title: title, content: content, importance: importance,
+        category: _announceCategory,
         images: base64Images
       };
 
@@ -3304,7 +3345,7 @@ function adminAddAnnouncement() {
   } else {
     var params = new URLSearchParams({
       action: 'addAnnouncement', adminKey: ADMIN_PASSWORD,
-      date: dateStr, title: title, content: content, importance: importance
+      date: dateStr, title: title, content: content, importance: importance, category: _announceCategory
     });
     apiCall(params, function() {
       clearAnnounceForm();

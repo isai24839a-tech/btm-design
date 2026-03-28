@@ -32,7 +32,7 @@ function setupSheets() {
   var sheets = [
     { name: 'スケジュール', headers: ['日付', 'スタジオ', '時間', 'クラス', '定員', 'category'] },
     { name: '予約一覧', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時'] },
-    { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像'] },
+    { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像', 'カテゴリ'] },
     { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ'] },
     { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] }
@@ -355,6 +355,7 @@ function getAnnouncements() {
       content: String(row[2] || ''),
       importance: String(row[3] || ''),
       images: imageUrls,
+      category: String(row[5] || ''),
       row: i + 1
     });
   }
@@ -480,7 +481,8 @@ function adminAddAnnouncement(params) {
     }
   }
 
-  sheet.appendRow([date, title, content, importance, imageIds.join(',')]);
+  var category = params.category || '';
+  sheet.appendRow([date, title, content, importance, imageIds.join(','), category]);
   return jsonResponse({ success: true, message: 'お知らせを追加しました' });
 }
 
