@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEAT THE MIX 管理者マニュアル</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  background: #f8f9fa;
+  color: #333;
+  line-height: 1.8;
+}
+
+.header {
+  background: linear-gradient(135deg, #FF6B35, #FF4D6D);
+  color: #fff;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+.header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+.header p { opacity: 0.9; font-size: 0.95rem; }
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.toc {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.toc h2 { font-size: 1.2rem; margin-bottom: 1rem; color: #FF6B35; }
+.toc ol { padding-left: 1.5rem; }
+.toc li { margin-bottom: 0.5rem; }
+.toc a { color: #FF6B35; text-decoration: none; font-weight: 500; }
+.toc a:hover { text-decoration: underline; }
+
+.section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.section h2 {
+  font-size: 1.3rem;
+  color: #FF6B35;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid #FFE8DE;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section h3 {
+  font-size: 1.05rem;
+  color: #333;
+  margin: 1.5rem 0 1rem;
+  padding-left: 0.8rem;
+  border-left: 3px solid #FF6B35;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+}
+
+.step-num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #FF6B35, #FF4D6D);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.step-content { flex: 1; }
+.step-content p { margin-bottom: 0.3rem; }
+
+.mock {
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin: 0.8rem 0;
+  position: relative;
+}
+
+.mock-label {
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  background: #FF6B35;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.mock-input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.mock-btn {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: default;
+}
+
+.mock-btn-primary {
+  background: linear-gradient(135deg, #FF6B35, #FF4D6D);
+  color: #fff;
+}
+
+.mock-btn-outline {
+  background: #fff;
+  color: #FF6B35;
+  border: 1.5px solid #FF6B35;
+}
+
+.mock-btn-danger {
+  background: #fff;
+  color: #c62828;
+  border: 1.5px solid #c62828;
+}
+
+.mock-btn-navy {
+  background: #0D1B2A;
+  color: #D4A853;
+}
+
+.mock-toggle {
+  display: inline-flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid #ddd;
+  margin: 0.3rem 0;
+}
+.mock-toggle span {
+  padding: 0.4rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: default;
+}
+.mock-toggle .active-kids { background: #FF6B35; color: #fff; }
+.mock-toggle .active-future { background: #0D1B2A; color: #D4A853; }
+.mock-toggle .inactive { background: #f5f5f5; color: #999; }
+
+.mock-tag {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0.15rem;
+}
+.tag-date { background: #FFE8DE; color: #FF6B35; }
+.tag-studio { background: #E3F2FD; color: #1565C0; }
+.tag-time { background: #E8F5E9; color: #2E7D32; }
+.tag-class { background: #F3E5F5; color: #7B1FA2; }
+.tag-kids { background: #FF6B35; color: #fff; }
+.tag-future { background: #0D1B2A; color: #D4A853; }
+.tag-important { background: #c62828; color: #fff; }
+
+.mock-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+}
+
+.mock-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.95);
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  margin: 0.5rem 0;
+}
+.mock-nav-brand { font-weight: 700; font-size: 0.9rem; }
+.mock-nav-brand span { color: #FF6B35; }
+.mock-nav-right { display: flex; align-items: center; gap: 0.5rem; }
+
+.mock-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin: 0.5rem 0;
+}
+.mock-cal-head {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #999;
+  padding: 0.3rem;
+}
+.mock-cal-day {
+  text-align: center;
+  padding: 0.4rem;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  background: #fafafa;
+}
+.mock-cal-day.has-lesson { background: #FFE8DE; font-weight: 600; color: #FF6B35; }
+.mock-cal-day.selected { background: #FF6B35; color: #fff; font-weight: 700; }
+.mock-cal-day.empty { background: transparent; }
+
+.mock-dow-grid {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+.mock-dow {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 2px solid #ddd;
+  background: #fff;
+  color: #999;
+}
+.mock-dow.selected { background: #FF6B35; color: #fff; border-color: #FF6B35; }
+
+.highlight {
+  background: #FFF3E0;
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  border-left: 4px solid #FF6B35;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.warning {
+  background: #FFF3F3;
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  border-left: 4px solid #c62828;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.arrow {
+  display: block;
+  text-align: center;
+  font-size: 1.5rem;
+  color: #FF6B35;
+  margin: 0.5rem 0;
+}
+
+.pw-display {
+  display: inline-block;
+  background: #333;
+  color: #4FC3F7;
+  padding: 0.3rem 1rem;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.flex-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mock-tab-bar {
+  display: flex;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 1rem;
+}
+.mock-tab {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #999;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: default;
+}
+.mock-tab.active { color: #FF6B35; border-bottom-color: #FF6B35; }
+
+.mock-gate {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  color: #fff;
+}
+.mock-gate h3 { font-size: 1rem; margin-bottom: 1rem; opacity: 0.8; font-weight: 400; }
+.mock-gate-input {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  color: #fff;
+  font-size: 1rem;
+  width: 80%;
+  max-width: 300px;
+  text-align: center;
+  letter-spacing: 0.2em;
+}
+
+.mock-announce {
+  border-left: 3px solid #FF6B35;
+  padding: 0.8rem 1rem;
+  margin: 0.5rem 0;
+  background: #fafafa;
+  border-radius: 0 8px 8px 0;
+}
+
+.img-attach-area {
+  border: 2px dashed #ddd;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  color: #999;
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 600px) {
+  .header { padding: 2rem 1rem; }
+  .header h1 { font-size: 1.4rem; }
+  .container { padding: 1rem; }
+  .section { padding: 1.5rem 1rem; }
+  .step { flex-direction: column; gap: 0.5rem; }
+  .step-num { width: 32px; height: 32px; font-size: 0.8rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>BEAT THE MIX 管理者マニュアル</h1>
+  <p>先生のための管理画面操作ガイド</p>
+</div>
+
+<div class="container">
+
+<!-- 目次 -->
+<div class="toc">
+  <h2>もくじ</h2>
+  <ol>
+    <li><a href="#sec-login">管理者としてログインする</a></li>
+    <li><a href="#sec-overview">管理画面のみかた</a></li>
+    <li><a href="#sec-toggle">KIDS / FUTURE を切り替える</a></li>
+    <li><a href="#sec-add-single">レッスン枠を追加する（1つずつ）</a></li>
+    <li><a href="#sec-add-bulk">レッスン枠をまとめて追加する</a></li>
+    <li><a href="#sec-edit-slot">レッスン枠を編集・削除する</a></li>
+    <li><a href="#sec-cancel">生徒さんの予約をキャンセルする</a></li>
+    <li><a href="#sec-regular">毎週レッスンを登録する</a></li>
+    <li><a href="#sec-announce">お知らせを投稿する</a></li>
+    <li><a href="#sec-announce-delete">お知らせを削除する</a></li>
+    <li><a href="#sec-signout">サインアウトする</a></li>
+  </ol>
+</div>
+
+<!-- ========== 1. ログイン ========== -->
+<div class="section" id="sec-login">
+  <h2>1. 管理者としてログインする</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>会員ページにアクセスします</strong></p>
+      <p>サイトのどのページからでも、右上の <span class="mock-btn mock-btn-primary" style="font-size:0.75rem;padding:0.3rem 0.8rem;">会員専用</span> ボタンをタップします。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>パスワード画面が表示されます</strong></p>
+      <div class="mock-gate">
+        <h3>パスワードを入力してください</h3>
+        <input class="mock-gate-input" type="text" value="btmadmin2026" readonly>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>管理者パスワードを入力</strong></p>
+      <p>以下のパスワードを入力して Enter を押します：</p>
+      <p style="margin:0.5rem 0;"><span class="pw-display">btmadmin2026</span></p>
+      <div class="highlight">
+        <strong>会員用と管理者用はパスワードが違います</strong><br>
+        会員用: <code>btm2025</code>（レッスン予約だけできる）<br>
+        管理者用: <code>btmadmin2026</code>（レッスン追加・削除・お知らせ投稿ができる）
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <p><strong>ナビバーに「Admin」と表示されたら成功です</strong></p>
+      <div class="mock-nav">
+        <div class="mock-nav-brand">BTM <span>MEMBERS</span></div>
+        <div class="mock-nav-right">
+          <span class="mock-btn mock-btn-primary" style="font-size:0.7rem;padding:0.2rem 0.6rem;">Admin</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 2. 管理画面のみかた ========== -->
+<div class="section" id="sec-overview">
+  <h2>2. 管理画面のみかた</h2>
+
+  <p>管理者でログインすると、画面の上部にタブが表示されます。</p>
+
+  <div class="mock-tab-bar">
+    <div class="mock-tab active">カレンダー</div>
+    <div class="mock-tab">お知らせ管理</div>
+  </div>
+
+  <p><strong>カレンダータブ</strong> — レッスン枠の追加・編集・削除、予約の確認とキャンセル</p>
+  <p><strong>お知らせ管理タブ</strong> — 会員向けのお知らせを投稿・削除</p>
+
+  <div class="highlight">
+    管理者モードでは、カレンダーの各レッスン枠に「編集」「削除」ボタンが追加表示されます。<br>
+    一般会員には見えないので安心してください。
+  </div>
+</div>
+
+<!-- ========== 3. KIDS/FUTURE切替 ========== -->
+<div class="section" id="sec-toggle">
+  <h2>3. KIDS / FUTURE を切り替える</h2>
+
+  <p>カレンダーの上にあるトグルボタンで、KIDS と FUTURE を切り替えます。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>見たいカテゴリをタップ</strong></p>
+      <div style="margin:0.5rem 0;">
+        <span style="font-size:0.85rem;color:#999;margin-right:0.5rem;">例）KIDSを選択中：</span>
+        <div class="mock-toggle">
+          <span class="active-kids">KIDS</span>
+          <span class="inactive">FUTURE</span>
+        </div>
+      </div>
+      <div style="margin:0.5rem 0;">
+        <span style="font-size:0.85rem;color:#999;margin-right:0.5rem;">例）FUTUREを選択中：</span>
+        <div class="mock-toggle">
+          <span class="inactive">KIDS</span>
+          <span class="active-future">FUTURE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    切り替えると、カレンダーに表示されるレッスン・スタジオの選択肢が自動で変わります。<br>
+    <strong>KIDS:</strong> 若葉studio / 稲毛studio<br>
+    <strong>FUTURE:</strong> 千葉studio / 美浜studio / 稲毛studio(穴川)
+  </div>
+</div>
+
+<!-- ========== 4. レッスン枠を追加（単発） ========== -->
+<div class="section" id="sec-add-single">
+  <h2>4. レッスン枠を追加する（1つずつ）</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>カレンダーの下にある「レッスン枠を追加」エリアを見ます</strong></p>
+      <p>「単発追加」が選ばれていることを確認します。</p>
+      <div class="mock-toggle" style="margin:0.3rem 0;">
+        <span class="active-kids">単発追加</span>
+        <span class="inactive">まとめて追加</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>必要な情報を入力します</strong></p>
+      <div class="mock">
+        <div class="mock-label">入力フォーム</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;">
+          <div>
+            <small style="color:#666;">日付</small>
+            <input class="mock-input" type="text" value="2026-04-05" readonly>
+          </div>
+          <div>
+            <small style="color:#666;">スタジオ</small>
+            <input class="mock-input" type="text" value="若葉studio" readonly>
+          </div>
+          <div>
+            <small style="color:#666;">開始時間</small>
+            <input class="mock-input" type="text" value="16:00" readonly>
+          </div>
+          <div>
+            <small style="color:#666;">終了時間</small>
+            <input class="mock-input" type="text" value="17:00" readonly>
+          </div>
+          <div>
+            <small style="color:#666;">クラス名</small>
+            <input class="mock-input" type="text" value="KIDSクラス" readonly>
+          </div>
+          <div>
+            <small style="color:#666;">定員</small>
+            <input class="mock-input" type="text" value="8" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>「追加」ボタンをタップ</strong></p>
+      <p><span class="mock-btn mock-btn-primary">追加</span></p>
+      <p style="margin-top:0.5rem;">「追加しました」と表示されたら完了です。カレンダーに反映されます。</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <strong>定員を無制限にしたい場合</strong><br>
+    「無制限」チェックボックスにチェックを入れると、何人でも予約できるようになります。<br>
+    会員画面では「予約受付中」と表示されます（人数は表示されません）。
+  </div>
+</div>
+
+<!-- ========== 5. レッスン枠をまとめて追加 ========== -->
+<div class="section" id="sec-add-bulk">
+  <h2>5. レッスン枠をまとめて追加する</h2>
+
+  <p>毎週同じ時間のレッスンを、まとめて一括で登録できます。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>「まとめて追加」をタップして切り替え</strong></p>
+      <div class="mock-toggle" style="margin:0.3rem 0;">
+        <span class="inactive">単発追加</span>
+        <span class="active-kids">まとめて追加</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>曜日を選びます</strong>（複数OK）</p>
+      <p>レッスンがある曜日の丸ボタンをタップします。</p>
+      <div class="mock-dow-grid">
+        <div class="mock-dow">月</div>
+        <div class="mock-dow selected">火</div>
+        <div class="mock-dow">水</div>
+        <div class="mock-dow">木</div>
+        <div class="mock-dow selected">金</div>
+        <div class="mock-dow selected">土</div>
+        <div class="mock-dow">日</div>
+      </div>
+      <p style="font-size:0.85rem;color:#666;">上の例では火・金・土を選択しています。もう一度タップすると解除できます。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>期間を設定します</strong></p>
+      <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+        <div>
+          <small style="color:#666;">開始日</small>
+          <input class="mock-input" type="text" value="2026-04-01" readonly style="width:150px;">
+        </div>
+        <span style="color:#999;">〜</span>
+        <div>
+          <small style="color:#666;">終了日</small>
+          <input class="mock-input" type="text" value="2026-06-30" readonly style="width:150px;">
+        </div>
+      </div>
+      <p style="font-size:0.85rem;color:#666;margin-top:0.3rem;">この期間の中で、選んだ曜日すべてにレッスン枠が作られます。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <p><strong>スタジオ・時間・クラス名・定員を入力して「追加」</strong></p>
+      <p>入力内容は単発追加と同じです。</p>
+      <p>「<strong>12件追加しました</strong>」のように、何件登録されたか表示されます。</p>
+    </div>
+  </div>
+
+  <div class="warning">
+    <strong>注意：</strong>同じ日・スタジオ・時間に既にレッスンがある場合は、重複して追加されます。<br>
+    追加前にカレンダーで既存のレッスンを確認してください。
+  </div>
+</div>
+
+<!-- ========== 6. レッスン枠を編集・削除 ========== -->
+<div class="section" id="sec-edit-slot">
+  <h2>6. レッスン枠を編集・削除する</h2>
+
+  <h3>レッスン枠を編集する</h3>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>カレンダーで日付をタップして、レッスン一覧を表示</strong></p>
+      <div class="mock-calendar">
+        <div class="mock-cal-head">月</div><div class="mock-cal-head">火</div><div class="mock-cal-head">水</div><div class="mock-cal-head">木</div><div class="mock-cal-head">金</div><div class="mock-cal-head">土</div><div class="mock-cal-head">日</div>
+        <div class="mock-cal-day empty"></div><div class="mock-cal-day">1</div><div class="mock-cal-day">2</div><div class="mock-cal-day">3</div><div class="mock-cal-day">4</div><div class="mock-cal-day has-lesson">5</div><div class="mock-cal-day">6</div>
+        <div class="mock-cal-day">7</div><div class="mock-cal-day">8</div><div class="mock-cal-day">9</div><div class="mock-cal-day">10</div><div class="mock-cal-day">11</div><div class="mock-cal-day selected">12</div><div class="mock-cal-day">13</div>
+      </div>
+      <p style="font-size:0.85rem;color:#666;">色のついた日にレッスンがあります。日付をタップすると下にレッスンが表示されます。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>編集したいレッスンの鉛筆アイコンをタップ</strong></p>
+      <div class="mock-card">
+        <div class="flex-row" style="justify-content:space-between;">
+          <div class="flex-row">
+            <span class="mock-tag tag-studio">若葉studio</span>
+            <span class="mock-tag tag-time">16:00〜17:00</span>
+            <span class="mock-tag tag-class">KIDSクラス</span>
+          </div>
+          <div class="flex-row">
+            <span class="mock-btn mock-btn-outline" style="font-size:0.7rem;padding:0.2rem 0.5rem;">&#9998; 編集</span>
+            <span class="mock-btn mock-btn-danger" style="font-size:0.7rem;padding:0.2rem 0.5rem;">削除</span>
+          </div>
+        </div>
+        <div style="margin-top:0.5rem;font-size:0.85rem;color:#666;">予約: 2 / 8名</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>スタジオ・時間・クラス名を修正して「保存」</strong></p>
+    </div>
+  </div>
+
+  <h3>レッスン枠を削除する</h3>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>削除したいレッスンの <span class="mock-btn mock-btn-danger" style="font-size:0.7rem;padding:0.2rem 0.5rem;">削除</span> をタップ</strong></p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>確認ダイアログで「OK」を押す</strong></p>
+      <p>「2026/04/05 若葉studio 16:00〜17:00 を削除しますか？」と聞かれます。</p>
+    </div>
+  </div>
+
+  <div class="warning">
+    <strong>注意：</strong>既に予約が入っているレッスンを削除すると、その予約もなくなります。<br>
+    削除前に予約者がいないか確認してください。
+  </div>
+</div>
+
+<!-- ========== 7. 予約キャンセル ========== -->
+<div class="section" id="sec-cancel">
+  <h2>7. 生徒さんの予約をキャンセルする</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>カレンダーで日付をタップして、レッスン一覧を表示</strong></p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>レッスン枠の下に予約者の名前が表示されます</strong></p>
+      <div class="mock-card">
+        <div class="flex-row">
+          <span class="mock-tag tag-studio">若葉studio</span>
+          <span class="mock-tag tag-time">16:00〜17:00</span>
+          <span class="mock-tag tag-class">KIDSクラス</span>
+        </div>
+        <div style="margin-top:0.8rem;padding-top:0.5rem;border-top:1px solid #eee;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;">
+            <span style="font-size:0.9rem;">山田 太郎</span>
+            <span style="color:#c62828;font-size:1.2rem;font-weight:700;cursor:default;">&times;</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;">
+            <span style="font-size:0.9rem;">鈴木 花子</span>
+            <span style="color:#c62828;font-size:1.2rem;font-weight:700;cursor:default;">&times;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>名前の右の赤い <span style="color:#c62828;font-weight:700;font-size:1.2rem;">&times;</span> をタップ</strong></p>
+      <p>「山田太郎 さんの予約をキャンセルしますか？」と確認されます。</p>
+      <p>「OK」を押すとキャンセル完了です。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 8. 毎週レッスン ========== -->
+<div class="section" id="sec-regular">
+  <h2>8. 毎週レッスンを登録する</h2>
+
+  <p>「毎週レッスン」は、会員ページのカレンダーの下に「定期スケジュール」として常時表示されるものです。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>カレンダー画面を下にスクロールして「毎週レッスンを追加」エリアを見つけます</strong></p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>曜日・スタジオ・時間・クラス名を入力</strong></p>
+      <div class="mock">
+        <div class="mock-label">毎週レッスン追加</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;">
+          <div>
+            <small style="color:#666;">曜日</small>
+            <input class="mock-input" type="text" value="火曜日" readonly>
+          </div>
+          <div>
+            <small style="color:#666;">スタジオ</small>
+            <input class="mock-input" type="text" value="若葉studio" readonly>
+          </div>
+          <div>
+            <small style="color:#666;">時間</small>
+            <input class="mock-input" type="text" value="16:00 〜 17:00" readonly>
+          </div>
+          <div>
+            <small style="color:#666;">クラス名</small>
+            <input class="mock-input" type="text" value="KIDSクラス" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>「追加」ボタンをタップ</strong></p>
+      <p>登録された毎週レッスンは一覧に表示されます。編集・削除もできます。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 9. お知らせ投稿 ========== -->
+<div class="section" id="sec-announce">
+  <h2>9. お知らせを投稿する</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>「お知らせ管理」タブをタップ</strong></p>
+      <div class="mock-tab-bar">
+        <div class="mock-tab">カレンダー</div>
+        <div class="mock-tab active">お知らせ管理</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>お知らせの内容を入力します</strong></p>
+      <div class="mock">
+        <div class="mock-label">お知らせ投稿フォーム</div>
+        <div style="margin-top:0.8rem;">
+          <small style="color:#666;">日付</small>
+          <input class="mock-input" type="text" value="2026-03-30" readonly>
+          <small style="color:#666;">タイトル</small>
+          <input class="mock-input" type="text" value="GW期間の休講について" readonly>
+          <small style="color:#666;">内容</small>
+          <textarea class="mock-input" style="height:60px;resize:none;" readonly>4/29(火)〜5/6(火)はGWのため全クラス休講となります。5/7(水)より通常レッスンを再開します。</textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>重要度とカテゴリを設定</strong></p>
+      <div class="flex-row" style="gap:1rem;margin:0.5rem 0;">
+        <div>
+          <small style="color:#666;">重要度</small><br>
+          <input class="mock-input" type="text" value="重要" readonly style="width:120px;">
+        </div>
+        <div>
+          <small style="color:#666;">カテゴリ</small><br>
+          <div class="mock-toggle">
+            <span class="active-kids">KIDS</span>
+            <span class="inactive">FUTURE</span>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:0.85rem;color:#666;">「重要」にすると、お知らせに赤いバッジがつきます。</p>
+      <div style="margin:0.5rem 0;">
+        <span class="mock-tag tag-important">重要</span>
+        <span class="mock-tag tag-kids">KIDS</span>
+        <span style="font-size:0.85rem;">GW期間の休講について</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <p><strong>写真をつけたい場合（オプション）</strong></p>
+      <p>「画像を添付」にチェックを入れると、写真選択エリアが出ます。</p>
+      <div class="img-attach-area">
+        <p>「写真を選択（最大5枚）」ボタンをタップ</p>
+        <p style="font-size:0.8rem;">スマホの写真ライブラリから選べます</p>
+      </div>
+      <p style="font-size:0.85rem;color:#666;margin-top:0.3rem;">選んだ写真は自動で圧縮＆ロゴ透かし入りでアップロードされます。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <p><strong>「投稿」ボタンをタップ</strong></p>
+      <p><span class="mock-btn mock-btn-primary">投稿</span></p>
+      <p style="margin-top:0.3rem;">「追加しました」と表示されたら完了。会員ページに即反映されます。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 10. お知らせ削除 ========== -->
+<div class="section" id="sec-announce-delete">
+  <h2>10. お知らせを削除する</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>「お知らせ管理」タブの投稿一覧を見ます</strong></p>
+      <div class="mock-announce">
+        <div class="flex-row" style="justify-content:space-between;">
+          <div>
+            <span style="font-size:0.8rem;color:#999;">2026/03/30</span>
+            <span class="mock-tag tag-kids" style="font-size:0.65rem;">KIDS</span>
+            <span class="mock-tag tag-important" style="font-size:0.65rem;">重要</span>
+          </div>
+          <span class="mock-btn mock-btn-danger" style="font-size:0.7rem;padding:0.15rem 0.5rem;">削除</span>
+        </div>
+        <p style="font-weight:600;margin-top:0.3rem;">GW期間の休講について</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>赤い「削除」ボタンをタップ → 確認で「OK」</strong></p>
+      <p>添付画像も一緒に削除されます。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 11. サインアウト ========== -->
+<div class="section" id="sec-signout">
+  <h2>11. サインアウトする</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>画面右上のログアウトアイコンをタップ</strong></p>
+      <div class="mock-nav">
+        <div class="mock-nav-brand">BTM <span>MEMBERS</span></div>
+        <div class="mock-nav-right">
+          <span class="mock-btn mock-btn-primary" style="font-size:0.7rem;padding:0.2rem 0.6rem;">Admin</span>
+          <span style="font-size:1.2rem;cursor:default;color:#999;" title="サインアウト">&#x23FB;</span>
+        </div>
+      </div>
+      <p style="margin-top:0.5rem;">パスワード画面に戻ります。ブラウザを閉じるだけでもOKです。</p>
+    </div>
+  </div>
+</div>
+
+<!-- パスワードまとめ -->
+<div class="section" style="background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;">
+  <h2 style="color:#FFD23F;border-bottom-color:rgba(255,210,63,0.3);">パスワード一覧</h2>
+  <table style="width:100%;border-collapse:collapse;margin-top:0.5rem;">
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+      <td style="padding:0.8rem 0;font-weight:600;">会員用パスワード</td>
+      <td style="padding:0.8rem 0;"><span class="pw-display">btm2025</span></td>
+    </tr>
+    <tr>
+      <td style="padding:0.8rem 0;font-weight:600;">管理者パスワード</td>
+      <td style="padding:0.8rem 0;"><span class="pw-display">btmadmin2026</span></td>
+    </tr>
+  </table>
+  <p style="margin-top:1rem;font-size:0.85rem;opacity:0.7;">このパスワードは生徒さんに教えないでください。</p>
+</div>
+
+</div>
+
+</body>
+</html>
