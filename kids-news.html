@@ -587,6 +587,7 @@ body {
 .cat-event { background: var(--orange); }
 .cat-info { background: #4A90D9; }
 .cat-lesson { background: #4CAF50; }
+.cat-all { background: #8B6914; }
 .cat-other { background: #9E9E9E; }
 
 /* Post title */
@@ -910,6 +911,7 @@ const CATEGORY_MAP = {
   'イベント': { cls: 'cat-event',  label: 'イベント' },
   'お知らせ': { cls: 'cat-info',   label: 'お知らせ' },
   'レッスン': { cls: 'cat-lesson', label: 'レッスン' },
+  '全体':     { cls: 'cat-all',    label: '全体' },
 };
 
 function getCategoryInfo(cat) {
@@ -1106,6 +1108,19 @@ function parseGoogleSheetsResponse(responseText) {
 }
 
 // ---- Fetch Data ----
+const ALL_NEWS_SHEET = '全体ニュース';
+
+function fetchSheet(sheetName) {
+  var encoded = encodeURIComponent(sheetName);
+  var url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encoded;
+  return fetch(url).then(function(response) {
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return response.text();
+  }).then(function(text) {
+    return parseGoogleSheetsResponse(text);
+  });
+}
+
 function fetchAndRender() {
   if (SPREADSHEET_ID === '1M96QizLwfPFPwNXBJHteMCpiVXkV3FIAqXasHAY0Le4' || !SPREADSHEET_ID) {
     showSetup();
@@ -1114,19 +1129,16 @@ function fetchAndRender() {
 
   showLoading();
 
-  var sheetEncoded = encodeURIComponent(NEWS_SHEET);
-  var url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + sheetEncoded;
-
-  fetch(url)
-    .then(function(response) {
-      if (!response.ok) {
-        throw new Error('HTTP ' + response.status);
-      }
-      return response.text();
-    })
-    .then(function(text) {
-      var rows = parseGoogleSheetsResponse(text);
-      renderPosts(rows);
+  Promise.all([
+    fetchSheet(NEWS_SHEET),
+    fetchSheet(ALL_NEWS_SHEET).catch(function() { return []; })
+  ])
+    .then(function(results) {
+      var merged = results[0].concat(results[1]);
+      merged.sort(function(a, b) {
+        return new Date(a.date || 0) - new Date(b.date || 0);
+      });
+      renderPosts(merged);
     })
     .catch(function(err) {
       console.error('Fetch error:', err);

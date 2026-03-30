@@ -486,6 +486,11 @@ canvas#particles {
   color: rgba(180, 240, 220, 0.9);
 }
 
+.news-category.cat-all {
+  background: linear-gradient(135deg, #8B6914, #A07D1C);
+  color: #fff;
+}
+
 .news-category.cat-other {
   background: rgba(60, 60, 70, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -902,6 +907,7 @@ canvas#particles {
     if (cat === 'イベント') return 'cat-event';
     if (cat === 'お知らせ') return 'cat-info';
     if (cat === 'レッスン') return 'cat-lesson';
+    if (cat === '全体') return 'cat-all';
     return 'cat-other';
   }
 
@@ -1078,85 +1084,86 @@ canvas#particles {
   }
 
   // ===== FETCH FROM GOOGLE SHEETS =====
+  var ALL_NEWS_SHEET = '全体ニュース';
+
+  function fetchSheetData(sheetName) {
+    return new Promise(function(resolve, reject) {
+      var encoded = encodeURIComponent(sheetName);
+      var url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID +
+                '/gviz/tq?tqx=out:json&sheet=' + encoded;
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.timeout = 15000;
+
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          try {
+            var text = xhr.responseText;
+            var startIdx = text.indexOf('{');
+            var endIdx = text.lastIndexOf('}');
+            if (startIdx === -1 || endIdx === -1) {
+              resolve([]);
+              return;
+            }
+            var json = JSON.parse(text.substring(startIdx, endIdx + 1));
+            if (!json.table || !json.table.rows) {
+              resolve([]);
+              return;
+            }
+
+            var posts = [];
+            json.table.rows.forEach(function(row) {
+              if (!row.c || row.c.length < 2) return;
+              var getValue = function(cell) {
+                if (!cell) return '';
+                if (cell.f) return cell.f;
+                if (cell.v !== null && cell.v !== undefined) return String(cell.v);
+                return '';
+              };
+              var date = getValue(row.c[0]);
+              var title = getValue(row.c[1]);
+              if (!date && !title) return;
+              posts.push({
+                date: date,
+                title: title,
+                content: row.c.length > 2 ? getValue(row.c[2]) : '',
+                category: row.c.length > 3 ? getValue(row.c[3]) : '',
+                imageUrl: row.c.length > 4 ? getValue(row.c[4]) : ''
+              });
+            });
+            resolve(posts);
+          } catch (e) {
+            resolve([]);
+          }
+        } else {
+          reject(new Error('HTTP ' + xhr.status));
+        }
+      };
+      xhr.onerror = function() { reject(new Error('Network error')); };
+      xhr.ontimeout = function() { reject(new Error('Timeout')); };
+      xhr.send();
+    });
+  }
+
   function fetchNews() {
     if (SPREADSHEET_ID === '1M96QizLwfPFPwNXBJHteMCpiVXkV3FIAqXasHAY0Le4') {
       showSetup();
       return;
     }
 
-    var encodedSheet = encodeURIComponent(NEWS_SHEET);
-    var url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID +
-              '/gviz/tq?tqx=out:json&sheet=' + encodedSheet;
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.timeout = 15000;
-
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        try {
-          // Parse JSONP response: strip prefix and suffix
-          var text = xhr.responseText;
-          var startIdx = text.indexOf('{');
-          var endIdx = text.lastIndexOf('}');
-          if (startIdx === -1 || endIdx === -1) {
-            throw new Error('Invalid response format');
-          }
-          var json = JSON.parse(text.substring(startIdx, endIdx + 1));
-
-          if (!json.table || !json.table.rows) {
-            renderNews([]);
-            return;
-          }
-
-          var rows = json.table.rows;
-          var posts = [];
-
-          rows.forEach(function(row) {
-            if (!row.c || row.c.length < 2) return;
-
-            var getValue = function(cell) {
-              if (!cell) return '';
-              if (cell.f) return cell.f; // formatted value
-              if (cell.v !== null && cell.v !== undefined) return String(cell.v);
-              return '';
-            };
-
-            var date = getValue(row.c[0]);
-            var title = getValue(row.c[1]);
-
-            // Skip rows without at least date and title
-            if (!date && !title) return;
-
-            posts.push({
-              date: date,
-              title: title,
-              content: row.c.length > 2 ? getValue(row.c[2]) : '',
-              category: row.c.length > 3 ? getValue(row.c[3]) : '',
-              imageUrl: row.c.length > 4 ? getValue(row.c[4]) : ''
-            });
-          });
-
-          renderNews(posts);
-
-        } catch (e) {
-          console.error('Parse error:', e);
-          showError('データの解析に失敗しました。スプレッドシートの共有設定を確認してください。');
-        }
-      } else {
-        showError('データの取得に失敗しました (HTTP ' + xhr.status + ')');
-      }
-    };
-
-    xhr.onerror = function() {
-      showError('ネットワークエラーが発生しました。インターネット接続を確認してください。');
-    };
-
-    xhr.ontimeout = function() {
-      showError('接続がタイムアウトしました。もう一度お試しください。');
-    };
-
-    xhr.send();
+    Promise.all([
+      fetchSheetData(NEWS_SHEET),
+      fetchSheetData(ALL_NEWS_SHEET).catch(function() { return []; })
+    ])
+      .then(function(results) {
+        var merged = results[0].concat(results[1]);
+        renderNews(merged);
+      })
+      .catch(function(err) {
+        console.error('Fetch error:', err);
+        showError(err.message);
+      });
   }
 
   // ===== INIT =====

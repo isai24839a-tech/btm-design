@@ -35,7 +35,8 @@ function setupSheets() {
     { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像', 'カテゴリ'] },
     { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ'] },
     { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
-    { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] }
+    { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
+    { name: '全体ニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] }
   ];
 
   sheets.forEach(function(def) {
