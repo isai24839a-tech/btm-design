@@ -215,18 +215,62 @@ body {
   background: var(--orange-light);
 }
 
-.nav-link.members-link {
+.nav-members-fixed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: linear-gradient(135deg, var(--orange), var(--coral));
   color: var(--white);
+  font-size: 0.75rem;
   font-weight: 600;
-  padding: 0.5rem 1.2rem;
+  letter-spacing: 0.08em;
+  padding: 0.45rem 1.1rem;
   border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-right: 0.5rem;
 }
-
-.nav-link.members-link:hover {
+.nav-members-fixed:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
   background: linear-gradient(135deg, var(--coral), var(--orange));
+}
+.nav-members-fixed svg { stroke: var(--white); }
+
+.men-welcome-badge {
+  position: fixed;
+  right: 18px;
+  bottom: 120px;
+  z-index: 50;
+  background: var(--white);
+  border: 2.5px solid var(--orange);
+  border-radius: 16px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(255, 107, 53, 0.2);
+  animation: badgePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1.5s both;
+  cursor: default;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--orange);
+  letter-spacing: 0.05em;
+}
+.men-welcome-badge .badge-icon {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.men-welcome-badge .badge-icon svg { stroke: var(--white); }
+@keyframes badgePop {
+  0% { opacity: 0; transform: scale(0.5) rotate(-8deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-3deg); }
 }
 
 /* Mobile nav toggle */
@@ -1995,6 +2039,15 @@ body {
 }
 
 @media (max-width: 480px) {
+  .men-welcome-badge {
+    right: 12px;
+    bottom: 80px;
+    font-size: 0.72rem;
+    padding: 8px 12px;
+  }
+  .men-welcome-badge .badge-icon { width: 24px; height: 24px; }
+  .nav-members-fixed { font-size: 0; padding: 0.4rem; margin-right: 0.3rem; }
+  .nav-members-fixed svg { width: 18px; height: 18px; }
   .hero-title {
     font-size: clamp(3.5rem, 14vw, 6rem);
   }
@@ -2326,6 +2379,10 @@ body {
     </a>
     <div class="nav-brand">BEAT THE MIX <span>KIDS</span></div>
   </div>
+  <a href="members-page.html" class="nav-members-fixed">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    会員専用
+  </a>
   <div class="nav-toggle" id="navToggle" aria-label="Menu">
     <span></span><span></span><span></span>
   </div>
@@ -2338,7 +2395,6 @@ body {
     <a href="#gallery" class="nav-link">ギャラリー</a>
     <a href="#contact" class="nav-link">お問い合わせ</a>
     <a href="kids-news.html" class="nav-link">ニュース</a>
-    <a href="members-page.html" class="nav-link members-link">会員専用</a>
   </div>
 </nav>
 
@@ -3041,6 +3097,14 @@ if ('IntersectionObserver' in window) {
   </div>
   <p>&copy; BEAT THE MIX Dance Studio. All rights reserved.</p>
 </footer>
+
+<!-- MEN WELCOME BADGE -->
+<div class="men-welcome-badge">
+  <div class="badge-icon">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  </div>
+  男の子も大歓迎！
+</div>
 
 <!-- ===================== JAVASCRIPT ===================== -->
 <script>

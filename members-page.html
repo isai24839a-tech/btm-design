@@ -668,6 +668,19 @@ body {
   border-color: transparent;
 }
 
+/* Both slot + regular lessons on same day - double border indicator */
+.calendar-day.has-lessons.has-regular {
+  background: var(--coral);
+  border: none;
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+
+.category-future .calendar-day.has-lessons.has-regular {
+  background: var(--navy);
+  outline-color: var(--navy);
+}
+
 /* Regular lesson card */
 .slot-card.regular-lesson {
   border-left: 4px solid var(--coral);
@@ -974,16 +987,28 @@ body {
   cursor: not-allowed;
 }
 
-/* Full slot card - grayed out */
+/* Full slot card - visually distinct */
 .slot-card.slot-full {
-  background: var(--gray-100);
-  border-left-color: var(--gray-300);
-  opacity: 0.6;
+  background: #fafafa;
+  border-left-color: #ccc;
+  opacity: 0.75;
 }
 
 .slot-card.slot-full:hover {
   transform: none;
   box-shadow: var(--shadow-sm);
+}
+
+.slot-full-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  background: #c62828;
+  padding: 2px 10px;
+  border-radius: 10px;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.3rem;
 }
 
 /* ===== BOOKING MODAL ===== */
@@ -1135,6 +1160,28 @@ body {
   text-align: center;
   padding: 2rem 1rem;
 }
+
+.booking-error-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fff3f3;
+  border: 1px solid #ffcdd2;
+  border-radius: 10px;
+  color: #c62828;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: all 0.3s ease;
+}
+.booking-error-msg.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.booking-error-msg svg { flex-shrink: 0; stroke: #c62828; }
 
 .booking-success-icon {
   width: 64px;
@@ -2528,6 +2575,9 @@ function renderDayLessons(dateStr) {
 
     var isFull = !isUnlimited && available <= 0;
     html += '<div class="slot-card' + (isFull ? ' slot-full' : '') + '" id="slot-card-' + idx + '">';
+    if (isFull) {
+      html += '<span class="slot-full-badge">満員</span>';
+    }
     html += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
     html += '<div class="slot-card-info">';
     html += '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>';
@@ -2670,6 +2720,15 @@ function submitBooking() {
 
   if (DEMO_MODE) {
     setTimeout(function() {
+      var isDuplicate = demoBookings.some(function(b) {
+        return b.date === currentBookingSlot.date && b.studio === currentBookingSlot.studio &&
+               b.time === currentBookingSlot.time && b.class_name === currentBookingSlot.class_name && b.name === name;
+      });
+      if (isDuplicate) {
+        btn.disabled = false; btn.textContent = '予約する';
+        showBookingError(name + 'さんは既にこのレッスンを予約済みです');
+        return;
+      }
       demoBookings.push({
         date: currentBookingSlot.date,
         studio: currentBookingSlot.studio,
@@ -2697,9 +2756,20 @@ function submitBooking() {
     .then(function(r) { return r.json(); })
     .then(function(result) {
       if (result.success) { showBookingSuccess(name); }
-      else { btn.disabled = false; btn.textContent = '予約する'; alert(result.error || '予約に失敗しました'); }
+      else { btn.disabled = false; btn.textContent = '予約する'; showBookingError(result.error || '予約に失敗しました'); }
     })
-    .catch(function() { btn.disabled = false; btn.textContent = '予約する'; alert('通信エラーが発生しました'); });
+    .catch(function() { btn.disabled = false; btn.textContent = '予約する'; showBookingError('通信エラーが発生しました'); });
+}
+
+function showBookingError(message) {
+  var existing = document.querySelector('.booking-error-msg');
+  if (existing) existing.remove();
+  var form = document.getElementById('booking-form');
+  var errDiv = document.createElement('div');
+  errDiv.className = 'booking-error-msg';
+  errDiv.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> ' + escapeHtml(message);
+  form.insertBefore(errDiv, form.querySelector('.booking-modal-actions'));
+  setTimeout(function() { errDiv.classList.add('show'); }, 10);
 }
 
 function showBookingSuccess(name) {

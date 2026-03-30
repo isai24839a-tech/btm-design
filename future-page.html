@@ -205,21 +205,63 @@ body {
 .nav-links a:hover { color: var(--gold); }
 .nav-links a:hover::after { width: 100%; }
 
-.nav-members {
-  padding: 6px 18px;
-  border: 1px solid var(--gold);
-  color: var(--gold) !important;
-  font-size: 11px !important;
-  letter-spacing: 2px;
-  transition: all 0.3s !important;
+.nav-members-fixed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border: 1.5px solid var(--gold);
+  color: var(--gold);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-decoration: none;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  margin-right: 0.5rem;
 }
-
-.nav-members:hover {
+.nav-members-fixed:hover {
   background: var(--gold);
-  color: var(--navy) !important;
+  color: var(--navy);
 }
+.nav-members-fixed:hover svg { stroke: var(--navy); }
+.nav-members-fixed svg { stroke: var(--gold); transition: stroke 0.3s; }
 
-.nav-members::after { display: none !important; }
+.men-welcome-badge {
+  position: fixed;
+  right: 18px;
+  bottom: 120px;
+  z-index: 50;
+  background: rgba(13, 27, 42, 0.9);
+  border: 1.5px solid var(--gold);
+  border-radius: 16px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(212, 168, 83, 0.15);
+  animation: badgePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1.5s both;
+  cursor: default;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+}
+.men-welcome-badge .badge-icon {
+  width: 28px;
+  height: 28px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.men-welcome-badge .badge-icon svg { stroke: var(--navy); }
+@keyframes badgePop {
+  0% { opacity: 0; transform: scale(0.5) rotate(-8deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-3deg); }
+}
 
 /* Mobile menu */
 .nav-hamburger {
@@ -1700,6 +1742,15 @@ section {
 }
 
 @media (max-width: 480px) {
+  .men-welcome-badge {
+    right: 12px;
+    bottom: 80px;
+    font-size: 0.72rem;
+    padding: 8px 12px;
+  }
+  .men-welcome-badge .badge-icon { width: 24px; height: 24px; }
+  .nav-members-fixed { font-size: 0; padding: 6px; margin-right: 4px; }
+  .nav-members-fixed svg { width: 18px; height: 18px; }
   .hero-title { letter-spacing: 6px; }
 
   .studio-schedule {
@@ -1891,6 +1942,11 @@ footer {
     <div class="nav-brand">BTM<span>FUTURE</span></div>
   </div>
 
+  <a href="members-page.html" class="nav-members-fixed">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    会員専用
+  </a>
+
   <ul class="nav-links" id="navLinks">
     <li><a href="#concept">コンセプト</a></li>
     <li><a href="#programs">プログラム</a></li>
@@ -1901,7 +1957,6 @@ footer {
     <li><a href="#gallery">ギャラリー</a></li>
     <li><a href="#contact">お問い合わせ</a></li>
     <li><a href="future-news.html">ニュース</a></li>
-    <li><a href="members-page.html" class="nav-members">会員専用</a></li>
   </ul>
 
   <div class="nav-hamburger" id="hamburger">
@@ -2522,6 +2577,14 @@ if ('IntersectionObserver' in window) {
   </div>
   <p class="footer-copy">&copy; 2025 BEAT THE MIX Dance Studio. All rights reserved.</p>
 </footer>
+
+<!-- MEN WELCOME BADGE -->
+<div class="men-welcome-badge">
+  <div class="badge-icon">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  </div>
+  男性も大歓迎！
+</div>
 
 <!-- ===== FLOATING TRIAL BANNER ===== -->
 <div class="trial-float-banner" id="trialFloatBanner">

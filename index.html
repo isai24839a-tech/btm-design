@@ -345,12 +345,34 @@ html, body {
   font-weight: 400;
   color: var(--white);
   opacity: 0.7;
-  transition: opacity 0.3s;
+  transition: all 0.3s;
   text-decoration: none;
   pointer-events: auto;
 }
 
 .top-link:hover { opacity: 1; }
+
+.top-link.members-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  padding: 0.5rem 1.2rem;
+  border: 1.5px solid rgba(255,255,255,0.6);
+  border-radius: 50px;
+  backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
+}
+.top-link.members-btn:hover {
+  background: rgba(255,255,255,0.25);
+  border-color: rgba(255,255,255,0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
 
 /* === BOTTOM BAR === */
 .bottom-bar {
@@ -596,7 +618,10 @@ html, body {
     <span class="brand-sub">DANCE STUDIO</span>
   </div>
   <div class="top-right">
-    <a href="members-page.html" class="top-link">MEMBERS</a>
+    <a href="members-page.html" class="top-link members-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      MEMBERS
+    </a>
     <a href="mailto:beat.the.mix7386@gmail.com" class="top-link">CONTACT</a>
   </div>
 </div>
