@@ -227,6 +227,12 @@ body {
 .nav-members-fixed:hover svg { stroke: var(--navy); }
 .nav-members-fixed svg { stroke: var(--gold); transition: stroke 0.3s; }
 
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .men-welcome-badge {
   position: fixed;
   right: 18px;
@@ -258,6 +264,18 @@ body {
   flex-shrink: 0;
 }
 .men-welcome-badge .badge-icon svg { stroke: var(--navy); }
+.badge-close {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 0 0 4px;
+  line-height: 1;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.badge-close:hover { opacity: 1; }
 @keyframes badgePop {
   0% { opacity: 0; transform: scale(0.5) rotate(-8deg); }
   100% { opacity: 1; transform: scale(1) rotate(-3deg); }
@@ -1942,10 +1960,17 @@ footer {
     <div class="nav-brand">BTM<span>FUTURE</span></div>
   </div>
 
-  <a href="members-page.html" class="nav-members-fixed">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    会員専用
-  </a>
+  <div class="nav-right">
+    <a href="members-page.html" class="nav-members-fixed">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      会員専用
+    </a>
+    <div class="nav-hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
 
   <ul class="nav-links" id="navLinks">
     <li><a href="#concept">コンセプト</a></li>
@@ -1958,12 +1983,6 @@ footer {
     <li><a href="#contact">お問い合わせ</a></li>
     <li><a href="future-news.html">ニュース</a></li>
   </ul>
-
-  <div class="nav-hamburger" id="hamburger">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
 </nav>
 
 <!-- ===== HERO ===== -->
@@ -2579,11 +2598,12 @@ if ('IntersectionObserver' in window) {
 </footer>
 
 <!-- MEN WELCOME BADGE -->
-<div class="men-welcome-badge">
+<div class="men-welcome-badge" id="menBadge">
   <div class="badge-icon">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
   </div>
   男性も大歓迎！
+  <button class="badge-close" onclick="document.getElementById('menBadge').style.display='none'" aria-label="閉じる">&times;</button>
 </div>
 
 <!-- ===== FLOATING TRIAL BANNER ===== -->
