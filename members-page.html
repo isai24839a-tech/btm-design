@@ -2698,6 +2698,7 @@ function initCategoryToggle() {
       selectedDate = null;
       document.getElementById('day-lessons').innerHTML = '';
       renderCalendar();
+      renderAnnouncements();
       if (isAdminMode) initAdminSlotForm(); // Re-render admin form with new category's studios
     });
   });
@@ -3177,47 +3178,58 @@ function showBookingSuccess(name) {
 }
 
 // ===== ANNOUNCEMENTS =====
+var cachedAnnouncements = null;
+
+function renderAnnouncements() {
+  var container = document.getElementById('announcements-content');
+  if (!cachedAnnouncements || cachedAnnouncements.length === 0) { showAnnounceEmpty(container); return; }
+  var catUpper = currentCategory.toUpperCase();
+  var filtered = cachedAnnouncements.filter(function(a) {
+    var ac = (a.category || '').toUpperCase();
+    return ac === catUpper || ac === '全体' || ac === '';
+  });
+  if (filtered.length === 0) { showAnnounceEmpty(container); return; }
+  var pinned = filtered.filter(function(a) { return a.pinned; });
+  var unpinned = filtered.filter(function(a) { return !a.pinned; });
+  var sorted = pinned.reverse().concat(unpinned.reverse());
+  var html = '';
+  for (var i = 0; i < sorted.length; i++) {
+    var a = sorted[i];
+    var isImportant = (a.importance || '').indexOf('重要') !== -1;
+    var isPinned = a.pinned;
+    var cardClass = 'announce-card';
+    if (isPinned) cardClass += ' pinned';
+    if (isImportant) cardClass += ' important';
+    html += '<div class="' + cardClass + '">';
+    html += '<div class="announce-card-header">';
+    if (isPinned) html += '<span class="announce-pin-icon">&#128204;</span>';
+    html += '<span class="announce-date">' + escapeHtml(a.date || '') + '</span>';
+    var cat = (a.category || '');
+    if (cat === 'KIDS') html += '<span class="announce-badge-kids">KIDS</span>';
+    if (cat === 'FUTURE') html += '<span class="announce-badge-future">FUTURE</span>';
+    if (cat === '全体') html += '<span class="announce-badge-all">全体</span>';
+    if (isImportant) html += '<span class="announce-badge-important">重要</span>';
+    html += '</div>';
+    html += '<h4>' + escapeHtml(a.title || '') + '</h4>';
+    html += '<p>' + escapeHtml(a.content || '') + '</p>';
+    if (a.images && a.images.length > 0) {
+      html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem">';
+      for (var j = 0; j < a.images.length; j++) {
+        html += '<a href="' + a.images[j] + '" target="_blank" style="display:block"><img src="' + a.images[j] + '" style="width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid #e0d8cc" loading="lazy"></a>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
 function fetchAnnouncements() {
   var container = document.getElementById('announcements-content');
 
   if (DEMO_MODE) {
-    var catUpper = currentCategory.toUpperCase();
-    var filtered = demoAnnouncements.filter(function(a) {
-      var ac = (a.category || '').toUpperCase();
-      return ac === catUpper || ac === '全体' || ac === '';
-    });
-    var pinned = filtered.filter(function(a) { return a.pinned; });
-    var unpinned = filtered.filter(function(a) { return !a.pinned; });
-    var sorted = pinned.reverse().concat(unpinned.reverse());
-    var html = '';
-    for (var i = 0; i < sorted.length; i++) {
-      var a = sorted[i];
-      var isImportant = a.importance === '重要';
-      var isPinned = a.pinned;
-      var cardClass = 'announce-card';
-      if (isPinned) cardClass += ' pinned';
-      if (isImportant) cardClass += ' important';
-      html += '<div class="' + cardClass + '">';
-      html += '<div class="announce-card-header">';
-      if (isPinned) html += '<span class="announce-pin-icon">&#128204;</span>';
-      html += '<span class="announce-date">' + escapeHtml(a.date) + '</span>';
-      if (a.category === 'KIDS') html += '<span class="announce-badge-kids">KIDS</span>';
-      if (a.category === 'FUTURE') html += '<span class="announce-badge-future">FUTURE</span>';
-      if (a.category === '全体') html += '<span class="announce-badge-all">全体</span>';
-      if (isImportant) html += '<span class="announce-badge-important">重要</span>';
-      html += '</div>';
-      html += '<h4>' + escapeHtml(a.title) + '</h4>';
-      html += '<p>' + escapeHtml(a.content) + '</p>';
-      if (a.images && a.images.length > 0) {
-        html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem">';
-        for (var j = 0; j < a.images.length; j++) {
-          html += '<a href="' + a.images[j] + '" target="_blank" style="display:block"><img src="' + a.images[j] + '" style="width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid #e0d8cc" loading="lazy"></a>';
-        }
-        html += '</div>';
-      }
-      html += '</div>';
-    }
-    container.innerHTML = html || '<div class="announcement-empty"><div class="announcement-empty-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div><p class="announcement-empty-text">お知らせはまだありません</p></div>';
+    cachedAnnouncements = demoAnnouncements;
+    renderAnnouncements();
     return;
   }
 
@@ -3231,47 +3243,8 @@ function fetchAnnouncements() {
   fetch(APPS_SCRIPT_URL + '?action=announcements', { redirect: 'follow' })
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      if (!data || data.length === 0) { showAnnounceEmpty(container); return; }
-      // Filter by current category: show matching category OR "全体"
-      var catUpper = currentCategory.toUpperCase();
-      var filtered = data.filter(function(a) {
-        var ac = (a.category || '').toUpperCase();
-        return ac === catUpper || ac === '全体' || ac === '';
-      });
-      if (filtered.length === 0) { showAnnounceEmpty(container); return; }
-      // Sort: pinned first, then by date descending
-      var pinned = filtered.filter(function(a) { return a.pinned; });
-      var unpinned = filtered.filter(function(a) { return !a.pinned; });
-      var sorted = pinned.reverse().concat(unpinned.reverse());
-      var html = '';
-      for (var i = 0; i < sorted.length; i++) {
-        var a = sorted[i];
-        var isImportant = (a.importance || '').indexOf('重要') !== -1;
-        var isPinned = a.pinned;
-        var cardClass = 'announce-card';
-        if (isPinned) cardClass += ' pinned';
-        if (isImportant) cardClass += ' important';
-        html += '<div class="' + cardClass + '">';
-        html += '<div class="announce-card-header">';
-        if (isPinned) html += '<span class="announce-pin-icon">&#128204;</span>';
-        html += '<span class="announce-date">' + escapeHtml(a.date || '') + '</span>';
-        if ((a.category||'') === 'KIDS') html += '<span class="announce-badge-kids">KIDS</span>';
-        if ((a.category||'') === 'FUTURE') html += '<span class="announce-badge-future">FUTURE</span>';
-        if ((a.category||'') === '全体') html += '<span class="announce-badge-all">全体</span>';
-        if (isImportant) html += '<span class="announce-badge-important">重要</span>';
-        html += '</div>';
-        html += '<h4>' + escapeHtml(a.title || '') + '</h4>';
-        html += '<p>' + escapeHtml(a.content || '') + '</p>';
-        if (a.images && a.images.length > 0) {
-          html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem">';
-          for (var j = 0; j < a.images.length; j++) {
-            html += '<a href="' + a.images[j] + '" target="_blank" style="display:block"><img src="' + a.images[j] + '" style="width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid #e0d8cc" loading="lazy"></a>';
-          }
-          html += '</div>';
-        }
-        html += '</div>';
-      }
-      container.innerHTML = html;
+      cachedAnnouncements = data || [];
+      renderAnnouncements();
     })
     .catch(function() { showAnnounceEmpty(container); });
 }
