@@ -16,7 +16,7 @@
 
 // ===== 設定 =====
 var ADMIN_EMAIL = 'beat.the.mix7386@gmail.com';
-var ADMIN_KEY = 'btmadmin2026'; // members-page.htmlのADMIN_PASSWORDと合わせる
+var ADMIN_KEY = 'potofu7386'; // members-page.htmlのADMIN_PASSWORDと合わせる
 var IMAGE_FOLDER_NAME = 'BTM_お知らせ画像';
 
 function getOrCreateImageFolder() {
@@ -32,11 +32,12 @@ function setupSheets() {
   var sheets = [
     { name: 'スケジュール', headers: ['日付', 'スタジオ', '時間', 'クラス', '定員', 'category'] },
     { name: '予約一覧', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時'] },
-    { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像', 'カテゴリ'] },
+    { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像', 'カテゴリ', 'ピン留め'] },
     { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ'] },
     { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
-    { name: '全体ニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] }
+    { name: '全体ニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
+    { name: '定期休み', headers: ['曜日', 'スタジオ', 'category'] }
   ];
 
   sheets.forEach(function(def) {
@@ -75,6 +76,7 @@ function doGet(e) {
   if (action === 'list') return getBookingList();
   if (action === 'announcements') return getAnnouncements();
   if (action === 'regularlessons') return getRegularLessons();
+  if (action === 'regularholidays') return getRegularHolidays();
 
   return jsonResponse({ error: 'Unknown action' });
 }
@@ -100,6 +102,9 @@ function doPost(e) {
   if (action === 'editregularlesson') return adminGuardPost(payload, adminEditRegularLesson);
   if (action === 'editslot') return adminGuardPost(payload, adminEditSlot);
   if (action === 'formatsheets') return adminGuardPost(payload, adminFormatSheets);
+  if (action === 'addregularholiday') return adminGuardPost(payload, adminAddRegularHoliday);
+  if (action === 'deleteregularholiday') return adminGuardPost(payload, adminDeleteRegularHoliday);
+  if (action === 'togglepinannouncement') return adminGuardPost(payload, adminTogglePinAnnouncement);
 
   return jsonResponse({ error: 'Unknown action' });
 }
@@ -350,6 +355,7 @@ function getAnnouncements() {
     if (!row[1]) continue; // skip empty title
     var imageIds = String(row[4] || '').split(',').filter(function(s) { return s.trim(); });
     var imageUrls = imageIds.map(function(id) { return 'https://lh3.googleusercontent.com/d/' + id.trim(); });
+    var pinned = String(row[6] || '').toUpperCase() === 'TRUE';
     items.push({
       date: formatDate(row[0]),
       title: String(row[1]),
@@ -357,9 +363,19 @@ function getAnnouncements() {
       importance: String(row[3] || ''),
       images: imageUrls,
       category: String(row[5] || ''),
+      pinned: pinned,
       row: i + 1
     });
   }
+  // Sort: pinned first, then by date descending
+  items.sort(function(a, b) {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    // Both same pin status — sort by date descending
+    if (a.date > b.date) return -1;
+    if (a.date < b.date) return 1;
+    return 0;
+  });
   return jsonResponse(items);
 }
 
@@ -608,6 +624,74 @@ function adminFormatSheets() {
     }
   }
   return jsonResponse({ success: true, message: '全シートの列幅を調整しました' });
+}
+
+// ===== 定期休み取得 =====
+function getRegularHolidays() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('定期休み');
+  if (!sheet || sheet.getLastRow() <= 1) return jsonResponse([]);
+
+  var data = sheet.getDataRange().getValues();
+  var items = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue;
+    items.push({
+      id: i + 1,
+      day: String(row[0]),
+      studio: String(row[1] || ''),
+      category: String(row[2] || '')
+    });
+  }
+  return jsonResponse(items);
+}
+
+// ===== 管理者: 定期休み追加 =====
+function adminAddRegularHoliday(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('定期休み');
+  if (!sheet) return jsonResponse({ success: false, error: '定期休みシートがありません' });
+
+  var day = params.day || '';
+  var studio = params.studio || '';
+  var category = params.category || '';
+
+  if (!day) return jsonResponse({ success: false, error: '曜日は必須です' });
+
+  sheet.appendRow([day, studio, category]);
+  return jsonResponse({ success: true, message: '定期休みを追加しました' });
+}
+
+// ===== 管理者: 定期休み削除 =====
+function adminDeleteRegularHoliday(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('定期休み');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var id = parseInt(params.id);
+  if (!id || id < 2) return jsonResponse({ success: false, error: '無効な行番号です' });
+  if (id > sheet.getLastRow()) return jsonResponse({ success: false, error: '該当する行がありません' });
+
+  sheet.deleteRow(id);
+  return jsonResponse({ success: true, message: '削除しました' });
+}
+
+// ===== 管理者: お知らせピン留めトグル =====
+function adminTogglePinAnnouncement(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('お知らせ');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var id = parseInt(params.id);
+  if (!id || id < 2) return jsonResponse({ success: false, error: '無効な行番号です' });
+  if (id > sheet.getLastRow()) return jsonResponse({ success: false, error: '該当する行がありません' });
+
+  var cell = sheet.getRange(id, 7); // 7th column = ピン留め
+  var current = String(cell.getValue()).toUpperCase();
+  var newValue = (current === 'TRUE') ? 'FALSE' : 'TRUE';
+  cell.setValue(newValue);
+  return jsonResponse({ success: true, message: 'ピン留めを' + (newValue === 'TRUE' ? '設定' : '解除') + 'しました', pinned: newValue === 'TRUE' });
 }
 
 // ===== ユーティリティ =====

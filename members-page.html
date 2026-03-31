@@ -1954,7 +1954,290 @@ body {
     height: 3px;
   }
 }
+
+/* ===== CATEGORY SELECTION SCREEN ===== */
+#category-select-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#category-select-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.cat-select-container {
+  text-align: center;
+  padding: 2rem;
+  max-width: 700px;
+  width: 100%;
+}
+
+.cat-select-logo {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.3em;
+  color: var(--gray-500);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.cat-select-title {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 1.8rem;
+  letter-spacing: 0.1em;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+
+.cat-select-subtitle {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+  margin-bottom: 2.5rem;
+}
+
+.cat-select-cards {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cat-select-card {
+  flex: 1;
+  min-width: 240px;
+  max-width: 300px;
+  padding: 2.5rem 2rem;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  border: none;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.cat-select-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+}
+
+.cat-select-card:active {
+  transform: translateY(-2px);
+}
+
+.cat-select-card.kids-card {
+  background: var(--coral);
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(255, 107, 53, 0.25);
+}
+
+.cat-select-card.future-card {
+  background: var(--navy);
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(13, 27, 42, 0.25);
+}
+
+.cat-select-card-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.cat-select-card-name {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: 0.15em;
+}
+
+.future-card .cat-select-card-name {
+  color: #D4A853;
+}
+
+.cat-select-card-sub {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.future-card .cat-select-card-sub {
+  color: rgba(212, 168, 83, 0.85);
+}
+
+/* Switch category button in navbar */
+.navbar-switch-cat {
+  background: none;
+  border: 1px solid var(--gray-200);
+  color: var(--gray-500);
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.navbar-switch-cat:hover {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+
+/* ===== REGULAR HOLIDAYS ===== */
+.calendar-day.holiday-day {
+  background: #f0ece4 !important;
+  border: none !important;
+  cursor: default;
+}
+
+.calendar-day.holiday-day .day-number {
+  color: var(--gray-300) !important;
+}
+
+.holiday-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--gray-300);
+  line-height: 1;
+}
+
+.admin-holiday-form {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  margin-top: 2rem;
+  border-top: 2px solid var(--gray-200);
+  padding-top: 1.5rem;
+}
+
+.admin-holiday-form h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 1rem;
+}
+
+.holiday-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.holiday-list-item .holiday-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ===== PINNED ANNOUNCEMENTS ===== */
+.announce-card.pinned {
+  border-left: 4px solid #D4A853;
+  background: #FFFDF5;
+}
+
+.announce-pin-icon {
+  font-size: 0.9rem;
+  margin-right: 4px;
+}
+
+.admin-pin-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--gray-500);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.admin-pin-btn:hover {
+  border-color: #D4A853;
+  color: #D4A853;
+}
+
+.admin-pin-btn.is-pinned {
+  border-color: #D4A853;
+  background: #D4A853;
+  color: #fff;
+}
+
+/* ===== HELP BUTTON ===== */
+.help-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-200);
+  background: #fff;
+  color: var(--gray-500);
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  z-index: 90;
+  transition: all 0.2s;
+}
+
+.help-btn:hover {
+  border-color: var(--coral);
+  color: var(--coral);
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .cat-select-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  .cat-select-card {
+    min-width: 200px;
+    max-width: 100%;
+    width: 100%;
+  }
+  .cat-select-title {
+    font-size: 1.4rem;
+  }
+  .help-btn {
+    bottom: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+}
 </style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF6B35">
 </head>
 <body>
 
@@ -1988,6 +2271,27 @@ body {
   </div>
 </div>
 
+<!-- ===== CATEGORY SELECTION SCREEN ===== -->
+<div id="category-select-screen" class="hidden">
+  <div class="cat-select-container">
+    <div class="cat-select-logo">BEAT THE MIX</div>
+    <h2 class="cat-select-title">SELECT YOUR CLASS</h2>
+    <p class="cat-select-subtitle">クラスを選択してください</p>
+    <div class="cat-select-cards">
+      <button class="cat-select-card kids-card" onclick="selectCategory('kids')">
+        <span class="cat-select-card-icon">&#9733;</span>
+        <span class="cat-select-card-name">KIDS</span>
+        <span class="cat-select-card-sub">4&#12316;18歳</span>
+      </button>
+      <button class="cat-select-card future-card" onclick="selectCategory('future')">
+        <span class="cat-select-card-icon">&#9830;</span>
+        <span class="cat-select-card-name">FUTURE</span>
+        <span class="cat-select-card-sub">40歳以上</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== MAIN CONTENT ===== -->
 <div id="main-content">
 
@@ -1999,6 +2303,10 @@ body {
         TOP
       </a>
       <span class="navbar-brand">BEAT THE MIX</span>
+      <button class="navbar-switch-cat" id="navbar-switch-cat" onclick="showCategorySelect()" title="クラス切替">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        <span id="navbar-cat-label">KIDS</span>
+      </button>
       <span class="navbar-member-badge">Members</span>
       <button class="navbar-signout" onclick="signOut()" title="サインアウト">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -2106,14 +2414,17 @@ body {
     BEAT THE MIX &copy; 2025 &mdash; Members Area
   </footer>
 
+  <!-- Help Button -->
+  <button class="help-btn" id="help-btn" title="ヘルプ" onclick="openHelp()">?</button>
+
 </div>
 
 <script>
 // ===== CONFIGURATION =====
 const SPREADSHEET_ID = '1M96QizLwfPFPwNXBJHteMCpiVXkV3FIAqXasHAY0Le4';
 const ANNOUNCE_SHEET = 'お知らせ';
-const MEMBER_PASSWORD = 'btm2025';
-const ADMIN_PASSWORD = 'btmadmin2026';
+const MEMBER_PASSWORD = 'btm2026';
+const ADMIN_PASSWORD = 'potofu7386';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_j23qQkb6hhZ90wkwLUdwWFXLUpS5KWweJORvp0Z1EOXl0AuPkCAO1CUVQOpAXcoAQg/exec';
 const REGULAR_LESSON_SHEET = '定期レッスン';
 const DEMO_MODE = false;
@@ -2126,6 +2437,7 @@ var currentMonth = new Date();
 var selectedDate = null;
 var allSlots = []; // Populated from demo or API
 var regularLessons = []; // { dayOfWeek: 0-6, studio, time, class_name, category }
+var regularHolidays = []; // { dayOfWeek: '月'~'日', studio: string, id: number }
 
 // ===== DEMO DATA =====
 var demoSlots = [
@@ -2158,10 +2470,16 @@ var demoAnnouncements = [
   var errorEl = document.getElementById('gate-error');
 
   var storedMode = sessionStorage.getItem('btm_mode');
+  var storedCat = sessionStorage.getItem('btm_category');
   if (storedMode === 'member' || storedMode === 'admin') {
     isAdminMode = storedMode === 'admin';
     gate.classList.add('hidden');
-    showMainContent();
+    if (storedCat === 'kids' || storedCat === 'future') {
+      currentCategory = storedCat;
+      showMainContent();
+    } else {
+      showCategorySelectScreen();
+    }
     return;
   }
 
@@ -2184,7 +2502,7 @@ var demoAnnouncements = [
       isAdminMode = value === ADMIN_PASSWORD;
       sessionStorage.setItem('btm_mode', isAdminMode ? 'admin' : 'member');
       gate.classList.add('hidden');
-      setTimeout(showMainContent, 300);
+      setTimeout(showCategorySelectScreen, 300);
     } else {
       errorEl.classList.add('visible');
       inputWrapper.classList.add('shake');
@@ -2196,9 +2514,43 @@ var demoAnnouncements = [
   });
 })();
 
+function showCategorySelectScreen() {
+  var screen = document.getElementById('category-select-screen');
+  screen.classList.remove('hidden');
+  // Hide main content if visible
+  var mainContent = document.getElementById('main-content');
+  mainContent.style.display = 'none';
+  mainContent.classList.remove('visible');
+}
+
+function selectCategory(cat) {
+  currentCategory = cat;
+  sessionStorage.setItem('btm_category', cat);
+  document.getElementById('category-select-screen').classList.add('hidden');
+  showMainContent();
+}
+
+function showCategorySelect() {
+  // Go back to category selection (from navbar switch button)
+  sessionStorage.removeItem('btm_category');
+  var mainContent = document.getElementById('main-content');
+  mainContent.style.display = 'none';
+  mainContent.classList.remove('visible');
+  showCategorySelectScreen();
+}
+
 function signOut() {
   sessionStorage.removeItem('btm_mode');
+  sessionStorage.removeItem('btm_category');
   location.reload();
+}
+
+function openHelp() {
+  if (isAdminMode) {
+    window.open('admin-manual.html', '_blank');
+  } else {
+    window.open('member-manual.html', '_blank');
+  }
 }
 
 function showMainContent() {
@@ -2206,6 +2558,21 @@ function showMainContent() {
   mainContent.style.display = 'block';
   void mainContent.offsetHeight;
   mainContent.classList.add('visible');
+
+  // Apply selected category
+  var panel = document.getElementById('panel-schedule');
+  panel.classList.remove('category-kids', 'category-future');
+  panel.classList.add('category-' + currentCategory);
+
+  // Update navbar category label
+  var catLabel = document.getElementById('navbar-cat-label');
+  if (catLabel) catLabel.textContent = currentCategory.toUpperCase();
+
+  // Update category toggle buttons to match selected category
+  var catBtns = document.querySelectorAll('#panel-schedule > .category-toggle .category-btn');
+  catBtns.forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('data-category') === currentCategory);
+  });
 
   // Admin mode: update badge + tabs
   if (isAdminMode) {
@@ -2219,56 +2586,58 @@ function showMainContent() {
       '<button class="tab-button active" data-tab="schedule">スケジュール管理</button>' +
       '<button class="tab-button" data-tab="admin-announce">お知らせ管理</button>';
 
-    // Add admin panels
-    var panels = document.querySelector('.tab-panels');
-    // Add admin announcements panel
-    var adminAnnouncePanel = document.createElement('div');
-    adminAnnouncePanel.className = 'tab-panel';
-    adminAnnouncePanel.id = 'panel-admin-announce';
-    adminAnnouncePanel.innerHTML =
-      '<div class="announcements-container">' +
-        '<div class="schedule-header">' +
-          '<h2 class="announcements-title">お知らせ管理</h2>' +
-        '</div>' +
-        '<div class="admin-add-form" style="margin-bottom:1.5rem">' +
-          '<h3>お知らせを追加</h3>' +
-          '<input type="date" id="admin-announce-date">' +
-          '<input type="text" id="admin-announce-title" placeholder="タイトル">' +
-          '<textarea id="admin-announce-content" placeholder="内容を入力..." rows="3"></textarea>' +
-          '<select id="admin-announce-importance">' +
-            '<option value="">通常</option>' +
-            '<option value="重要">重要</option>' +
-          '</select>' +
-          '<div class="category-toggle" style="margin:0.8rem 0 0.5rem">' +
-            '<button type="button" class="category-btn active" data-category="kids" onclick="setAnnounceCategory(this,\'KIDS\')">KIDS</button>' +
-            '<button type="button" class="category-btn" data-category="future" onclick="setAnnounceCategory(this,\'FUTURE\')">FUTURE</button>' +
-            '<button type="button" class="category-btn" data-category="all" onclick="setAnnounceCategory(this,\'全体\')">全体</button>' +
+    // Add admin panels (only if not already added)
+    if (!document.getElementById('panel-admin-announce')) {
+      var panels = document.querySelector('.tab-panels');
+      var adminAnnouncePanel = document.createElement('div');
+      adminAnnouncePanel.className = 'tab-panel';
+      adminAnnouncePanel.id = 'panel-admin-announce';
+      adminAnnouncePanel.innerHTML =
+        '<div class="announcements-container">' +
+          '<div class="schedule-header">' +
+            '<h2 class="announcements-title">お知らせ管理</h2>' +
           '</div>' +
-          '<label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0;cursor:pointer;font-size:0.9rem">' +
-            '<input type="checkbox" id="admin-announce-attach" onchange="toggleImageAttach()" style="width:18px;height:18px">' +
-            '<span>画像を添付</span>' +
-          '</label>' +
-          '<div id="admin-announce-image-area" style="display:none">' +
-            '<input type="file" id="admin-announce-images" multiple accept="image/*" onchange="previewImages(this)" style="display:none">' +
-            '<button type="button" style="background:#666;color:#fff;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-size:0.85rem;margin-bottom:0.5rem" onclick="document.getElementById(\'admin-announce-images\').click()">写真を選択（最大5枚）</button>' +
-            '<div id="admin-announce-preview" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem"></div>' +
+          '<div class="admin-add-form" style="margin-bottom:1.5rem">' +
+            '<h3>お知らせを追加</h3>' +
+            '<input type="date" id="admin-announce-date">' +
+            '<input type="text" id="admin-announce-title" placeholder="タイトル">' +
+            '<textarea id="admin-announce-content" placeholder="内容を入力..." rows="3"></textarea>' +
+            '<select id="admin-announce-importance">' +
+              '<option value="">通常</option>' +
+              '<option value="重要">重要</option>' +
+            '</select>' +
+            '<div class="category-toggle" style="margin:0.8rem 0 0.5rem">' +
+              '<button type="button" class="category-btn active" data-category="kids" onclick="setAnnounceCategory(this,\'KIDS\')">KIDS</button>' +
+              '<button type="button" class="category-btn" data-category="future" onclick="setAnnounceCategory(this,\'FUTURE\')">FUTURE</button>' +
+              '<button type="button" class="category-btn" data-category="all" onclick="setAnnounceCategory(this,\'全体\')">全体</button>' +
+            '</div>' +
+            '<label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0;cursor:pointer;font-size:0.9rem">' +
+              '<input type="checkbox" id="admin-announce-attach" onchange="toggleImageAttach()" style="width:18px;height:18px">' +
+              '<span>画像を添付</span>' +
+            '</label>' +
+            '<div id="admin-announce-image-area" style="display:none">' +
+              '<input type="file" id="admin-announce-images" multiple accept="image/*" onchange="previewImages(this)" style="display:none">' +
+              '<button type="button" style="background:#666;color:#fff;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-size:0.85rem;margin-bottom:0.5rem" onclick="document.getElementById(\'admin-announce-images\').click()">写真を選択（最大5枚）</button>' +
+              '<div id="admin-announce-preview" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem"></div>' +
+            '</div>' +
+            '<button class="admin-add-btn" id="admin-announce-submit" onclick="adminAddAnnouncement()">追加する</button>' +
           '</div>' +
-          '<button class="admin-add-btn" id="admin-announce-submit" onclick="adminAddAnnouncement()">追加する</button>' +
-        '</div>' +
-        '<div id="admin-announce-list"></div>' +
-      '</div>';
-    panels.appendChild(adminAnnouncePanel);
+          '<div id="admin-announce-list"></div>' +
+        '</div>';
+      panels.appendChild(adminAnnouncePanel);
 
-    // Set default date for announce form
-    var today = new Date();
-    var dateInput = adminAnnouncePanel.querySelector('#admin-announce-date');
-    if (dateInput) dateInput.value = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+      // Set default date for announce form
+      var today = new Date();
+      var dateInput = adminAnnouncePanel.querySelector('#admin-announce-date');
+      if (dateInput) dateInput.value = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+    }
   }
 
   initTabs();
   initCategoryToggle();
   initCalendar();
   initBookingModal();
+  fetchRegularHolidays();
   if (isAdminMode) {
     initAdminSlotForm();
     fetchAdminAnnouncements();
@@ -2309,11 +2678,12 @@ function initTabs() {
 
 // ===== CATEGORY TOGGLE (KIDS / FUTURE) =====
 function initCategoryToggle() {
-  var buttons = document.querySelectorAll('.category-btn');
+  var buttons = document.querySelectorAll('#panel-schedule > .category-toggle .category-btn');
   buttons.forEach(function(btn) {
     btn.addEventListener('click', function() {
       var cat = this.getAttribute('data-category');
       currentCategory = cat;
+      sessionStorage.setItem('btm_category', cat);
       buttons.forEach(function(b) { b.classList.remove('active'); });
       this.classList.add('active');
 
@@ -2321,10 +2691,14 @@ function initCategoryToggle() {
       panel.classList.remove('category-kids', 'category-future');
       panel.classList.add('category-' + cat);
 
+      // Update navbar category label
+      var catLabel = document.getElementById('navbar-cat-label');
+      if (catLabel) catLabel.textContent = cat.toUpperCase();
+
       selectedDate = null;
       document.getElementById('day-lessons').innerHTML = '';
       renderCalendar();
-      initAdminSlotForm(); // Re-render admin form with new category's studios
+      if (isAdminMode) initAdminSlotForm(); // Re-render admin form with new category's studios
     });
   });
 }
@@ -2469,16 +2843,24 @@ function renderCalendar() {
   for (var d = 1; d <= daysInMonth; d++) {
     var dateStr = year + '/' + String(month + 1).padStart(2, '0') + '/' + String(d).padStart(2, '0');
     var hasRegular = getRegularLessonsForDate(dateStr).length > 0;
+    var isHoliday = isRegularHoliday(dateStr);
     var classes = ['calendar-day'];
     if (dateStr === todayStr) classes.push('today');
     if (dateStr === selectedDate) classes.push('selected');
-    if (lessonDates[dateStr]) classes.push('has-lessons');
-    if (hasRegular) classes.push('has-regular');
-
-    html += '<div class="' + classes.join(' ') + '" onclick="selectDate(\'' + dateStr + '\')">';
-    html += '<span class="day-number">' + d + '</span>';
-    if (lessonDates[dateStr] || hasRegular) html += '<span class="day-dot"></span>';
-    html += '</div>';
+    if (isHoliday) {
+      classes.push('holiday-day');
+      html += '<div class="' + classes.join(' ') + '" onclick="selectDate(\'' + dateStr + '\')">';
+      html += '<span class="day-number">' + d + '</span>';
+      html += '<span class="holiday-label">休</span>';
+      html += '</div>';
+    } else {
+      if (lessonDates[dateStr]) classes.push('has-lessons');
+      if (hasRegular) classes.push('has-regular');
+      html += '<div class="' + classes.join(' ') + '" onclick="selectDate(\'' + dateStr + '\')">';
+      html += '<span class="day-number">' + d + '</span>';
+      if (lessonDates[dateStr] || hasRegular) html += '<span class="day-dot"></span>';
+      html += '</div>';
+    }
   }
 
   grid.innerHTML = html;
@@ -2799,13 +3181,25 @@ function fetchAnnouncements() {
   var container = document.getElementById('announcements-content');
 
   if (DEMO_MODE) {
+    var catUpper = currentCategory.toUpperCase();
+    var filtered = demoAnnouncements.filter(function(a) {
+      var ac = (a.category || '').toUpperCase();
+      return ac === catUpper || ac === '全体' || ac === '';
+    });
+    var pinned = filtered.filter(function(a) { return a.pinned; });
+    var unpinned = filtered.filter(function(a) { return !a.pinned; });
+    var sorted = pinned.reverse().concat(unpinned.reverse());
     var html = '';
-    for (var i = demoAnnouncements.length - 1; i >= 0; i--) {
-      var a = demoAnnouncements[i];
+    for (var i = 0; i < sorted.length; i++) {
+      var a = sorted[i];
       var isImportant = a.importance === '重要';
-      var cardClass = isImportant ? 'announce-card important' : 'announce-card';
+      var isPinned = a.pinned;
+      var cardClass = 'announce-card';
+      if (isPinned) cardClass += ' pinned';
+      if (isImportant) cardClass += ' important';
       html += '<div class="' + cardClass + '">';
       html += '<div class="announce-card-header">';
+      if (isPinned) html += '<span class="announce-pin-icon">&#128204;</span>';
       html += '<span class="announce-date">' + escapeHtml(a.date) + '</span>';
       if (a.category === 'KIDS') html += '<span class="announce-badge-kids">KIDS</span>';
       if (a.category === 'FUTURE') html += '<span class="announce-badge-future">FUTURE</span>';
@@ -2823,7 +3217,7 @@ function fetchAnnouncements() {
       }
       html += '</div>';
     }
-    container.innerHTML = html;
+    container.innerHTML = html || '<div class="announcement-empty"><div class="announcement-empty-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div><p class="announcement-empty-text">お知らせはまだありません</p></div>';
     return;
   }
 
@@ -2838,12 +3232,28 @@ function fetchAnnouncements() {
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (!data || data.length === 0) { showAnnounceEmpty(container); return; }
+      // Filter by current category: show matching category OR "全体"
+      var catUpper = currentCategory.toUpperCase();
+      var filtered = data.filter(function(a) {
+        var ac = (a.category || '').toUpperCase();
+        return ac === catUpper || ac === '全体' || ac === '';
+      });
+      if (filtered.length === 0) { showAnnounceEmpty(container); return; }
+      // Sort: pinned first, then by date descending
+      var pinned = filtered.filter(function(a) { return a.pinned; });
+      var unpinned = filtered.filter(function(a) { return !a.pinned; });
+      var sorted = pinned.reverse().concat(unpinned.reverse());
       var html = '';
-      for (var i = data.length - 1; i >= 0; i--) {
-        var a = data[i];
+      for (var i = 0; i < sorted.length; i++) {
+        var a = sorted[i];
         var isImportant = (a.importance || '').indexOf('重要') !== -1;
-        html += '<div class="' + (isImportant ? 'announce-card important' : 'announce-card') + '">';
+        var isPinned = a.pinned;
+        var cardClass = 'announce-card';
+        if (isPinned) cardClass += ' pinned';
+        if (isImportant) cardClass += ' important';
+        html += '<div class="' + cardClass + '">';
         html += '<div class="announce-card-header">';
+        if (isPinned) html += '<span class="announce-pin-icon">&#128204;</span>';
         html += '<span class="announce-date">' + escapeHtml(a.date || '') + '</span>';
         if ((a.category||'') === 'KIDS') html += '<span class="announce-badge-kids">KIDS</span>';
         if ((a.category||'') === 'FUTURE') html += '<span class="announce-badge-future">FUTURE</span>';
@@ -3007,6 +3417,35 @@ function initAdminSlotForm() {
 
     fetchAdminRegularLessons();
   }
+
+  // ===== REGULAR HOLIDAYS SECTION =====
+  var holidayContainer = document.getElementById('admin-holiday-container');
+  if (!holidayContainer) {
+    holidayContainer = document.createElement('div');
+    holidayContainer.id = 'admin-holiday-container';
+    var schedPanel = document.getElementById('panel-schedule');
+    schedPanel.appendChild(holidayContainer);
+  }
+
+  var activeCatH = currentCategory.toUpperCase();
+  var catLabelH = activeCatH === 'FUTURE' ? 'FUTURE' : 'KIDS';
+  var dowLabelsH = ['月','火','水','木','金','土','日'];
+  var dowOptsH = dowLabelsH.map(function(d) { return '<option value="' + d + '">' + d + '曜</option>'; }).join('');
+  var studioOptsH = '<option value="">全スタジオ</option>' + buildStudioOptions(activeCatH);
+
+  holidayContainer.innerHTML =
+    '<div class="admin-holiday-form">' +
+      '<h3>定期休み管理（' + catLabelH + '）</h3>' +
+      '<p style="font-size:0.8rem;color:var(--gray-500);margin:-0.5rem 0 1rem">毎週決まった曜日の休みをカレンダーに表示します</p>' +
+      '<div class="admin-form-grid">' +
+        '<select id="admin-holiday-dow">' + dowOptsH + '</select>' +
+        '<select id="admin-holiday-studio">' + studioOptsH + '</select>' +
+      '</div>' +
+      '<button class="admin-add-btn" onclick="adminAddRegularHoliday()" style="margin-top:0.75rem">休みを追加</button>' +
+      '<div id="admin-holiday-list" style="margin-top:1rem"></div>' +
+    '</div>';
+
+  renderAdminHolidayList();
 }
 
 function toggleUnlimited(mode) {
@@ -3249,8 +3688,12 @@ function renderAdminAnnouncements(items, container) {
   for (var i = items.length - 1; i >= 0; i--) {
     var a = items[i];
     var isImportant = (a.importance || '').indexOf('重要') !== -1;
-    html += '<div class="' + (isImportant ? 'announce-card important' : 'announce-card') + '" style="position:relative">';
+    var isPinned = a.pinned;
+    var cardClass = isImportant ? 'announce-card important' : 'announce-card';
+    if (isPinned) cardClass += ' pinned';
+    html += '<div class="' + cardClass + '" style="position:relative">';
     html += '<div class="announce-card-header">';
+    if (isPinned) html += '<span class="announce-pin-icon">&#128204;</span>';
     html += '<span class="announce-date">' + escapeHtml(a.date || '') + '</span>';
     if ((a.category||'') === 'KIDS') html += '<span class="announce-badge-kids">KIDS</span>';
     if ((a.category||'') === 'FUTURE') html += '<span class="announce-badge-future">FUTURE</span>';
@@ -3266,8 +3709,13 @@ function renderAdminAnnouncements(items, container) {
       }
       html += '</div>';
     }
-    html += '<button class="admin-delete-btn" style="margin-top:0.8rem" onclick=\'adminDeleteAnnouncement(' +
-      (a.row ? a.row : i) + ',' + JSON.stringify(a.title||'').replace(/'/g, "\\'") + ')\'">削除</button>';
+    html += '<div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem">';
+    var announceId = a.row ? a.row : i;
+    html += '<button class="admin-pin-btn' + (isPinned ? ' is-pinned' : '') + '" onclick=\'adminTogglePin(' +
+      announceId + ')\'>' + (isPinned ? '&#128204; ピン解除' : '&#128204; ピン留め') + '</button>';
+    html += '<button class="admin-delete-btn" onclick=\'adminDeleteAnnouncement(' +
+      announceId + ',' + JSON.stringify(a.title||'').replace(/'/g, "\\'") + ')\'">削除</button>';
+    html += '</div>';
     html += '</div>';
   }
   container.innerHTML = html;
@@ -3654,6 +4102,139 @@ function adminDeleteRegularLesson(row) {
   });
 }
 
+// ===== REGULAR HOLIDAYS =====
+function fetchRegularHolidays(callback) {
+  if (!APPS_SCRIPT_URL) {
+    if (callback) callback();
+    return;
+  }
+  fetch(APPS_SCRIPT_URL + '?action=getRegularHolidays', { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && Array.isArray(data)) {
+        regularHolidays = data;
+      }
+      if (callback) callback();
+      renderCalendar();
+      if (isAdminMode) renderAdminHolidayList();
+    })
+    .catch(function() {
+      regularHolidays = [];
+      if (callback) callback();
+    });
+}
+
+function isRegularHoliday(dateStr) {
+  var parts = dateStr.split('/');
+  var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  var dow = dateObj.getDay();
+  var dowNames = ['日','月','火','水','木','金','土'];
+  var dayName = dowNames[dow];
+  var catUpper = currentCategory.toUpperCase();
+  var kidsStudios = ['若葉studio', '稲毛studio'];
+  var futureStudios = ['千葉studio', '美浜studio', '稲毛studio(穴川)', '若葉studio'];
+  var studioList = catUpper === 'FUTURE' ? futureStudios : kidsStudios;
+
+  return regularHolidays.some(function(h) {
+    if (h.dayOfWeek !== dayName) return false;
+    // If studio is specified, check if it matches the current category's studios
+    if (h.studio) {
+      return studioList.indexOf(h.studio) !== -1;
+    }
+    return true; // No studio = applies to all
+  });
+}
+
+function adminAddRegularHoliday() {
+  var dow = document.getElementById('admin-holiday-dow').value;
+  var studio = document.getElementById('admin-holiday-studio').value;
+
+  if (!dow) { alert('曜日を選択してください'); return; }
+
+  var body = {
+    action: 'adminAddRegularHoliday',
+    adminKey: ADMIN_PASSWORD,
+    dayOfWeek: dow,
+    studio: studio || ''
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        alert('定期休みを追加しました');
+        fetchRegularHolidays();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
+function adminDeleteRegularHoliday(id) {
+  if (!confirm('この定期休みを削除しますか？')) return;
+
+  var body = {
+    action: 'adminDeleteRegularHoliday',
+    adminKey: ADMIN_PASSWORD,
+    id: id
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        fetchRegularHolidays();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
+function renderAdminHolidayList() {
+  var container = document.getElementById('admin-holiday-list');
+  if (!container) return;
+  if (!regularHolidays || regularHolidays.length === 0) {
+    container.innerHTML = '<div class="day-lessons-empty" style="padding:1rem;font-size:0.85rem">定期休みはまだ設定されていません</div>';
+    return;
+  }
+  var html = '';
+  regularHolidays.forEach(function(h) {
+    html += '<div class="holiday-list-item">';
+    html += '<div class="holiday-info">';
+    html += '<strong>' + escapeHtml(h.dayOfWeek || '') + '曜</strong>';
+    if (h.studio) html += '<span style="margin-left:0.5rem;font-size:0.82rem;color:var(--gray-500)">' + escapeHtml(h.studio) + '</span>';
+    else html += '<span style="margin-left:0.5rem;font-size:0.82rem;color:var(--gray-500)">全スタジオ</span>';
+    html += '</div>';
+    html += '<button class="admin-cancel-btn" title="削除" onclick="adminDeleteRegularHoliday(' + (h.id || h.row || 0) + ')">&times;</button>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+// ===== ANNOUNCEMENT PINNING =====
+function adminTogglePin(announceId) {
+  if (!APPS_SCRIPT_URL) return;
+
+  var body = {
+    action: 'adminTogglePinAnnouncement',
+    adminKey: ADMIN_PASSWORD,
+    id: announceId
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        fetchAdminAnnouncements();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
 function apiCall(params, onSuccess) {
   // Convert URLSearchParams to plain object for JSON body
   var body = {};
@@ -3680,5 +4261,10 @@ function escapeHtml(str) {
 }
 </script>
 
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js').catch(function() {});
+}
+</script>
 </body>
 </html>

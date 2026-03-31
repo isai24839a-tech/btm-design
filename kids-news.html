@@ -836,6 +836,8 @@ body {
   }
 }
 </style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF6B35">
 </head>
 <body>
 
@@ -1208,6 +1210,11 @@ backToTop.addEventListener('click', function() {
 document.addEventListener('DOMContentLoaded', function() {
   fetchAndRender();
 });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js').catch(function() {});
+}
 </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /members-page.html
-
+Disallow: /admin-manual.html
+Disallow: /member-manual.html
 Sitemap: https://tibadance.com/sitemap.xml

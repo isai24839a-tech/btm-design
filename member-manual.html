@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEAT THE MIX 会員ガイド</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  background: #f8f9fa;
+  color: #333;
+  line-height: 1.8;
+}
+
+.header {
+  background: linear-gradient(135deg, #FF6B35, #FF4D6D);
+  color: #fff;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+.header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Oswald', 'Noto Sans JP', sans-serif; }
+.header p { opacity: 0.9; font-size: 0.95rem; }
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 1rem;
+  padding: 0.5rem 1.2rem;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: 50px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.back-btn:hover { background: rgba(255,255,255,0.35); }
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.toc {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.toc h2 { font-size: 1.2rem; margin-bottom: 1rem; color: #FF6B35; }
+.toc ol { padding-left: 1.5rem; }
+.toc li { margin-bottom: 0.5rem; }
+.toc a { color: #FF6B35; text-decoration: none; font-weight: 500; }
+.toc a:hover { text-decoration: underline; }
+
+.section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.section h2 {
+  font-size: 1.3rem;
+  color: #FF6B35;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid #FFE8DE;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section h3 {
+  font-size: 1.05rem;
+  color: #333;
+  margin: 1.5rem 0 1rem;
+  padding-left: 0.8rem;
+  border-left: 3px solid #FF6B35;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+}
+
+.step-num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #FF6B35, #FF4D6D);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.step-content { flex: 1; }
+.step-content p { margin-bottom: 0.3rem; }
+
+.mock {
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin: 0.8rem 0;
+  position: relative;
+}
+
+.mock-label {
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  background: #FF6B35;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.mock-btn {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: default;
+}
+
+.mock-btn-primary {
+  background: linear-gradient(135deg, #FF6B35, #FF4D6D);
+  color: #fff;
+}
+
+.mock-btn-navy {
+  background: #0D1B2A;
+  color: #D4A853;
+}
+
+.mock-gate {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  color: #fff;
+}
+.mock-gate h3 { font-size: 1rem; margin-bottom: 1rem; opacity: 0.8; font-weight: 400; border: none; padding: 0; }
+.mock-gate-input {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  color: #fff;
+  font-size: 1rem;
+  width: 80%;
+  max-width: 300px;
+  text-align: center;
+  letter-spacing: 0.2em;
+}
+
+.mock-toggle {
+  display: inline-flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid #ddd;
+  margin: 0.3rem 0;
+}
+.mock-toggle span {
+  padding: 0.4rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: default;
+}
+.mock-toggle .active-kids { background: #FF6B35; color: #fff; }
+.mock-toggle .active-future { background: #0D1B2A; color: #D4A853; }
+.mock-toggle .inactive { background: #f5f5f5; color: #999; }
+
+.mock-tag {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0.15rem;
+}
+.tag-studio { background: #E3F2FD; color: #1565C0; }
+.tag-time { background: #E8F5E9; color: #2E7D32; }
+.tag-class { background: #F3E5F5; color: #7B1FA2; }
+
+.mock-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+}
+
+.mock-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin: 0.5rem 0;
+}
+.mock-cal-head {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #999;
+  padding: 0.3rem;
+}
+.mock-cal-day {
+  text-align: center;
+  padding: 0.4rem;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  background: #fafafa;
+}
+.mock-cal-day.has-lesson { background: #FFE8DE; font-weight: 600; color: #FF6B35; }
+.mock-cal-day.selected { background: #FF6B35; color: #fff; font-weight: 700; }
+.mock-cal-day.holiday { background: #f0f0f0; color: #bbb; }
+.mock-cal-day.empty { background: transparent; }
+
+.mock-input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.mock-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.95);
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  margin: 0.5rem 0;
+}
+.mock-nav-brand { font-weight: 700; font-size: 0.9rem; }
+.mock-nav-brand span { color: #FF6B35; }
+
+.highlight {
+  background: #FFF3E0;
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  border-left: 4px solid #FF6B35;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.warning {
+  background: #FFF3F3;
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  border-left: 4px solid #c62828;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.flex-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mock-announce {
+  border-left: 3px solid #FF6B35;
+  padding: 0.8rem 1rem;
+  margin: 0.5rem 0;
+  background: #fafafa;
+  border-radius: 0 8px 8px 0;
+}
+
+.mock-announce-pinned {
+  border-left: 3px solid #D4A853;
+  padding: 0.8rem 1rem;
+  margin: 0.5rem 0;
+  background: #FFFBF0;
+  border-radius: 0 8px 8px 0;
+}
+
+.device-steps {
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin: 0.8rem 0;
+}
+.device-steps h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+.device-steps ol {
+  padding-left: 1.5rem;
+  font-size: 0.9rem;
+}
+.device-steps li { margin-bottom: 0.3rem; }
+
+.contact-card {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-radius: 16px;
+  padding: 2rem;
+  color: #fff;
+  text-align: center;
+}
+.contact-card h2 {
+  color: #D4A853;
+  border-bottom-color: rgba(212, 168, 83, 0.3);
+  justify-content: center;
+}
+.contact-card a {
+  color: #4FC3F7;
+  text-decoration: none;
+}
+.contact-card a:hover { text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .header { padding: 2rem 1rem; }
+  .header h1 { font-size: 1.4rem; }
+  .container { padding: 1rem; }
+  .section { padding: 1.5rem 1rem; }
+  .step { flex-direction: column; gap: 0.5rem; }
+  .step-num { width: 32px; height: 32px; font-size: 0.8rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>BEAT THE MIX 会員ガイド</h1>
+  <p>会員ページの使い方をご案内します</p>
+  <a href="members-page.html" class="back-btn">&larr; 会員ページに戻る</a>
+</div>
+
+<div class="container">
+
+<!-- 目次 -->
+<div class="toc">
+  <h2>もくじ</h2>
+  <ol>
+    <li><a href="#sec-intro">はじめに</a></li>
+    <li><a href="#sec-login">ログイン方法</a></li>
+    <li><a href="#sec-schedule">スケジュールの見方</a></li>
+    <li><a href="#sec-booking">予約方法</a></li>
+    <li><a href="#sec-cancel">予約のキャンセル</a></li>
+    <li><a href="#sec-news">お知らせ</a></li>
+    <li><a href="#sec-pwa">ホーム画面に追加（アプリ化）</a></li>
+    <li><a href="#sec-contact">お問い合わせ</a></li>
+  </ol>
+</div>
+
+<!-- ========== 1. はじめに ========== -->
+<div class="section" id="sec-intro">
+  <h2>1. はじめに</h2>
+  <p>このページでは、BEAT THE MIX（BTM）会員ページの使い方をご説明します。</p>
+  <p>会員ページでは以下のことができます：</p>
+  <ul style="margin:1rem 0;padding-left:1.5rem;">
+    <li>レッスンスケジュールの確認</li>
+    <li>レッスンの予約</li>
+    <li>スタジオからのお知らせの確認</li>
+  </ul>
+  <div class="highlight">
+    スマホのホーム画面に追加すると、アプリのようにすぐアクセスできて便利です。<br>
+    <a href="#sec-pwa" style="color:#FF6B35;">追加方法はこちら</a>
+  </div>
+</div>
+
+<!-- ========== 2. ログイン ========== -->
+<div class="section" id="sec-login">
+  <h2>2. ログイン方法</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>サイトの「会員専用」ボタンをタップ</strong></p>
+      <p>トップページやKIDS・FUTUREページの右上にあるボタンです。</p>
+      <div class="mock-nav">
+        <div class="mock-nav-brand">BTM <span>KIDS</span></div>
+        <div><span class="mock-btn mock-btn-primary" style="font-size:0.75rem;padding:0.3rem 0.8rem;">会員専用</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>パスワードを入力します</strong></p>
+      <p>先生からお伝えしたパスワードを入力してください。</p>
+      <div class="mock-gate">
+        <h3>パスワードを入力してください</h3>
+        <input class="mock-gate-input" type="text" value="********" readonly>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>KIDS または FUTURE を選択</strong></p>
+      <p>お通いのクラスのボタンをタップすると、会員ページに入れます。</p>
+      <div style="display:flex;gap:0.8rem;margin:0.8rem 0;flex-wrap:wrap;">
+        <span class="mock-btn mock-btn-primary">KIDS</span>
+        <span class="mock-btn mock-btn-navy">FUTURE</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <strong>パスワードを忘れた場合</strong><br>
+    先生にLINEでお問い合わせください。
+  </div>
+</div>
+
+<!-- ========== 3. スケジュールの見方 ========== -->
+<div class="section" id="sec-schedule">
+  <h2>3. スケジュールの見方</h2>
+
+  <p>ログインすると、カレンダーが表示されます。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>カレンダーの色の意味</strong></p>
+      <div class="mock-calendar">
+        <div class="mock-cal-head">月</div><div class="mock-cal-head">火</div><div class="mock-cal-head">水</div><div class="mock-cal-head">木</div><div class="mock-cal-head">金</div><div class="mock-cal-head">土</div><div class="mock-cal-head">日</div>
+        <div class="mock-cal-day empty"></div><div class="mock-cal-day has-lesson">1</div><div class="mock-cal-day">2</div><div class="mock-cal-day">3</div><div class="mock-cal-day has-lesson">4</div><div class="mock-cal-day has-lesson">5</div><div class="mock-cal-day">6</div>
+        <div class="mock-cal-day">7</div><div class="mock-cal-day has-lesson">8</div><div class="mock-cal-day">9</div><div class="mock-cal-day">10</div><div class="mock-cal-day has-lesson">11</div><div class="mock-cal-day selected">12</div><div class="mock-cal-day">13</div>
+      </div>
+      <ul style="margin-top:0.8rem;padding-left:1.2rem;font-size:0.9rem;">
+        <li><span style="display:inline-block;width:16px;height:16px;background:#FFE8DE;border-radius:4px;vertical-align:middle;margin-right:4px;border:1px solid #FF6B35;"></span> <strong>レッスンがある日</strong>（タップで詳細表示）</li>
+        <li><span style="display:inline-block;width:16px;height:16px;background:#FF6B35;border-radius:4px;vertical-align:middle;margin-right:4px;"></span> <strong>選択中の日</strong></li>
+        <li><span style="display:inline-block;width:16px;height:16px;background:#f0f0f0;border-radius:4px;vertical-align:middle;margin-right:4px;border:1px solid #ddd;"></span> レッスンなし / お休みの日</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>日付をタップすると、レッスン詳細が表示されます</strong></p>
+      <div class="mock-card">
+        <div class="flex-row">
+          <span class="mock-tag tag-studio">若葉studio</span>
+          <span class="mock-tag tag-time">16:00〜17:00</span>
+          <span class="mock-tag tag-class">KIDSクラス</span>
+        </div>
+        <div style="margin-top:0.5rem;font-size:0.85rem;color:#666;">残り: 6 / 8名</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>定期スケジュール</strong></p>
+      <p>カレンダーの下に、毎週の定期レッスン一覧が表示されます。</p>
+      <div class="mock" style="padding:1rem;">
+        <div class="mock-label">定期スケジュール</div>
+        <div style="margin-top:0.5rem;">
+          <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;border-bottom:1px solid #eee;">
+            <span style="font-weight:600;color:#FF6B35;width:40px;">火</span>
+            <span class="mock-tag tag-studio" style="font-size:0.7rem;">若葉</span>
+            <span style="font-size:0.85rem;">16:00〜17:00</span>
+            <span style="font-size:0.85rem;color:#666;">KIDSクラス</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;">
+            <span style="font-weight:600;color:#FF6B35;width:40px;">土</span>
+            <span class="mock-tag tag-studio" style="font-size:0.7rem;">稲毛</span>
+            <span style="font-size:0.85rem;">10:00〜11:00</span>
+            <span style="font-size:0.85rem;color:#666;">KIDSクラス</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 4. 予約方法 ========== -->
+<div class="section" id="sec-booking">
+  <h2>4. 予約方法</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>カレンダーで予約したい日をタップ</strong></p>
+      <p>レッスンがある日（色付きの日付）をタップします。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>レッスンを選択</strong></p>
+      <p>表示されたレッスン一覧から、予約したいレッスンの「予約する」ボタンをタップします。</p>
+      <div class="mock-card">
+        <div class="flex-row" style="justify-content:space-between;">
+          <div class="flex-row">
+            <span class="mock-tag tag-studio">若葉studio</span>
+            <span class="mock-tag tag-time">16:00〜17:00</span>
+          </div>
+          <span class="mock-btn mock-btn-primary" style="font-size:0.75rem;padding:0.3rem 0.8rem;">予約する</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>お名前とメールアドレスを入力</strong></p>
+      <div class="mock">
+        <div class="mock-label">予約フォーム</div>
+        <div style="margin-top:0.8rem;">
+          <small style="color:#666;">お名前</small>
+          <input class="mock-input" type="text" value="山田 太郎" readonly>
+          <small style="color:#666;">メールアドレス</small>
+          <input class="mock-input" type="text" value="yamada@example.com" readonly>
+        </div>
+      </div>
+      <p style="font-size:0.85rem;color:#666;margin-top:0.3rem;">2回目以降は前回の入力内容が自動で入ります。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <p><strong>「予約する」ボタンをタップ</strong></p>
+      <p><span class="mock-btn mock-btn-primary">予約する</span></p>
+      <p style="margin-top:0.5rem;">「予約が完了しました」と表示されたら完了です。</p>
+      <p>入力したメールアドレスに確認メールが届きます。</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <strong>予約が満員の場合</strong><br>
+    「満員」と表示されているレッスンは予約できません。<br>
+    キャンセルが出ると再び予約できるようになります。
+  </div>
+</div>
+
+<!-- ========== 5. キャンセル ========== -->
+<div class="section" id="sec-cancel">
+  <h2>5. 予約のキャンセル</h2>
+
+  <p>予約をキャンセルしたい場合は、<strong>LINEで先生に直接ご連絡ください。</strong></p>
+
+  <div class="highlight">
+    キャンセルはLINEのみの受付となります。<br>
+    レッスン前日までにご連絡いただけると助かります。
+  </div>
+</div>
+
+<!-- ========== 6. お知らせ ========== -->
+<div class="section" id="sec-news">
+  <h2>6. お知らせ</h2>
+
+  <p>会員ページの「お知らせ」エリアに、スタジオからの連絡事項が表示されます。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>ピン留めされたお知らせ</strong></p>
+      <p>重要なお知らせは上部に固定表示（ピン留め）されます。</p>
+      <div class="mock-announce-pinned">
+        <div class="flex-row">
+          <span style="font-size:1rem;">&#128204;</span>
+          <span style="font-size:0.8rem;color:#999;">2026/04/01</span>
+          <span style="font-size:0.75rem;font-weight:600;background:#c62828;color:#fff;padding:0.15rem 0.5rem;border-radius:10px;">重要</span>
+        </div>
+        <p style="font-weight:600;margin-top:0.3rem;">GW期間の休講について</p>
+        <p style="font-size:0.85rem;color:#666;">4/29〜5/6は全クラス休講です。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>通常のお知らせ</strong></p>
+      <p>新しいものから順に表示されます。写真が添付されている場合もあります。</p>
+      <div class="mock-announce">
+        <div class="flex-row">
+          <span style="font-size:0.8rem;color:#999;">2026/03/28</span>
+        </div>
+        <p style="font-weight:600;margin-top:0.3rem;">発表会の練習が始まります</p>
+        <p style="font-size:0.85rem;color:#666;">5月の発表会に向けて、4月から練習スタートします。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 7. ホーム画面に追加 ========== -->
+<div class="section" id="sec-pwa">
+  <h2>7. ホーム画面に追加（アプリ化）</h2>
+
+  <p>ホーム画面に追加すると、アプリのようにワンタップでアクセスできます。</p>
+
+  <div class="device-steps">
+    <h4>iPhone / iPad の場合（Safari）</h4>
+    <ol>
+      <li><strong>Safari</strong> でサイトを開きます（Chrome等では追加できません）</li>
+      <li>画面下の <strong>「共有」ボタン</strong>（四角に上矢印のアイコン）をタップ</li>
+      <li>メニューを上にスクロールして <strong>「ホーム画面に追加」</strong> をタップ</li>
+      <li>名前を確認して <strong>「追加」</strong> をタップ</li>
+    </ol>
+  </div>
+
+  <div class="device-steps" style="margin-top:0.8rem;">
+    <h4>Android の場合（Chrome）</h4>
+    <ol>
+      <li><strong>Chrome</strong> でサイトを開きます</li>
+      <li>右上の <strong>「メニュー」</strong>（3つの点のアイコン）をタップ</li>
+      <li><strong>「ホーム画面に追加」</strong> または <strong>「アプリをインストール」</strong> をタップ</li>
+      <li><strong>「追加」</strong> をタップ</li>
+    </ol>
+  </div>
+
+  <div class="highlight">
+    ホーム画面に追加すると、BTMのアイコンが表示されます。<br>
+    次回からはアイコンをタップするだけでアクセスできます。
+  </div>
+</div>
+
+<!-- ========== 8. お問い合わせ ========== -->
+<div class="contact-card" id="sec-contact">
+  <h2>8. お問い合わせ</h2>
+  <p style="margin:1.5rem 0;">ご不明な点がございましたら、<br>お気軽にお問い合わせください。</p>
+
+  <div style="margin:1.5rem 0;">
+    <p style="font-size:0.9rem;opacity:0.7;margin-bottom:0.3rem;">LINE</p>
+    <p style="font-size:1.1rem;font-weight:600;">先生のLINEに直接メッセージ</p>
+  </div>
+
+  <div style="margin:1.5rem 0;">
+    <p style="font-size:0.9rem;opacity:0.7;margin-bottom:0.3rem;">メール</p>
+    <p><a href="mailto:beat.the.mix7386@gmail.com" style="font-size:1.05rem;font-weight:600;">beat.the.mix7386@gmail.com</a></p>
+  </div>
+</div>
+
+</div>
+
+</body>
+</html>

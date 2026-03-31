@@ -2385,6 +2385,8 @@ body {
   .wave-separator { display: none; }
 }
 </style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF6B35">
 </head>
 <body>
 
@@ -3413,5 +3415,10 @@ function toggleFaq(el) {
 })();
 </script>
 
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js').catch(function() {});
+}
+</script>
 </body>
 </html>

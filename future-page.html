@@ -1945,6 +1945,8 @@ footer {
   .elegant-divider { display: none; }
 }
 </style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF6B35">
 </head>
 <body>
 
@@ -2033,8 +2035,8 @@ footer {
       </div>
       <div class="reason-item reveal reveal-delay-2">
         <div class="reason-number">02</div>
-        <h3 class="reason-title">すべてオリジナル振り付け</h3>
-        <p class="reason-desc">BTMの振り付けは、すべて講師のオリジナル。<br>ここでしか出会えないダンスだから、初めてでも「誰かの真似」にならない楽しさがあります。</p>
+        <h3 class="reason-title">ジャンルに縛られない楽しさ</h3>
+        <p class="reason-desc">K-POP、J-POP、HipHop等、ジャンルに縛られず、<br>その時生徒さん達が楽しめる内容でレッスンを行います。</p>
       </div>
       <div class="reason-item reveal reveal-delay-3">
         <div class="reason-number">03</div>
@@ -2251,8 +2253,9 @@ footer {
         <p class="studio-area">千葉市若葉区</p>
         <div class="studio-schedule">
           <span class="studio-day">土曜</span>
-          <span class="studio-time">17:10〜</span>
+          <span class="studio-time">15:00〜</span>
         </div>
+        <p style="font-size:12px;color:var(--gold);margin-top:8px;font-weight:400;">隔週でまとめてレッスン</p>
       </div>
     </div>
   </div>
@@ -2276,7 +2279,10 @@ footer {
     </div>
 
     <p class="reveal reveal-delay-1" style="color:var(--gold);font-family:'Oswald',sans-serif;font-size:0.9rem;letter-spacing:0.15em;margin-top:12px;margin-bottom:4px;">TICKET SYSTEM</p>
-    <p class="reveal reveal-delay-1" style="color:var(--text-body);font-size:14px;font-weight:300;margin-bottom:24px;">月謝制ではなくチケット制。<br>ご自身のペースで無駄なく通えます。</p>
+    <p class="reveal reveal-delay-1" style="color:var(--text-body);font-size:14px;font-weight:300;margin-bottom:12px;">月謝制ではなくチケット制。<br>ご自身のペースで無駄なく通えます。</p>
+    <div class="reveal reveal-delay-1" style="display:inline-block;background:linear-gradient(135deg, rgba(212,168,83,0.2), rgba(212,168,83,0.08));border:1px solid var(--gold);border-radius:8px;padding:10px 24px;margin-bottom:24px;">
+      <span style="color:var(--gold);font-weight:500;font-size:15px;letter-spacing:0.05em;">1枚のチケットで全class受講可能！無理のない振替もOK</span>
+    </div>
 
     <table class="pricing-table">
       <tr class="reveal reveal-delay-1">
@@ -2386,7 +2392,7 @@ footer {
           <div class="faq-icon"></div>
         </div>
         <div class="faq-answer">
-          <div class="faq-answer-inner">動きやすい服装であれば何でもOKです。室内シューズ、タオル、飲み物をご持参ください。</div>
+          <div class="faq-answer-inner">動きやすい服装であれば何でもOKです。室内シューズ、タオル、飲み物をご持参ください。バスタオル、室内用スニーカー、スマホをお持ちください。</div>
         </div>
       </div>
 
@@ -2942,6 +2948,11 @@ if ('IntersectionObserver' in window) {
   })();
 
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js').catch(function() {});
+}
 </script>
 </body>
 </html>

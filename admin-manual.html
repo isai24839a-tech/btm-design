@@ -388,6 +388,8 @@ body {
     <li><a href="#sec-regular">毎週レッスンを登録する</a></li>
     <li><a href="#sec-announce">お知らせを投稿する</a></li>
     <li><a href="#sec-announce-delete">お知らせを削除する</a></li>
+    <li><a href="#sec-announce-pin">お知らせをピン留めする</a></li>
+    <li><a href="#sec-holidays">定期休みを管理する</a></li>
     <li><a href="#sec-signout">サインアウトする</a></li>
   </ol>
 </div>
@@ -410,7 +412,7 @@ body {
       <p><strong>パスワード画面が表示されます</strong></p>
       <div class="mock-gate">
         <h3>パスワードを入力してください</h3>
-        <input class="mock-gate-input" type="text" value="btmadmin2026" readonly>
+        <input class="mock-gate-input" type="text" value="potofu7386" readonly>
       </div>
     </div>
   </div>
@@ -420,11 +422,11 @@ body {
     <div class="step-content">
       <p><strong>管理者パスワードを入力</strong></p>
       <p>以下のパスワードを入力して Enter を押します：</p>
-      <p style="margin:0.5rem 0;"><span class="pw-display">btmadmin2026</span></p>
+      <p style="margin:0.5rem 0;"><span class="pw-display">potofu7386</span></p>
       <div class="highlight">
         <strong>会員用と管理者用はパスワードが違います</strong><br>
-        会員用: <code>btm2025</code>（レッスン予約だけできる）<br>
-        管理者用: <code>btmadmin2026</code>（レッスン追加・削除・お知らせ投稿ができる）
+        会員用: <code>btm2026</code>（レッスン予約だけできる）<br>
+        管理者用: <code>potofu7386</code>（レッスン追加・削除・お知らせ投稿ができる）
       </div>
     </div>
   </div>
@@ -912,9 +914,117 @@ body {
   </div>
 </div>
 
-<!-- ========== 11. サインアウト ========== -->
+<!-- ========== 11. お知らせピン留め ========== -->
+<div class="section" id="sec-announce-pin">
+  <h2>11. お知らせをピン留めする</h2>
+
+  <p>重要なお知らせを会員ページの上部に固定表示（ピン留め）できます。ピン留めされたお知らせは他のお知らせより上に常時表示されます。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>「お知らせ管理」タブを開きます</strong></p>
+      <p>投稿済みの一覧から、ピン留めしたいお知らせを見つけます。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>ピンアイコンをタップ</strong></p>
+      <p>お知らせの右側にあるピンアイコンをタップすると、ピン留め状態がON/OFFで切り替わります。</p>
+      <div class="mock-announce" style="border-left-color:#D4A853;background:#FFFBF0;">
+        <div class="flex-row" style="justify-content:space-between;">
+          <div>
+            <span style="font-size:1rem;">&#128204;</span>
+            <span style="font-size:0.8rem;color:#999;">2026/04/01</span>
+            <span class="mock-tag tag-important" style="font-size:0.65rem;">重要</span>
+          </div>
+          <span style="font-size:0.85rem;color:#D4A853;font-weight:600;">ピン留め中</span>
+        </div>
+        <p style="font-weight:600;margin-top:0.3rem;">GW期間の休講について</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <strong>ピン留めの効果</strong><br>
+    ・会員ページのお知らせ欄で最上部に固定表示されます<br>
+    ・ピン留めは複数のお知らせに同時に設定できます<br>
+    ・もう一度ピンアイコンをタップするとピン留め解除されます
+  </div>
+</div>
+
+<!-- ========== 12. 定期休み管理 ========== -->
+<div class="section" id="sec-holidays">
+  <h2>12. 定期休みを管理する</h2>
+
+  <p>GW・お盆・年末年始などの定期的な休みをカレンダーに反映できます。休みに設定された日はカレンダーでグレー表示になり、予約ができなくなります。</p>
+
+  <h3>定期休みを追加する</h3>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>カレンダー画面の「定期休み管理」エリアを見ます</strong></p>
+      <p>カレンダーの下部にあるセクションです。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>休みの日付を入力して「追加」</strong></p>
+      <div class="mock">
+        <div class="mock-label">定期休み追加</div>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-top:0.5rem;">
+          <div>
+            <small style="color:#666;">日付</small>
+            <input class="mock-input" type="text" value="2026-05-03" readonly style="width:160px;">
+          </div>
+          <div>
+            <small style="color:#666;">メモ（任意）</small>
+            <input class="mock-input" type="text" value="GW休み" readonly style="width:160px;">
+          </div>
+          <span class="mock-btn mock-btn-primary" style="font-size:0.8rem;padding:0.4rem 1rem;">追加</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>カレンダーに反映されます</strong></p>
+      <p>追加した日付がグレー表示になり、その日のレッスン枠は非表示（または予約不可）になります。</p>
+      <div class="mock-calendar" style="max-width:300px;">
+        <div class="mock-cal-head">月</div><div class="mock-cal-head">火</div><div class="mock-cal-head">水</div><div class="mock-cal-head">木</div><div class="mock-cal-head">金</div><div class="mock-cal-head">土</div><div class="mock-cal-head">日</div>
+        <div class="mock-cal-day empty"></div><div class="mock-cal-day empty"></div><div class="mock-cal-day empty"></div><div class="mock-cal-day">1</div><div class="mock-cal-day has-lesson">2</div><div class="mock-cal-day holiday">3</div><div class="mock-cal-day holiday">4</div>
+        <div class="mock-cal-day holiday">5</div><div class="mock-cal-day holiday">6</div><div class="mock-cal-day">7</div><div class="mock-cal-day has-lesson">8</div><div class="mock-cal-day has-lesson">9</div><div class="mock-cal-day has-lesson">10</div><div class="mock-cal-day">11</div>
+      </div>
+      <p style="font-size:0.85rem;color:#666;margin-top:0.3rem;">3〜6日がグレー（GW休み）になっています。</p>
+    </div>
+  </div>
+
+  <h3>定期休みを削除する</h3>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>登録済みの定期休み一覧から、削除したい日の <span style="color:#c62828;font-weight:700;">&times;</span> をタップ</strong></p>
+      <p>確認ダイアログで「OK」を押すと削除されます。</p>
+    </div>
+  </div>
+
+  <div class="warning">
+    <strong>注意：</strong>定期休みを削除しても、既に削除済みのレッスン枠は復活しません。<br>
+    必要に応じてレッスン枠を再度追加してください。
+  </div>
+</div>
+
+<!-- ========== 13. サインアウト ========== -->
 <div class="section" id="sec-signout">
-  <h2>11. サインアウトする</h2>
+  <h2>13. サインアウトする</h2>
 
   <div class="step">
     <div class="step-num">1</div>
@@ -938,11 +1048,11 @@ body {
   <table style="width:100%;border-collapse:collapse;margin-top:0.5rem;">
     <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
       <td style="padding:0.8rem 0;font-weight:600;">会員用パスワード</td>
-      <td style="padding:0.8rem 0;"><span class="pw-display">btm2025</span></td>
+      <td style="padding:0.8rem 0;"><span class="pw-display">btm2026</span></td>
     </tr>
     <tr>
       <td style="padding:0.8rem 0;font-weight:600;">管理者パスワード</td>
-      <td style="padding:0.8rem 0;"><span class="pw-display">btmadmin2026</span></td>
+      <td style="padding:0.8rem 0;"><span class="pw-display">potofu7386</span></td>
     </tr>
   </table>
   <p style="margin-top:1rem;font-size:0.85rem;opacity:0.7;">このパスワードは生徒さんに教えないでください。</p>
