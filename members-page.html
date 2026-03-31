@@ -2414,10 +2414,11 @@ body {
     BEAT THE MIX &copy; 2025 &mdash; Members Area
   </footer>
 
-  <!-- Help Button -->
-  <button class="help-btn" id="help-btn" title="ヘルプ" onclick="openHelp()">?</button>
 
 </div>
+
+<!-- Help Button (outside main-content so it's always visible after login) -->
+<button class="help-btn" id="help-btn" title="ヘルプ" onclick="openHelp()" style="display:none">?</button>
 
 <script>
 // ===== CONFIGURATION =====
@@ -2521,6 +2522,8 @@ function showCategorySelectScreen() {
   var mainContent = document.getElementById('main-content');
   mainContent.style.display = 'none';
   mainContent.classList.remove('visible');
+  // Show help button after login
+  document.getElementById('help-btn').style.display = 'flex';
 }
 
 function selectCategory(cat) {
