@@ -56,6 +56,15 @@ body {
   line-height: 1.7;
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background-color 0.4s ease;
+}
+
+body.category-future {
+  background-color: #ECEEF5;
+}
+
+body.category-future .navbar {
+  background: rgba(236, 238, 245, 0.92);
 }
 
 /* ===== PASSWORD GATE ===== */
@@ -2345,11 +2354,7 @@ body {
 
     <!-- Schedule + Booking Panel (Calendar View) -->
     <div class="tab-panel active category-kids" id="panel-schedule">
-      <!-- Category Toggle -->
-      <div class="category-toggle">
-        <button class="category-btn active" data-category="kids">KIDS</button>
-        <button class="category-btn" data-category="future">FUTURE</button>
-      </div>
+      <!-- Category is selected at login screen; no toggle needed here -->
 
       <!-- Calendar -->
       <div class="calendar-container" id="calendar-container">
@@ -2553,6 +2558,7 @@ function selectCategory(cat) {
 function showCategorySelect() {
   // Go back to category selection (from navbar switch button)
   sessionStorage.removeItem('btm_category');
+  document.body.classList.remove('category-kids', 'category-future');
   var mainContent = document.getElementById('main-content');
   mainContent.style.display = 'none';
   mainContent.classList.remove('visible');
@@ -2593,11 +2599,9 @@ function showMainContent() {
   var catLabel = document.getElementById('navbar-cat-label');
   if (catLabel) catLabel.textContent = currentCategory.toUpperCase();
 
-  // Update category toggle buttons to match selected category
-  var catBtns = document.querySelectorAll('#panel-schedule > .category-toggle .category-btn');
-  catBtns.forEach(function(b) {
-    b.classList.toggle('active', b.getAttribute('data-category') === currentCategory);
-  });
+  // Apply category theme to body background
+  document.body.classList.remove('category-kids', 'category-future');
+  document.body.classList.add('category-' + currentCategory);
 
   // Admin mode: update badge + tabs
   if (isAdminMode) {
@@ -2659,7 +2663,6 @@ function showMainContent() {
   }
 
   initTabs();
-  initCategoryToggle();
   initCalendar();
   initBookingModal();
   fetchRegularHolidays();
@@ -2698,39 +2701,6 @@ function initTabs() {
   window.addEventListener('resize', function() {
     var active = document.querySelector('.tab-button.active');
     if (active) updateSlider(active);
-  });
-}
-
-// ===== CATEGORY TOGGLE (KIDS / FUTURE) =====
-function initCategoryToggle() {
-  var buttons = document.querySelectorAll('#panel-schedule > .category-toggle .category-btn');
-  buttons.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var cat = this.getAttribute('data-category');
-      currentCategory = cat;
-      sessionStorage.setItem('btm_category', cat);
-      buttons.forEach(function(b) { b.classList.remove('active'); });
-      this.classList.add('active');
-
-      var panel = document.getElementById('panel-schedule');
-      panel.classList.remove('category-kids', 'category-future');
-      panel.classList.add('category-' + cat);
-      var annPanel = document.getElementById('panel-announcements');
-      if (annPanel) {
-        annPanel.classList.remove('category-kids', 'category-future');
-        annPanel.classList.add('category-' + cat);
-      }
-
-      // Update navbar category label
-      var catLabel = document.getElementById('navbar-cat-label');
-      if (catLabel) catLabel.textContent = cat.toUpperCase();
-
-      selectedDate = null;
-      document.getElementById('day-lessons').innerHTML = '';
-      renderCalendar();
-      renderAnnouncements();
-      if (isAdminMode) initAdminSlotForm(); // Re-render admin form with new category's studios
-    });
   });
 }
 
