@@ -37,7 +37,9 @@ function setupSheets() {
     { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: '全体ニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
-    { name: '定期休み', headers: ['曜日', 'スタジオ', 'category'] }
+    { name: '定期休み', headers: ['曜日', 'スタジオ', 'category'] },
+    { name: '臨時キャンセル', headers: ['日付', 'スタジオ', '時間', 'クラス', 'カテゴリ'] },
+    { name: '不定休', headers: ['日付', '理由', 'カテゴリ'] }
   ];
 
   sheets.forEach(function(def) {
@@ -77,6 +79,8 @@ function doGet(e) {
   if (action === 'announcements') return getAnnouncements();
   if (action === 'regularlessons') return getRegularLessons();
   if (action === 'regularholidays') return getRegularHolidays();
+  if (action === 'lessoncancels') return getLessonCancels();
+  if (action === 'irregularholidays') return getIrregularHolidays();
 
   return jsonResponse({ error: 'Unknown action' });
 }
@@ -105,6 +109,10 @@ function doPost(e) {
   if (action === 'addregularholiday') return adminGuardPost(payload, adminAddRegularHoliday);
   if (action === 'deleteregularholiday') return adminGuardPost(payload, adminDeleteRegularHoliday);
   if (action === 'togglepinannouncement') return adminGuardPost(payload, adminTogglePinAnnouncement);
+  if (action === 'addlessoncancel') return adminGuardPost(payload, adminAddLessonCancel);
+  if (action === 'deletelessoncancel') return adminGuardPost(payload, adminDeleteLessonCancel);
+  if (action === 'addirregularholiday') return adminGuardPost(payload, adminAddIrregularHoliday);
+  if (action === 'deleteirregularholiday') return adminGuardPost(payload, adminDeleteIrregularHoliday);
 
   return jsonResponse({ error: 'Unknown action' });
 }
@@ -692,6 +700,112 @@ function adminTogglePinAnnouncement(params) {
   var newValue = (current === 'TRUE') ? 'FALSE' : 'TRUE';
   cell.setValue(newValue);
   return jsonResponse({ success: true, message: 'ピン留めを' + (newValue === 'TRUE' ? '設定' : '解除') + 'しました', pinned: newValue === 'TRUE' });
+}
+
+// ===== 臨時キャンセル取得 =====
+function getLessonCancels() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('臨時キャンセル');
+  if (!sheet || sheet.getLastRow() <= 1) return jsonResponse([]);
+
+  var data = sheet.getDataRange().getValues();
+  var items = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue;
+    items.push({
+      date: formatDate(row[0]),
+      studio: String(row[1] || ''),
+      time: String(row[2] || ''),
+      class_name: String(row[3] || ''),
+      category: String(row[4] || ''),
+      row: i + 1
+    });
+  }
+  return jsonResponse(items);
+}
+
+// ===== 管理者: 臨時キャンセル追加 =====
+function adminAddLessonCancel(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('臨時キャンセル');
+  if (!sheet) return jsonResponse({ success: false, error: '臨時キャンセルシートがありません' });
+
+  var date = params.date || '';
+  var studio = params.studio || '';
+  var time = params.time || '';
+  var className = params.class_name || '';
+  var category = params.category || '';
+
+  if (!date) return jsonResponse({ success: false, error: '日付は必須です' });
+
+  sheet.appendRow([date, studio, time, className, category]);
+  return jsonResponse({ success: true, message: '臨時キャンセルを追加しました' });
+}
+
+// ===== 管理者: 臨時キャンセル削除 =====
+function adminDeleteLessonCancel(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('臨時キャンセル');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var row = parseInt(params.row);
+  if (!row || row < 2) return jsonResponse({ success: false, error: '無効な行番号です' });
+  if (row > sheet.getLastRow()) return jsonResponse({ success: false, error: '該当する行がありません' });
+
+  sheet.deleteRow(row);
+  return jsonResponse({ success: true, message: '削除しました' });
+}
+
+// ===== 不定休取得 =====
+function getIrregularHolidays() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('不定休');
+  if (!sheet || sheet.getLastRow() <= 1) return jsonResponse([]);
+
+  var data = sheet.getDataRange().getValues();
+  var items = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue;
+    items.push({
+      date: formatDate(row[0]),
+      reason: String(row[1] || ''),
+      category: String(row[2] || ''),
+      row: i + 1
+    });
+  }
+  return jsonResponse(items);
+}
+
+// ===== 管理者: 不定休追加 =====
+function adminAddIrregularHoliday(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('不定休');
+  if (!sheet) return jsonResponse({ success: false, error: '不定休シートがありません' });
+
+  var date = params.date || '';
+  var reason = params.reason || '';
+  var category = params.category || '';
+
+  if (!date) return jsonResponse({ success: false, error: '日付は必須です' });
+
+  sheet.appendRow([date, reason, category]);
+  return jsonResponse({ success: true, message: '不定休を追加しました' });
+}
+
+// ===== 管理者: 不定休削除 =====
+function adminDeleteIrregularHoliday(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('不定休');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var row = parseInt(params.row);
+  if (!row || row < 2) return jsonResponse({ success: false, error: '無効な行番号です' });
+  if (row > sheet.getLastRow()) return jsonResponse({ success: false, error: '該当する行がありません' });
+
+  sheet.deleteRow(row);
+  return jsonResponse({ success: true, message: '削除しました' });
 }
 
 // ===== ユーティリティ =====

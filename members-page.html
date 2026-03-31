@@ -1012,6 +1012,51 @@ body.category-future .navbar {
   box-shadow: var(--shadow-sm);
 }
 
+.slot-card.cancelled-lesson {
+  opacity: 0.5;
+  border-left-color: var(--gray-300) !important;
+}
+
+.slot-card.cancelled-lesson .slot-cancel-label {
+  color: #c62828;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.admin-cancel-lesson-btn {
+  padding: 4px 10px;
+  border: 1px solid #c62828;
+  border-radius: 20px;
+  background: transparent;
+  color: #c62828;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.admin-cancel-lesson-btn:hover {
+  background: #c62828;
+  color: #fff;
+}
+
+.admin-uncancel-btn {
+  padding: 4px 10px;
+  border: 1px solid #2e7d32;
+  border-radius: 20px;
+  background: transparent;
+  color: #2e7d32;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.admin-uncancel-btn:hover {
+  background: #2e7d32;
+  color: #fff;
+}
+
 .slot-full-badge {
   display: inline-block;
   font-size: 0.7rem;
@@ -2484,6 +2529,8 @@ var selectedDate = null;
 var allSlots = []; // Populated from demo or API
 var regularLessons = []; // { dayOfWeek: 0-6, studio, time, class_name, category }
 var regularHolidays = []; // { dayOfWeek: '月'~'日', studio: string, id: number }
+var lessonCancels = []; // { date, studio, time, class_name, category, row }
+var irregularHolidays = []; // { date, reason, category, row }
 
 // ===== DEMO DATA =====
 var demoSlots = [
@@ -2689,6 +2736,8 @@ function showMainContent() {
   initCalendar();
   initBookingModal();
   fetchRegularHolidays();
+  fetchLessonCancels();
+  fetchIrregularHolidays();
   if (isAdminMode) {
     initAdminSlotForm();
     fetchAdminAnnouncements();
@@ -2868,10 +2917,11 @@ function renderCalendar() {
     var dateStr = year + '/' + String(month + 1).padStart(2, '0') + '/' + String(d).padStart(2, '0');
     var hasRegular = getRegularLessonsForDate(dateStr).length > 0;
     var isHoliday = isRegularHoliday(dateStr);
+    var irregHoliday = isIrregularHoliday(dateStr);
     var classes = ['calendar-day'];
     if (dateStr === todayStr) classes.push('today');
     if (dateStr === selectedDate) classes.push('selected');
-    if (isHoliday) {
+    if (isHoliday || irregHoliday) {
       classes.push('holiday-day');
       html += '<div class="' + classes.join(' ') + '" onclick="selectDate(\'' + dateStr + '\')">';
       html += '<span class="day-number">' + d + '</span>';
@@ -2949,7 +2999,8 @@ function getSlotMembers(slot) {
 function renderDayLessons(dateStr) {
   var container = document.getElementById('day-lessons');
   var slots = getFilteredSlots().filter(function(s) { return s.date === dateStr; });
-  var regulars = getRegularLessonsForDate(dateStr);
+  var irregHolidayMatch = isIrregularHoliday(dateStr);
+  var regulars = irregHolidayMatch ? [] : getRegularLessonsForDate(dateStr);
 
   var parts = dateStr.split('/');
   var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
@@ -2957,9 +3008,13 @@ function renderDayLessons(dateStr) {
   var dateLabel = parseInt(parts[1]) + '/' + parseInt(parts[2]) + '（' + days[dateObj.getDay()] + '）';
 
   if (slots.length === 0 && regulars.length === 0) {
+    var emptyMsg = 'この日のレッスンはありません';
+    if (irregHolidayMatch) {
+      emptyMsg = '不定休' + (irregHolidayMatch.reason ? '（' + irregHolidayMatch.reason + '）' : '');
+    }
     container.innerHTML =
       '<div class="day-lessons-header">' + escapeHtml(dateLabel) + '</div>' +
-      '<div class="day-lessons-empty">この日のレッスンはありません</div>';
+      '<div class="day-lessons-empty">' + escapeHtml(emptyMsg) + '</div>';
     return;
   }
 
@@ -2968,7 +3023,10 @@ function renderDayLessons(dateStr) {
 
   // Regular lessons first
   regulars.forEach(function(r, idx) {
-    html += '<div class="slot-card regular-lesson" id="regular-card-' + idx + '">';
+    var cancelled = isLessonCancelled(dateStr, r.studio, r.time);
+    var cancelData = cancelled ? getLessonCancelData(dateStr, r.studio, r.time) : null;
+    var cardClass = 'slot-card regular-lesson' + (cancelled ? ' cancelled-lesson' : '');
+    html += '<div class="' + cardClass + '" id="regular-card-' + idx + '">';
     html += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
     html += '<div class="slot-card-info">';
     html += '<span class="regular-lesson-badge">定期レッスン</span>';
@@ -2976,11 +3034,21 @@ function renderDayLessons(dateStr) {
     html += '<span class="slot-tag time">' + escapeHtml(r.time || '') + '</span>';
     html += '<span class="slot-tag">' + escapeHtml(r.class_name || '') + '</span>';
     html += '</div>';
-    if (isAdminMode) {
+    if (isAdminMode && !cancelled) {
       html += '<button class="admin-edit-btn" onclick=\'showEditRegularForm(' + JSON.stringify(r).replace(/'/g, "\\'") + ',"regular-card-' + idx + '")\'>' +
         '<svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>';
     }
     html += '</div>';
+    if (cancelled) {
+      html += '<div class="slot-cancel-label" style="margin-top:0.5rem">この日はお休み</div>';
+      if (isAdminMode && cancelData) {
+        html += '<div style="margin-top:0.5rem"><button class="admin-uncancel-btn" onclick="adminUncancelLesson(' + (cancelData.row || 0) + ')">キャンセル解除</button></div>';
+      }
+    } else if (isAdminMode) {
+      html += '<div style="margin-top:0.5rem"><button class="admin-cancel-lesson-btn" onclick=\'adminCancelLesson(' +
+        JSON.stringify({date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name}).replace(/'/g, "\\'") +
+        ')\'>&#10005; この日はお休み</button></div>';
+    }
     html += '</div>';
   });
 
@@ -3442,6 +3510,32 @@ function initAdminSlotForm() {
     '</div>';
 
   renderAdminHolidayList();
+
+  // ===== IRREGULAR HOLIDAYS SECTION =====
+  var irregHolidayContainer = document.getElementById('admin-irregular-holiday-container');
+  if (!irregHolidayContainer) {
+    irregHolidayContainer = document.createElement('div');
+    irregHolidayContainer.id = 'admin-irregular-holiday-container';
+    var schedPanel2 = document.getElementById('panel-schedule');
+    schedPanel2.appendChild(irregHolidayContainer);
+  }
+
+  var today = new Date();
+  var defaultDateIH = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+
+  irregHolidayContainer.innerHTML =
+    '<div class="admin-holiday-form">' +
+      '<h3>不定休管理（' + catLabelH + '）</h3>' +
+      '<p style="font-size:0.8rem;color:var(--gray-500);margin:-0.5rem 0 1rem">特定の日を休みに設定します（カレンダーがグレーアウトされます）</p>' +
+      '<div class="admin-form-grid">' +
+        '<input type="date" id="admin-irreg-holiday-date" value="' + defaultDateIH + '">' +
+        '<input type="text" id="admin-irreg-holiday-reason" placeholder="理由（任意）">' +
+      '</div>' +
+      '<button class="admin-add-btn" onclick="adminAddIrregularHoliday()" style="margin-top:0.75rem">不定休を追加</button>' +
+      '<div id="admin-irreg-holiday-list" style="margin-top:1rem"></div>' +
+    '</div>';
+
+  renderAdminIrregularHolidayList();
 }
 
 function toggleUnlimited(mode) {
@@ -4204,6 +4298,197 @@ function renderAdminHolidayList() {
     else html += '<span style="margin-left:0.5rem;font-size:0.82rem;color:var(--gray-500)">全スタジオ</span>';
     html += '</div>';
     html += '<button class="admin-cancel-btn" title="削除" onclick="adminDeleteRegularHoliday(' + (h.id || h.row || 0) + ')">&times;</button>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+// ===== LESSON CANCELS (日別キャンセル) =====
+function fetchLessonCancels(callback) {
+  if (!APPS_SCRIPT_URL) {
+    if (callback) callback();
+    return;
+  }
+  fetch(APPS_SCRIPT_URL + '?action=lessoncancels', { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && Array.isArray(data)) {
+        lessonCancels = data;
+      }
+      if (callback) callback();
+      renderCalendar();
+      if (selectedDate) renderDayLessons(selectedDate);
+    })
+    .catch(function() {
+      lessonCancels = [];
+      if (callback) callback();
+    });
+}
+
+function isLessonCancelled(dateStr, studio, time) {
+  return lessonCancels.some(function(c) {
+    return c.date === dateStr && c.studio === studio && c.time === time;
+  });
+}
+
+function getLessonCancelData(dateStr, studio, time) {
+  return lessonCancels.find(function(c) {
+    return c.date === dateStr && c.studio === studio && c.time === time;
+  }) || null;
+}
+
+function adminCancelLesson(info) {
+  if (!confirm(info.class_name + '（' + info.studio + ' ' + info.time + '）をこの日お休みにしますか？')) return;
+
+  var body = {
+    action: 'addLessonCancel',
+    adminKey: ADMIN_PASSWORD,
+    date: selectedDate,
+    studio: info.studio,
+    time: info.time,
+    class_name: info.class_name,
+    category: currentCategory.toUpperCase()
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        fetchLessonCancels();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
+function adminUncancelLesson(row) {
+  if (!confirm('キャンセルを解除しますか？')) return;
+
+  var body = {
+    action: 'deleteLessonCancel',
+    adminKey: ADMIN_PASSWORD,
+    row: row
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        fetchLessonCancels();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
+// ===== IRREGULAR HOLIDAYS (不定休) =====
+function fetchIrregularHolidays(callback) {
+  if (!APPS_SCRIPT_URL) {
+    if (callback) callback();
+    return;
+  }
+  fetch(APPS_SCRIPT_URL + '?action=irregularholidays', { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && Array.isArray(data)) {
+        irregularHolidays = data;
+      }
+      if (callback) callback();
+      renderCalendar();
+      if (selectedDate) renderDayLessons(selectedDate);
+      if (isAdminMode) renderAdminIrregularHolidayList();
+    })
+    .catch(function() {
+      irregularHolidays = [];
+      if (callback) callback();
+    });
+}
+
+function isIrregularHoliday(dateStr) {
+  return irregularHolidays.find(function(h) {
+    var cat = (h.category || '').toUpperCase();
+    var cur = currentCategory.toUpperCase();
+    return h.date === dateStr && (cat === cur || cat === '全体' || cat === '');
+  });
+}
+
+function adminAddIrregularHoliday() {
+  var dateInput = document.getElementById('admin-irreg-holiday-date');
+  var reasonInput = document.getElementById('admin-irreg-holiday-reason');
+
+  if (!dateInput || !dateInput.value) { alert('日付を選択してください'); return; }
+
+  var dateParts = dateInput.value.split('-');
+  var dateStr = dateParts[0] + '/' + dateParts[1] + '/' + dateParts[2];
+
+  var body = {
+    action: 'addIrregularHoliday',
+    adminKey: ADMIN_PASSWORD,
+    date: dateStr,
+    reason: reasonInput ? reasonInput.value : '',
+    category: currentCategory.toUpperCase()
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        alert('不定休を追加しました');
+        if (dateInput) dateInput.value = '';
+        if (reasonInput) reasonInput.value = '';
+        fetchIrregularHolidays();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
+function adminDeleteIrregularHoliday(row) {
+  if (!confirm('この不定休を削除しますか？')) return;
+
+  var body = {
+    action: 'deleteIrregularHoliday',
+    adminKey: ADMIN_PASSWORD,
+    row: row
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        fetchIrregularHolidays();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
+function renderAdminIrregularHolidayList() {
+  var container = document.getElementById('admin-irreg-holiday-list');
+  if (!container) return;
+
+  var catUpper = currentCategory.toUpperCase();
+  var filtered = irregularHolidays.filter(function(h) {
+    var cat = (h.category || '').toUpperCase();
+    return cat === catUpper || cat === '全体' || cat === '';
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="day-lessons-empty" style="padding:1rem;font-size:0.85rem">不定休はまだ設定されていません</div>';
+    return;
+  }
+  var html = '';
+  filtered.forEach(function(h) {
+    html += '<div class="holiday-list-item">';
+    html += '<div class="holiday-info">';
+    html += '<strong>' + escapeHtml(h.date || '') + '</strong>';
+    if (h.reason) html += '<span style="margin-left:0.5rem;font-size:0.82rem;color:var(--gray-500)">' + escapeHtml(h.reason) + '</span>';
+    html += '</div>';
+    html += '<button class="admin-cancel-btn" title="削除" onclick="adminDeleteIrregularHoliday(' + (h.row || 0) + ')">&times;</button>';
     html += '</div>';
   });
   container.innerHTML = html;
