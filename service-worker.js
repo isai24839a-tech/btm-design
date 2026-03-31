@@ -1,4 +1,4 @@
-const CACHE_NAME = 'btm-cache-v1';
+const CACHE_NAME = 'btm-cache-v2';
 
 const PRECACHE_URLS = [
   '/',
@@ -35,15 +35,19 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: cache-first, fallback to network
+// Fetch: let navigation requests pass through, cache-first for assets
 self.addEventListener('fetch', (event) => {
+  // Don't intercept navigation requests - avoids redirect conflicts with Cloudflare
+  if (event.request.mode === 'navigate') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
         return cachedResponse;
       }
       return fetch(event.request).then((networkResponse) => {
-        // Cache successful GET responses for same-origin requests
         if (
           event.request.method === 'GET' &&
           networkResponse.status === 200 &&
@@ -57,10 +61,7 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       });
     }).catch(() => {
-      // If both cache and network fail, return a simple offline fallback
-      if (event.request.destination === 'document') {
-        return caches.match('/index.html');
-      }
+      return new Response('Offline', { status: 503 });
     })
   );
 });
