@@ -33,7 +33,7 @@ function setupSheets() {
     { name: 'スケジュール', headers: ['日付', 'スタジオ', '時間', 'クラス', '定員', 'category'] },
     { name: '予約一覧', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時'] },
     { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像', 'カテゴリ', 'ピン留め'] },
-    { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ'] },
+    { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ', '頻度', '基準日'] },
     { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: '全体ニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
@@ -101,6 +101,7 @@ function doPost(e) {
   if (action === 'cancelbooking') return adminGuardPost(payload, adminCancelBooking);
   if (action === 'addannouncement') return adminGuardPost(payload, adminAddAnnouncement);
   if (action === 'deleteannouncement') return adminGuardPost(payload, adminDeleteAnnouncement);
+  if (action === 'editannouncement') return adminGuardPost(payload, adminEditAnnouncement);
   if (action === 'addregularlesson') return adminGuardPost(payload, adminAddRegularLesson);
   if (action === 'deleteregularlesson') return adminGuardPost(payload, adminDeleteRegularLesson);
   if (action === 'editregularlesson') return adminGuardPost(payload, adminEditRegularLesson);
@@ -404,6 +405,8 @@ function getRegularLessons() {
       time: String(row[2] || ''),
       class_name: String(row[3] || ''),
       category: String(row[4] || 'KIDS').toUpperCase(),
+      frequency: String(row[5] || 'weekly'),
+      startDate: row[6] ? formatDate(row[6]) : '',
       row: i + 1
     });
   }
@@ -535,6 +538,23 @@ function adminDeleteAnnouncement(params) {
   return jsonResponse({ success: true, message: '削除しました' });
 }
 
+// ===== 管理者: お知らせ編集 =====
+function adminEditAnnouncement(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('お知らせ');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var row = parseInt(params.row);
+  if (!row || row < 2) return jsonResponse({ success: false, error: '無効な行番号です' });
+  if (row > sheet.getLastRow()) return jsonResponse({ success: false, error: '該当する行がありません' });
+
+  if (params.title) sheet.getRange(row, 2).setValue(params.title);
+  if (params.content !== undefined) sheet.getRange(row, 3).setValue(params.content);
+  if (params.importance !== undefined) sheet.getRange(row, 4).setValue(params.importance);
+
+  return jsonResponse({ success: true, message: 'お知らせを更新しました' });
+}
+
 // ===== 管理者: 定期レッスン追加 =====
 function adminAddRegularLesson(params) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -549,7 +569,10 @@ function adminAddRegularLesson(params) {
 
   if (!dayOfWeek || !className) return jsonResponse({ success: false, error: '曜日とクラス名は必須です' });
 
-  sheet.appendRow([dayOfWeek, studio, time, className, category]);
+  var frequency = params.frequency || 'weekly';
+  var startDate = params.startDate || '';
+
+  sheet.appendRow([dayOfWeek, studio, time, className, category, frequency, startDate]);
   return jsonResponse({ success: true, message: '定期レッスンを追加しました' });
 }
 

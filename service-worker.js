@@ -1,4 +1,4 @@
-const CACHE_NAME = 'btm-cache-v2';
+const CACHE_NAME = 'btm-cache-v3';
 
 const PRECACHE_URLS = [
   '/',
@@ -9,6 +9,7 @@ const PRECACHE_URLS = [
   '/kids-news.html',
   '/future-news.html',
   '/manifest.json',
+  '/manifest-members.json',
   '/favicon.ico',
   '/images/btm_logo.webp'
 ];

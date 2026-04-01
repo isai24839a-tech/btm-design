@@ -1878,6 +1878,23 @@ body.category-future .navbar {
 }
 .inline-edit-form .edit-cancel-btn:hover { background: var(--gray-100); }
 
+.admin-edit-btn {
+  padding: 6px 14px;
+  border: 2px solid #1976d2;
+  border-radius: 20px;
+  background: transparent;
+  color: #1976d2;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.admin-edit-btn:hover {
+  background: #1976d2;
+  color: #fff;
+}
+
 .admin-delete-btn {
   padding: 6px 14px;
   border: 2px solid #e53935;
@@ -2330,7 +2347,7 @@ body.category-future .navbar {
   }
 }
 </style>
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="/manifest-members.json">
 <meta name="theme-color" content="#FF6B35">
 </head>
 <body>
@@ -2501,7 +2518,7 @@ body.category-future .navbar {
 
   <!-- Footer -->
   <footer class="members-footer">
-    BEAT THE MIX &copy; 2025 &mdash; Members Area
+    BEAT THE MIX &copy; 2026 &mdash; Members Area
   </footer>
 
 
@@ -2705,11 +2722,10 @@ function showMainContent() {
               '<option value="">通常</option>' +
               '<option value="重要">重要</option>' +
             '</select>' +
-            '<div class="category-toggle" style="margin:0.8rem 0 0.5rem">' +
-              '<button type="button" class="category-btn active" data-category="kids" onclick="setAnnounceCategory(this,\'KIDS\')">KIDS</button>' +
-              '<button type="button" class="category-btn" data-category="future" onclick="setAnnounceCategory(this,\'FUTURE\')">FUTURE</button>' +
-              '<button type="button" class="category-btn" data-category="all" onclick="setAnnounceCategory(this,\'全体\')">全体</button>' +
-            '</div>' +
+            '<label style="display:flex;align-items:center;gap:0.5rem;margin:0.8rem 0 0.5rem;cursor:pointer;font-size:0.9rem">' +
+              '<input type="checkbox" id="admin-announce-all" style="width:18px;height:18px"> ' +
+              '<span>全体のお知らせにする</span>' +
+            '</label>' +
             '<label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0;cursor:pointer;font-size:0.9rem">' +
               '<input type="checkbox" id="admin-announce-attach" onchange="toggleImageAttach()" style="width:18px;height:18px">' +
               '<span>画像を添付</span>' +
@@ -2860,7 +2876,9 @@ function fetchRegularLessons(callback) {
               studio: item.studio || '',
               time: item.time || '',
               class_name: item.class_name,
-              category: (item.category || 'KIDS').toUpperCase()
+              category: (item.category || 'KIDS').toUpperCase(),
+              frequency: item.frequency || 'weekly',
+              startDate: item.startDate || ''
             });
           }
         });
@@ -2877,7 +2895,16 @@ function getRegularLessonsForDate(dateStr) {
   var filterFn = currentCategory === 'kids' ? isKidsSlot : isFutureSlot;
 
   return regularLessons.filter(function(r) {
-    return r.dayOfWeek === dow && filterFn(r);
+    if (r.dayOfWeek !== dow || !filterFn(r)) return false;
+    // Biweekly check
+    if (r.frequency === 'biweekly' && r.startDate) {
+      var sp = r.startDate.split('/');
+      var startObj = new Date(parseInt(sp[0]), parseInt(sp[1]) - 1, parseInt(sp[2]));
+      var diffDays = Math.round((dateObj - startObj) / (1000 * 60 * 60 * 24));
+      var diffWeeks = Math.round(diffDays / 7);
+      if (diffWeeks % 2 !== 0) return false;
+    }
+    return true;
   });
 }
 
@@ -3362,9 +3389,9 @@ function initAdminSlotForm() {
   var nextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
   var defaultEnd = nextMonth.getFullYear() + '-' + String(nextMonth.getMonth()+1).padStart(2,'0') + '-' + String(nextMonth.getDate()).padStart(2,'0');
 
-  // Generate time options (09:00 - 22:00, 10min intervals)
+  // Generate time options (12:00 - 22:00, 10min intervals)
   var timeOptions = '<option value="">--:--</option>';
-  for (var h = 9; h <= 22; h++) {
+  for (var h = 12; h <= 22; h++) {
     for (var m = 0; m < 60; m += 10) {
       var tv = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
       timeOptions += '<option value="' + tv + '">' + tv + '</option>';
@@ -3464,7 +3491,7 @@ function initAdminSlotForm() {
     regContainer.innerHTML =
       '<div class="admin-add-form" style="margin-top:2rem;border-top:2px solid var(--gray-200);padding-top:1.5rem">' +
         '<h3>定期レッスンを追加（' + catLabel + '）</h3>' +
-        '<p style="font-size:0.8rem;color:var(--gray-500);margin:-0.5rem 0 1rem">毎週決まった曜日のレッスン。カレンダーに塗りつぶしで表示されます。</p>' +
+        '<p style="font-size:0.8rem;color:var(--gray-500);margin:-0.5rem 0 1rem">毎週または隔週の決まった曜日のレッスン。カレンダーに塗りつぶしで表示されます。</p>' +
         '<div class="admin-form-grid">' +
           '<select id="admin-regular-dow">' + dowOptionsReg + '</select>' +
           '<select id="admin-regular-studio">' + buildStudioOptions(activeCat) + '</select>' +
@@ -3474,6 +3501,14 @@ function initAdminSlotForm() {
             '<select id="admin-regular-time-end">' + timeOptions + '</select>' +
           '</div>' +
           '<input type="text" id="admin-regular-class" placeholder="' + catLabel + 'クラス">' +
+          '<div class="admin-mode-toggle" style="margin:0">' +
+            '<button type="button" class="active" id="admin-regular-freq-weekly" onclick="setRegularFreq(\'weekly\',this)">毎週</button>' +
+            '<button type="button" id="admin-regular-freq-biweekly" onclick="setRegularFreq(\'biweekly\',this)">隔週</button>' +
+          '</div>' +
+          '<div id="admin-regular-startdate-wrap" style="display:none">' +
+            '<label style="font-size:0.8rem;color:var(--gray-600)">隔週の基準日（この日から2週ごと）</label>' +
+            '<input type="date" id="admin-regular-startdate">' +
+          '</div>' +
         '</div>' +
         '<button class="admin-add-btn" onclick="adminAddRegularLesson()" style="margin-top:0.75rem">追加する</button>' +
       '</div>' +
@@ -3774,9 +3809,19 @@ function renderAdminAnnouncements(items, container) {
     container.innerHTML = '<div class="day-lessons-empty">お知らせはまだありません</div>';
     return;
   }
+  // Filter by current category: show matching category + 全体
+  var activeCat = currentCategory.toUpperCase();
+  var filtered = items.filter(function(a) {
+    var cat = (a.category || '').toUpperCase();
+    return cat === activeCat || cat === '全体' || cat === '';
+  });
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="day-lessons-empty">' + activeCat + ' のお知らせはまだありません</div>';
+    return;
+  }
   var html = '';
-  for (var i = items.length - 1; i >= 0; i--) {
-    var a = items[i];
+  for (var i = filtered.length - 1; i >= 0; i--) {
+    var a = filtered[i];
     var isImportant = (a.importance || '').indexOf('重要') !== -1;
     var isPinned = a.pinned;
     var cardClass = isImportant ? 'announce-card important' : 'announce-card';
@@ -3799,26 +3844,25 @@ function renderAdminAnnouncements(items, container) {
       }
       html += '</div>';
     }
-    html += '<div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem">';
+    html += '<div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;flex-wrap:wrap">';
     var announceId = a.row ? a.row : i;
+    html += '<button class="admin-edit-btn" onclick=\'showEditAnnounceForm(' + JSON.stringify(a).replace(/'/g, "\\'") + ',' + announceId + ')\' title="編集">&#9998; 編集</button>';
     html += '<button class="admin-pin-btn' + (isPinned ? ' is-pinned' : '') + '" onclick=\'adminTogglePin(' +
       announceId + ')\'>' + (isPinned ? '&#128204; ピン解除' : '&#128204; ピン留め') + '</button>';
     html += '<button class="admin-delete-btn" onclick=\'adminDeleteAnnouncement(' +
       announceId + ',' + JSON.stringify(a.title||'').replace(/'/g, "\\'") + ')\'">削除</button>';
     html += '</div>';
+    html += '<div id="edit-announce-' + announceId + '" style="display:none"></div>';
     html += '</div>';
   }
   container.innerHTML = html;
 }
 
 var _removedImageIndexes = [];
-var _announceCategory = 'KIDS';
-
-function setAnnounceCategory(btn, cat) {
-  _announceCategory = cat;
-  var btns = btn.parentElement.querySelectorAll('.category-btn');
-  btns.forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
+function getAnnounceCategory() {
+  var allCheck = document.getElementById('admin-announce-all');
+  if (allCheck && allCheck.checked) return '全体';
+  return currentCategory.toUpperCase();
 }
 
 function toggleImageAttach() {
@@ -3898,10 +3942,8 @@ function clearAnnounceForm() {
   var attachCb = document.getElementById('admin-announce-attach');
   if (attachCb) { attachCb.checked = false; toggleImageAttach(); }
   _removedImageIndexes = [];
-  _announceCategory = 'KIDS';
-  var catBtns = document.querySelectorAll('#panel-admin-announce .category-btn');
-  catBtns.forEach(function(b) { b.classList.remove('active'); });
-  if (catBtns[0]) catBtns[0].classList.add('active');
+  var allCheck = document.getElementById('admin-announce-all');
+  if (allCheck) allCheck.checked = false;
 }
 
 function adminAddAnnouncement() {
@@ -3915,7 +3957,7 @@ function adminAddAnnouncement() {
   var dateStr = dateInput ? dateInput.replace(/-/g, '/') : '';
 
   if (DEMO_MODE) {
-    demoAnnouncements.push({ date: dateStr, title: title, content: content, importance: importance, category: _announceCategory, images: [] });
+    demoAnnouncements.push({ date: dateStr, title: title, content: content, importance: importance, category: getAnnounceCategory(), images: [] });
     clearAnnounceForm();
     fetchAdminAnnouncements();
     alert('追加しました');
@@ -3940,7 +3982,7 @@ function adminAddAnnouncement() {
         action: 'addAnnouncement',
         adminKey: ADMIN_PASSWORD,
         date: dateStr, title: title, content: content, importance: importance,
-        category: _announceCategory,
+        category: getAnnounceCategory(),
         images: base64Images
       };
 
@@ -3966,7 +4008,7 @@ function adminAddAnnouncement() {
   } else {
     var params = new URLSearchParams({
       action: 'addAnnouncement', adminKey: ADMIN_PASSWORD,
-      date: dateStr, title: title, content: content, importance: importance, category: _announceCategory
+      date: dateStr, title: title, content: content, importance: importance, category: getAnnounceCategory()
     });
     apiCall(params, function() {
       clearAnnounceForm();
@@ -3989,10 +4031,64 @@ function adminDeleteAnnouncement(rowOrIndex, title) {
   apiCall(params, function() { fetchAdminAnnouncements(); });
 }
 
+function showEditAnnounceForm(item, rowId) {
+  var container = document.getElementById('edit-announce-' + rowId);
+  if (!container) return;
+  if (container.style.display === 'block') { container.style.display = 'none'; return; }
+  var isImportant = (item.importance || '').indexOf('重要') !== -1;
+  container.innerHTML =
+    '<div style="background:#f5f5f5;padding:1rem;border-radius:10px;margin-top:0.5rem">' +
+      '<input type="text" id="edit-ann-title-' + rowId + '" value="' + escapeHtml(item.title || '') + '" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;margin-bottom:0.5rem;box-sizing:border-box">' +
+      '<textarea id="edit-ann-content-' + rowId + '" rows="3" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;margin-bottom:0.5rem;box-sizing:border-box">' + escapeHtml(item.content || '') + '</textarea>' +
+      '<label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;font-size:0.9rem">' +
+        '<input type="checkbox" id="edit-ann-important-' + rowId + '"' + (isImportant ? ' checked' : '') + ' style="width:18px;height:18px">' +
+        '<span>重要タグ</span>' +
+      '</label>' +
+      '<div style="display:flex;gap:0.5rem">' +
+        '<button class="admin-add-btn" onclick="saveEditAnnouncement(' + rowId + ')" style="flex:1">保存</button>' +
+        '<button class="admin-delete-btn" onclick="document.getElementById(\'edit-announce-' + rowId + '\').style.display=\'none\'" style="flex:1">キャンセル</button>' +
+      '</div>' +
+    '</div>';
+  container.style.display = 'block';
+}
+
+function saveEditAnnouncement(rowId) {
+  var title = document.getElementById('edit-ann-title-' + rowId).value.trim();
+  var content = document.getElementById('edit-ann-content-' + rowId).value.trim();
+  var important = document.getElementById('edit-ann-important-' + rowId).checked ? '重要' : '';
+
+  if (!title) { alert('タイトルを入力してください'); return; }
+
+  if (DEMO_MODE) {
+    alert('デモモードでは編集できません');
+    return;
+  }
+
+  var body = {
+    action: 'editAnnouncement',
+    adminKey: ADMIN_PASSWORD,
+    row: rowId,
+    title: title,
+    content: content,
+    importance: important
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        fetchAdminAnnouncements();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
 // ===== INLINE EDIT HELPERS =====
 function generateTimeOpts(selected) {
   var html = '<option value="">--:--</option>';
-  for (var h = 9; h <= 22; h++) {
+  for (var h = 12; h <= 22; h++) {
     for (var m = 0; m < 60; m += 10) {
       var tv = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
       html += '<option value="' + tv + '"' + (tv === selected ? ' selected' : '') + '>' + tv + '</option>';
@@ -4141,7 +4237,8 @@ function renderAdminRegularLessons(items, container) {
     html += '<div class="slot-card regular-lesson" style="position:relative">';
     html += '<div class="slot-card-info">';
     html += '<span class="regular-lesson-badge" style="background:var(--' + catClass + ')">' + escapeHtml(r.category || 'KIDS') + '</span>';
-    html += '<span class="slot-tag" style="font-weight:600">毎週' + escapeHtml(r.dayOfWeek || '') + '曜</span>';
+    var freqLabel = (r.frequency === 'biweekly') ? '隔週' : '毎週';
+    html += '<span class="slot-tag" style="font-weight:600">' + freqLabel + escapeHtml(r.dayOfWeek || '') + '曜</span>';
     if (r.studio) html += '<span class="slot-tag studio">' + escapeHtml(r.studio) + '</span>';
     if (r.time) html += '<span class="slot-tag time">' + escapeHtml(r.time) + '</span>';
     html += '<span class="slot-tag">' + escapeHtml(r.class_name || '') + '</span>';
@@ -4153,6 +4250,16 @@ function renderAdminRegularLessons(items, container) {
   container.innerHTML = html;
 }
 
+var _regularFreq = 'weekly';
+function setRegularFreq(freq, btn) {
+  _regularFreq = freq;
+  var wrap = document.getElementById('admin-regular-startdate-wrap');
+  if (wrap) wrap.style.display = freq === 'biweekly' ? 'block' : 'none';
+  var btns = btn.parentElement.querySelectorAll('button');
+  btns.forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
 function adminAddRegularLesson() {
   var dow = document.getElementById('admin-regular-dow').value;
   var studio = document.getElementById('admin-regular-studio').value;
@@ -4161,12 +4268,19 @@ function adminAddRegularLesson() {
   var time = tStart && tEnd ? tStart + '〜' + tEnd : '';
   var className = document.getElementById('admin-regular-class').value.trim();
   var category = currentCategory.toUpperCase();
+  var frequency = _regularFreq || 'weekly';
+  var startDate = '';
+  if (frequency === 'biweekly') {
+    startDate = document.getElementById('admin-regular-startdate').value;
+    if (!startDate) { alert('隔週の基準日を選択してください'); return; }
+  }
 
   if (!dow || !className) { alert('曜日とクラス名を入力してください'); return; }
 
   var params = new URLSearchParams({
     action: 'addRegularLesson', adminKey: ADMIN_PASSWORD,
-    dayOfWeek: dow, studio: studio, time: time, class_name: className, category: category
+    dayOfWeek: dow, studio: studio, time: time, class_name: className, category: category,
+    frequency: frequency, startDate: startDate
   });
 
   apiCall(params, function() {
