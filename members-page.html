@@ -1878,7 +1878,7 @@ body.category-future .navbar {
 }
 .inline-edit-form .edit-cancel-btn:hover { background: var(--gray-100); }
 
-.admin-edit-btn {
+.admin-announce-edit-btn {
   padding: 6px 14px;
   border: 2px solid #1976d2;
   border-radius: 20px;
@@ -1890,7 +1890,7 @@ body.category-future .navbar {
   transition: all 0.2s;
   font-family: 'Noto Sans JP', sans-serif;
 }
-.admin-edit-btn:hover {
+.admin-announce-edit-btn:hover {
   background: #1976d2;
   color: #fff;
 }
@@ -3846,7 +3846,7 @@ function renderAdminAnnouncements(items, container) {
     }
     html += '<div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;flex-wrap:wrap">';
     var announceId = a.row ? a.row : i;
-    html += '<button class="admin-edit-btn" onclick=\'showEditAnnounceForm(' + JSON.stringify(a).replace(/'/g, "\\'") + ',' + announceId + ')\' title="編集">&#9998; 編集</button>';
+    html += '<button class="admin-announce-edit-btn" onclick=\'showEditAnnounceForm(' + JSON.stringify(a).replace(/'/g, "\\'") + ',' + announceId + ')\' title="編集">&#9998; 編集</button>';
     html += '<button class="admin-pin-btn' + (isPinned ? ' is-pinned' : '') + '" onclick=\'adminTogglePin(' +
       announceId + ')\'>' + (isPinned ? '&#128204; ピン解除' : '&#128204; ピン留め') + '</button>';
     html += '<button class="admin-delete-btn" onclick=\'adminDeleteAnnouncement(' +

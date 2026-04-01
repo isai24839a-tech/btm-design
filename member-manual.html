@@ -448,6 +448,8 @@ body {
         <li><span style="display:inline-block;width:16px;height:16px;background:#FFE8DE;border-radius:4px;vertical-align:middle;margin-right:4px;border:1px solid #FF6B35;"></span> <strong>レッスンがある日</strong>（タップで詳細表示）</li>
         <li><span style="display:inline-block;width:16px;height:16px;background:#FF6B35;border-radius:4px;vertical-align:middle;margin-right:4px;"></span> <strong>選択中の日</strong></li>
         <li><span style="display:inline-block;width:16px;height:16px;background:#f0f0f0;border-radius:4px;vertical-align:middle;margin-right:4px;border:1px solid #ddd;"></span> レッスンなし / お休みの日</li>
+        <li><span style="display:inline-block;width:16px;height:16px;background:#e0e0e0;border-radius:4px;vertical-align:middle;margin-right:4px;border:1px solid #bbb;text-decoration:line-through;font-size:10px;text-align:center;line-height:16px;color:#999;">X</span> <strong>グレーで打ち消し線の日</strong> = 定期休み or 不定休（「休」マーク付き）</li>
+        <li><span style="display:inline-block;font-size:0.7rem;background:#fff3e0;color:#e65100;padding:0.1rem 0.4rem;border-radius:4px;vertical-align:middle;margin-right:4px;">この日はお休み</span> 通常レッスンがその日だけお休み（振替なし）</li>
       </ul>
     </div>
   </div>
@@ -481,14 +483,16 @@ body {
             <span style="font-size:0.85rem;">16:00〜17:00</span>
             <span style="font-size:0.85rem;color:#666;">KIDSクラス</span>
           </div>
-          <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;">
+          <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;border-bottom:1px solid #eee;">
             <span style="font-weight:600;color:#FF6B35;width:40px;">土</span>
             <span class="mock-tag tag-studio" style="font-size:0.7rem;">稲毛</span>
             <span style="font-size:0.85rem;">10:00〜11:00</span>
             <span style="font-size:0.85rem;color:#666;">KIDSクラス</span>
+            <span style="font-size:0.65rem;background:#fff3e0;color:#e65100;padding:0.1rem 0.4rem;border-radius:4px;font-weight:600;">隔週</span>
           </div>
         </div>
       </div>
+      <p style="margin-top:0.5rem;font-size:0.85rem;color:#666;"><strong>「隔週」ラベル</strong>が付いているレッスンは、毎週ではなく隔週（2週間に1回）の開催です。カレンダー上でも隔週の該当日のみにレッスンが表示されます。</p>
     </div>
   </div>
 </div>
@@ -603,6 +607,31 @@ body {
         <p style="font-weight:600;margin-top:0.3rem;">発表会の練習が始まります</p>
         <p style="font-size:0.85rem;color:#666;">5月の発表会に向けて、4月から練習スタートします。</p>
       </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>カテゴリタグ・画像について</strong></p>
+      <p>お知らせには、対象クラスを示す<strong>カテゴリタグ</strong>が付く場合があります。</p>
+      <div class="mock-announce">
+        <div class="flex-row">
+          <span style="font-size:0.8rem;color:#999;">2026/03/25</span>
+          <span style="font-size:0.7rem;font-weight:600;background:#FF6B35;color:#fff;padding:0.1rem 0.5rem;border-radius:10px;">KIDS</span>
+        </div>
+        <p style="font-weight:600;margin-top:0.3rem;">KIDSクラス 衣装について</p>
+        <p style="font-size:0.85rem;color:#666;">発表会の衣装サイズを確認します。</p>
+        <div style="display:flex;gap:0.3rem;margin-top:0.5rem;">
+          <div style="width:50px;height:50px;background:#f0f0f0;border-radius:6px;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:#999;">画像</div>
+        </div>
+      </div>
+      <ul style="margin-top:0.8rem;padding-left:1.2rem;font-size:0.85rem;">
+        <li><span style="font-size:0.7rem;font-weight:600;background:#FF6B35;color:#fff;padding:0.1rem 0.5rem;border-radius:10px;">KIDS</span> KIDSクラス向けのお知らせ</li>
+        <li><span style="font-size:0.7rem;font-weight:600;background:#1a237e;color:#fff;padding:0.1rem 0.5rem;border-radius:10px;">FUTURE</span> FUTUREクラス向けのお知らせ</li>
+        <li>タグなし = 全体へのお知らせ</li>
+        <li>写真付きのお知らせは、画像をタップすると拡大表示できます</li>
+      </ul>
     </div>
   </div>
 </div>
