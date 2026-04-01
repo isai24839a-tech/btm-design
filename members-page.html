@@ -3447,12 +3447,12 @@ function initAdminSlotForm() {
             '</label>' +
           '</div>' +
         '</div>' +
-        '<button class="admin-add-btn" onclick="adminAddSlot()" style="margin-top:0.75rem">追加する</button>' +
+        '<button type="button" class="admin-add-btn" onclick="adminAddSlot()" style="margin-top:0.75rem">追加する</button>' +
       '</div>' +
 
       // Bulk mode
       '<div id="admin-bulk-form" style="display:' + (adminSlotMode === 'bulk' ? 'block' : 'none') + '">' +
-        '<label style="font-size:0.85rem;font-weight:600;color:var(--navy);margin-bottom:6px;display:block">曜日を選択</label>' +
+        '<label style="font-size:0.85rem;font-weight:600;color:var(--navy);margin-bottom:6px;display:block">曜日を選択 <span style="color:var(--coral);font-size:0.8rem">※必須：レッスンのある曜日をタップ</span></label>' +
         '<div class="admin-dow-grid" id="admin-dow-grid">' + dowButtons + '</div>' +
         '<div class="admin-form-grid" style="margin-top:0.75rem">' +
           '<div><label style="font-size:0.8rem;color:var(--gray-600)">開始日</label><input type="date" id="admin-bulk-start" value="' + defaultDate + '"></div>' +
@@ -3472,7 +3472,7 @@ function initAdminSlotForm() {
           '</div>' +
         '</div>' +
         '<div class="admin-bulk-info" id="admin-bulk-preview">曜日を選んで日程を確認</div>' +
-        '<button class="admin-add-btn" onclick="adminBulkAddSlots()" style="margin-top:0.75rem">まとめて追加</button>' +
+        '<button type="button" class="admin-add-btn" id="admin-bulk-submit" onclick="adminBulkAddSlots()" style="margin-top:0.75rem;opacity:0.5;pointer-events:none" disabled>曜日を選んでください</button>' +
       '</div>' +
     '</div>';
 
@@ -3592,15 +3592,38 @@ function switchSlotMode(mode) {
   if (singleForm) singleForm.style.display = mode === 'single' ? 'block' : 'none';
   if (bulkForm) bulkForm.style.display = mode === 'bulk' ? 'block' : 'none';
 
-  var toggleBtns = document.querySelectorAll('.admin-mode-toggle button');
-  toggleBtns.forEach(function(btn, i) {
-    btn.classList.toggle('active', (i === 0 && mode === 'single') || (i === 1 && mode === 'bulk'));
-  });
+  // Only target the slot form toggle buttons (first .admin-mode-toggle)
+  var slotFormContainer = document.getElementById('admin-slot-form-container');
+  if (slotFormContainer) {
+    var toggleBtns = slotFormContainer.querySelectorAll('.admin-mode-toggle button');
+    toggleBtns.forEach(function(btn, i) {
+      btn.classList.toggle('active', (i === 0 && mode === 'single') || (i === 1 && mode === 'bulk'));
+    });
+  }
+  if (mode === 'bulk') updateBulkSubmitBtn();
 }
 
 function toggleDow(btn) {
   btn.classList.toggle('selected');
   updateBulkPreview();
+  updateBulkSubmitBtn();
+}
+
+function updateBulkSubmitBtn() {
+  var submitBtn = document.getElementById('admin-bulk-submit');
+  if (!submitBtn) return;
+  var hasDow = document.querySelectorAll('.admin-dow-btn.selected').length > 0;
+  if (hasDow) {
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '1';
+    submitBtn.style.pointerEvents = 'auto';
+    submitBtn.textContent = 'まとめて追加';
+  } else {
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.5';
+    submitBtn.style.pointerEvents = 'none';
+    submitBtn.textContent = '曜日を選んでください';
+  }
 }
 
 function getSelectedDows() {
@@ -3690,9 +3713,14 @@ function adminAddSlot() {
 }
 
 function adminBulkAddSlots() {
+  var dows = getSelectedDows();
+  if (dows.length === 0) {
+    alert('先に上の曜日ボタン（月〜日）をタップして、レッスンのある曜日を選んでください');
+    return;
+  }
   var dates = getBulkDates();
   if (dates.length === 0) {
-    alert('曜日と期間を設定してください');
+    alert('選んだ曜日が開始日〜終了日の期間内にありません。期間を確認してください');
     return;
   }
 
@@ -3705,8 +3733,12 @@ function adminBulkAddSlots() {
   var max = unlimited ? 0 : (parseInt(document.getElementById('admin-bulk-max').value) || 8);
   var category = currentCategory.toUpperCase();
 
-  if (!studio || !tStart || !tEnd || !className) {
-    alert('スタジオ・時間・クラス名を入力してください');
+  var missing = [];
+  if (!studio) missing.push('スタジオ');
+  if (!tStart || !tEnd) missing.push('時間');
+  if (!className) missing.push('クラス名');
+  if (missing.length > 0) {
+    alert(missing.join('・') + 'を入力してください');
     return;
   }
 
