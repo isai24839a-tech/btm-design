@@ -2547,6 +2547,7 @@ var allSlots = []; // Populated from demo or API
 var regularLessons = []; // { dayOfWeek: 0-6, studio, time, class_name, category }
 var regularHolidays = []; // { dayOfWeek: '月'~'日', studio: string, id: number }
 var lessonCancels = []; // { date, studio, time, class_name, category, row }
+var lessonNotes = []; // { date, studio, time, memo, category, row }
 var irregularHolidays = []; // { date, reason, category, row }
 
 // ===== DEMO DATA =====
@@ -2753,6 +2754,7 @@ function showMainContent() {
   initBookingModal();
   fetchRegularHolidays();
   fetchLessonCancels();
+  fetchLessonNotes();
   fetchIrregularHolidays();
   if (isAdminMode) {
     initAdminSlotForm();
@@ -3054,6 +3056,7 @@ function renderDayLessons(dateStr) {
   regulars.forEach(function(r, idx) {
     var cancelled = isLessonCancelled(dateStr, r.studio, r.time);
     var cancelData = cancelled ? getLessonCancelData(dateStr, r.studio, r.time) : null;
+    var noteData = getLessonNoteData(dateStr, r.studio, r.time);
     var cardClass = 'slot-card regular-lesson' + (cancelled ? ' cancelled-lesson' : '');
     html += '<div class="' + cardClass + '" id="regular-card-' + idx + '">';
     html += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
@@ -3068,15 +3071,31 @@ function renderDayLessons(dateStr) {
         '<svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>';
     }
     html += '</div>';
+    // Lesson note display (visible to everyone)
+    if (noteData) {
+      html += '<div class="lesson-note-display" style="margin-top:0.5rem;padding:0.5rem 0.7rem;background:#FFF8E1;border-left:3px solid #FFC107;border-radius:4px;font-size:0.85rem">';
+      html += '<span style="margin-right:0.3rem">⚠️</span>' + escapeHtml(noteData.memo);
+      if (isAdminMode) {
+        html += ' <button class="admin-uncancel-btn" style="margin-left:0.5rem;font-size:0.75rem" onclick="adminDeleteLessonNote(' + (noteData.row || 0) + ')">メモ削除</button>';
+      }
+      html += '</div>';
+    }
     if (cancelled) {
       html += '<div class="slot-cancel-label" style="margin-top:0.5rem">この日はお休み</div>';
       if (isAdminMode && cancelData) {
         html += '<div style="margin-top:0.5rem"><button class="admin-uncancel-btn" onclick="adminUncancelLesson(' + (cancelData.row || 0) + ')">キャンセル解除</button></div>';
       }
     } else if (isAdminMode) {
-      html += '<div style="margin-top:0.5rem"><button class="admin-cancel-lesson-btn" onclick=\'adminCancelLesson(' +
+      html += '<div style="margin-top:0.5rem">';
+      html += '<button class="admin-cancel-lesson-btn" onclick=\'adminCancelLesson(' +
         JSON.stringify({date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name}).replace(/'/g, "\\'") +
-        ')\'>&#10005; この日はお休み</button></div>';
+        ')\'>&#10005; この日はお休み</button>';
+      if (!noteData) {
+        html += ' <button class="admin-cancel-lesson-btn" style="background:#FFF8E1;color:#F57F17;border-color:#FFC107;margin-left:0.3rem" onclick=\'adminAddLessonNote(' +
+          JSON.stringify({date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name}).replace(/'/g, "\\'") +
+          ')\'>📝 メモ追加</button>';
+      }
+      html += '</div>';
     }
     html += '</div>';
   });
@@ -4529,6 +4548,82 @@ function adminUncancelLesson(row) {
     .then(function(result) {
       if (result.success) {
         fetchLessonCancels();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
+// ===== LESSON NOTES (臨時メモ) =====
+function fetchLessonNotes(callback) {
+  if (!APPS_SCRIPT_URL) {
+    if (callback) callback();
+    return;
+  }
+  fetch(APPS_SCRIPT_URL + '?action=lessonnotes', { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && Array.isArray(data)) {
+        lessonNotes = data;
+      }
+      if (callback) callback();
+      renderCalendar();
+      if (selectedDate) renderDayLessons(selectedDate);
+    })
+    .catch(function() {
+      lessonNotes = [];
+      if (callback) callback();
+    });
+}
+
+function getLessonNoteData(dateStr, studio, time) {
+  return lessonNotes.find(function(n) {
+    return n.date === dateStr && n.studio === studio && n.time === time;
+  }) || null;
+}
+
+function adminAddLessonNote(info) {
+  var memo = prompt(info.class_name + '（' + info.studio + ' ' + info.time + '）\nこの日のメモを入力してください:');
+  if (!memo) return;
+  if (!confirm('以下のメモを追加しますか？\n\n' + memo)) return;
+
+  var body = {
+    action: 'addLessonNote',
+    adminKey: ADMIN_PASSWORD,
+    date: selectedDate,
+    studio: info.studio,
+    time: info.time,
+    memo: memo,
+    category: currentCategory.toUpperCase()
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        fetchLessonNotes();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
+function adminDeleteLessonNote(row) {
+  if (!confirm('このメモを削除しますか？')) return;
+
+  var body = {
+    action: 'deleteLessonNote',
+    adminKey: ADMIN_PASSWORD,
+    row: row
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        fetchLessonNotes();
       } else {
         alert(result.error || 'エラーが発生しました');
       }

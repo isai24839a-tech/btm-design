@@ -39,7 +39,8 @@ function setupSheets() {
     { name: '全体ニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: '定期休み', headers: ['曜日', 'スタジオ', 'category'] },
     { name: '臨時キャンセル', headers: ['日付', 'スタジオ', '時間', 'クラス', 'カテゴリ'] },
-    { name: '不定休', headers: ['日付', '理由', 'カテゴリ'] }
+    { name: '不定休', headers: ['日付', '理由', 'カテゴリ'] },
+    { name: '臨時メモ', headers: ['日付', 'スタジオ', '時間', 'メモ', 'カテゴリ'] }
   ];
 
   sheets.forEach(function(def) {
@@ -81,6 +82,7 @@ function doGet(e) {
   if (action === 'regularholidays') return getRegularHolidays();
   if (action === 'lessoncancels') return getLessonCancels();
   if (action === 'irregularholidays') return getIrregularHolidays();
+  if (action === 'lessonnotes') return getLessonNotes();
 
   return jsonResponse({ error: 'Unknown action' });
 }
@@ -114,6 +116,8 @@ function doPost(e) {
   if (action === 'deletelessoncancel') return adminGuardPost(payload, adminDeleteLessonCancel);
   if (action === 'addirregularholiday') return adminGuardPost(payload, adminAddIrregularHoliday);
   if (action === 'deleteirregularholiday') return adminGuardPost(payload, adminDeleteIrregularHoliday);
+  if (action === 'addlessonnote') return adminGuardPost(payload, adminAddLessonNote);
+  if (action === 'deletelessonnote') return adminGuardPost(payload, adminDeleteLessonNote);
 
   return jsonResponse({ error: 'Unknown action' });
 }
@@ -770,6 +774,62 @@ function adminAddLessonCancel(params) {
 function adminDeleteLessonCancel(params) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('臨時キャンセル');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var row = parseInt(params.row);
+  if (!row || row < 2) return jsonResponse({ success: false, error: '無効な行番号です' });
+  if (row > sheet.getLastRow()) return jsonResponse({ success: false, error: '該当する行がありません' });
+
+  sheet.deleteRow(row);
+  return jsonResponse({ success: true, message: '削除しました' });
+}
+
+// ===== 臨時メモ取得 =====
+function getLessonNotes() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('臨時メモ');
+  if (!sheet || sheet.getLastRow() <= 1) return jsonResponse([]);
+
+  var data = sheet.getDataRange().getValues();
+  var items = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue;
+    items.push({
+      date: formatDate(row[0]),
+      studio: String(row[1] || ''),
+      time: String(row[2] || ''),
+      memo: String(row[3] || ''),
+      category: String(row[4] || ''),
+      row: i + 1
+    });
+  }
+  return jsonResponse(items);
+}
+
+// ===== 管理者: 臨時メモ追加 =====
+function adminAddLessonNote(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('臨時メモ');
+  if (!sheet) return jsonResponse({ success: false, error: '臨時メモシートがありません' });
+
+  var date = params.date || '';
+  var studio = params.studio || '';
+  var time = params.time || '';
+  var memo = params.memo || '';
+  var category = params.category || '';
+
+  if (!date) return jsonResponse({ success: false, error: '日付は必須です' });
+  if (!memo) return jsonResponse({ success: false, error: 'メモ内容は必須です' });
+
+  sheet.appendRow([date, studio, time, memo, category]);
+  return jsonResponse({ success: true, message: '臨時メモを追加しました' });
+}
+
+// ===== 管理者: 臨時メモ削除 =====
+function adminDeleteLessonNote(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('臨時メモ');
   if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
 
   var row = parseInt(params.row);
