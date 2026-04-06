@@ -2946,7 +2946,11 @@ function renderCalendar() {
 
   for (var d = 1; d <= daysInMonth; d++) {
     var dateStr = year + '/' + String(month + 1).padStart(2, '0') + '/' + String(d).padStart(2, '0');
-    var hasRegular = getRegularLessonsForDate(dateStr).length > 0;
+    var regularsForDay = getRegularLessonsForDate(dateStr);
+    var hasRegular = regularsForDay.length > 0;
+    var allRegularsCancelled = hasRegular && regularsForDay.every(function(r) {
+      return isLessonCancelled(dateStr, r.studio, r.time);
+    });
     var isHoliday = isRegularHoliday(dateStr);
     var irregHoliday = isIrregularHoliday(dateStr);
     var classes = ['calendar-day'];
@@ -2958,12 +2962,18 @@ function renderCalendar() {
       html += '<span class="day-number">' + d + '</span>';
       html += '<span class="holiday-label">休</span>';
       html += '</div>';
-    } else {
-      if (lessonDates[dateStr]) classes.push('has-lessons');
-      if (hasRegular) classes.push('has-regular');
+    } else if (allRegularsCancelled && !lessonDates[dateStr]) {
+      classes.push('holiday-day');
       html += '<div class="' + classes.join(' ') + '" onclick="selectDate(\'' + dateStr + '\')">';
       html += '<span class="day-number">' + d + '</span>';
-      if (lessonDates[dateStr] || hasRegular) html += '<span class="day-dot"></span>';
+      html += '<span class="holiday-label">休</span>';
+      html += '</div>';
+    } else {
+      if (lessonDates[dateStr]) classes.push('has-lessons');
+      if (hasRegular && !allRegularsCancelled) classes.push('has-regular');
+      html += '<div class="' + classes.join(' ') + '" onclick="selectDate(\'' + dateStr + '\')">';
+      html += '<span class="day-number">' + d + '</span>';
+      if (lessonDates[dateStr] || (hasRegular && !allRegularsCancelled)) html += '<span class="day-dot"></span>';
       html += '</div>';
     }
   }
