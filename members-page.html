@@ -2878,7 +2878,8 @@ function fetchRegularLessons(callback) {
               class_name: item.class_name,
               category: (item.category || 'KIDS').toUpperCase(),
               frequency: item.frequency || 'weekly',
-              startDate: item.startDate || ''
+              startDate: item.startDate || '',
+              row: item.row
             });
           }
         });
