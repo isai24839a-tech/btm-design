@@ -2873,6 +2873,7 @@ function fetchRegularLessons(callback) {
           if (dow !== undefined && item.class_name) {
             regularLessons.push({
               dayOfWeek: dow,
+              dayOfWeekName: item.dayOfWeek,
               studio: item.studio || '',
               time: item.time || '',
               class_name: item.class_name,
@@ -4148,8 +4149,9 @@ function showEditRegularForm(r, cardId) {
   var t = parseTime(r.time);
   var cat = currentCategory.toUpperCase();
   var dowLabels = ['月','火','水','木','金','土','日'];
+  var currentDowName = r.dayOfWeekName || '';
   var dowOpts = dowLabels.map(function(d) {
-    return '<option value="' + d + '"' + (d === r.dayOfWeek ? ' selected' : '') + '>' + d + '曜</option>';
+    return '<option value="' + d + '"' + (d === currentDowName ? ' selected' : '') + '>' + d + '曜</option>';
   }).join('');
 
   var formHtml = '<div class="inline-edit-form">' +
@@ -4185,6 +4187,8 @@ function saveEditRegular(row, cardId) {
   var category = currentCategory.toUpperCase();
 
   if (!dow || !className) { alert('曜日とクラス名を入力してください'); return; }
+
+  if (!confirm(dow + '曜 ' + studio + ' ' + time + ' ' + className + '\nこの内容で保存しますか？')) return;
 
   var params = new URLSearchParams({
     action: 'editRegularLesson', adminKey: ADMIN_PASSWORD,
@@ -4230,6 +4234,8 @@ function saveEditSlot(oldSlot, cardId) {
   var time = ts && te ? ts + '〜' + te : '';
   var className = document.getElementById('edit-slot-class-' + cardId).value.trim();
   var category = currentCategory.toUpperCase();
+
+  if (!confirm(oldSlot.date + ' ' + studio + ' ' + time + ' ' + className + '\nこの内容で保存しますか？')) return;
 
   var params = new URLSearchParams({
     action: 'editSlot', adminKey: ADMIN_PASSWORD,
