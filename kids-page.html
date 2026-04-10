@@ -753,7 +753,7 @@ body {
 
 .class-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
 }
 
@@ -785,6 +785,7 @@ body {
 .class-card:nth-child(1)::before { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
 .class-card:nth-child(2)::before { background: linear-gradient(90deg, var(--coral), var(--orange)); }
 .class-card:nth-child(3)::before { background: linear-gradient(90deg, var(--yellow), var(--coral)); }
+.class-card:nth-child(4)::before { background: linear-gradient(90deg, var(--coral), var(--yellow)); }
 
 .class-card-icon {
   width: 64px;
@@ -806,6 +807,9 @@ body {
 .class-card:nth-child(3) .class-card-icon {
   background: linear-gradient(135deg, rgba(255,210,63,0.12), rgba(255,77,109,0.12));
 }
+.class-card:nth-child(4) .class-card-icon {
+  background: linear-gradient(135deg, rgba(255,77,109,0.12), rgba(255,210,63,0.12));
+}
 
 .class-card-icon svg {
   width: 30px;
@@ -817,6 +821,7 @@ body {
 .class-card:nth-child(1) .class-card-icon svg { stroke: var(--orange); }
 .class-card:nth-child(2) .class-card-icon svg { stroke: var(--coral); }
 .class-card:nth-child(3) .class-card-icon svg { stroke: var(--yellow); stroke: #E6A800; }
+.class-card:nth-child(4) .class-card-icon svg { stroke: var(--coral); }
 
 .class-card-age {
   font-family: 'Oswald', sans-serif;
@@ -840,6 +845,10 @@ body {
 .class-card:nth-child(3) .class-card-age {
   background: rgba(255,210,63,0.15);
   color: #C48800;
+}
+.class-card:nth-child(4) .class-card-age {
+  background: rgba(255,77,109,0.1);
+  color: var(--coral);
 }
 
 .class-card-title {
@@ -2418,6 +2427,7 @@ body {
     <a href="#gallery" class="nav-link">ギャラリー</a>
     <a href="#contact" class="nav-link">お問い合わせ</a>
     <a href="kids-news.html" class="nav-link">ニュース</a>
+    <a href="kids-choreography-master.html" class="nav-link">振付マスター</a>
   </div>
 </nav>
 
@@ -2576,6 +2586,18 @@ body {
           さらなる上達を目指すクラス。初級〜上級まで。入会にはオーディションが必要です。本気で上を目指す子のための特別なクラス。
         </p>
       </div>
+      <!-- Choreography Master -->
+      <a href="kids-choreography-master.html" class="class-card fade-in delay-4" style="text-decoration:none;color:inherit;cursor:pointer;">
+        <div class="class-card-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M12 6v5"/><path d="M9 17l3-6 3 6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9l7 2 7-2" stroke-linecap="round"/><circle cx="5" cy="12" r="1.5" fill="none"/><circle cx="19" cy="12" r="1.5" fill="none"/></svg>
+        </div>
+        <div class="class-card-age">個人レッスン</div>
+        <h3 class="class-card-title">振付マスター</h3>
+        <p class="class-card-desc">
+          1〜3人の少人数制で、一人ひとりの癖や改善点をピンポイントで修正。50分間の集中指導で確実にレベルアップ。
+        </p>
+        <span style="display:inline-block;margin-top:12px;font-family:'Oswald',sans-serif;font-size:0.7rem;letter-spacing:2px;color:var(--coral);border-bottom:1px solid var(--coral);">詳しくはこちら</span>
+      </a>
     </div>
   </div>
 </section>

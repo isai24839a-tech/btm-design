@@ -8,11 +8,11 @@
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <title>振付マスター | FUTURE | BEAT THE MIX 千葉市</title>
-<meta name="description" content="BEAT THE MIX 振付マスター。通常Lessonではカバーしきれない個人の癖や改善点をピンポイントで修正する個人Lesson。KIDS・FUTURE対応。1〜3人の少人数制で確実にレベルアップ。">
+<meta name="description" content="BEAT THE MIX FUTURE 振付マスター。通常Lessonではカバーしきれない個人の癖や改善点をピンポイントで修正する個人Lesson。1〜3人の少人数制で確実にレベルアップ。">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://tibadance.com/choreography-master.html">
 <meta property="og:title" content="振付マスター | FUTURE | BEAT THE MIX 千葉市">
-<meta property="og:description" content="通常Lessonではカバーしきれない個人の癖や改善点をピンポイントで修正する個人Lesson。KIDS・FUTURE対応。">
+<meta property="og:description" content="BEAT THE MIX FUTURE 振付マスター。通常Lessonではカバーしきれない個人の癖や改善点をピンポイントで修正する個人Lesson。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://tibadance.com/choreography-master.html">
 <meta property="og:site_name" content="BEAT THE MIX Dance Studio">
@@ -50,7 +50,7 @@
     "itemListElement": [
       {
         "@type": "Offer",
-        "itemOffered": {"@type": "Service", "name": "KIDS 1枠"},
+        "itemOffered": {"@type": "Service", "name": "FUTURE 1枠"},
         "price": "2200",
         "priceCurrency": "JPY"
       }
@@ -78,9 +78,6 @@
   --white-soft: rgba(255, 255, 255, 0.85);
   --white-muted: rgba(255, 255, 255, 0.55);
   --text-body: rgba(255, 255, 255, 0.8);
-  --kids-accent: #FF6B35;
-  --kids-accent-dim: rgba(255, 107, 53, 0.15);
-  --kids-accent-light: #FF8F60;
 }
 
 html {
@@ -207,9 +204,7 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
 .sec-dotacan { background: linear-gradient(180deg, var(--navy-light) 0%, var(--navy) 100%); }
 .sec-fewer { background: var(--navy); }
 .sec-venue { background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 100%); }
-.sec-extra { background: var(--navy-light); }
-.sec-anagawa { background: linear-gradient(180deg, var(--navy-light) 0%, var(--purple-deep) 100%); }
-.sec-withdraw { background: linear-gradient(180deg, var(--purple-deep) 0%, var(--navy) 100%); }
+.sec-withdraw { background: linear-gradient(180deg, var(--navy-light) 0%, var(--navy) 100%); }
 
 /* ===== CLASS TYPE CARDS ===== */
 .class-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 32px; }
@@ -224,16 +219,13 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
 }
 .class-card:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(212, 168, 83, 0.3); transform: translateY(-3px); }
 .class-card:hover::before { opacity: 1; }
-.class-card--kids::before { background: linear-gradient(90deg, transparent, var(--kids-accent), transparent); }
-.class-card--kids:hover { border-color: rgba(255, 107, 53, 0.3); }
 .class-card h3 { font-family: 'Oswald', sans-serif; font-size: clamp(22px, 3vw, 30px); font-weight: 500; letter-spacing: 3px; margin-bottom: 8px; }
-.class-card--kids h3 { color: var(--kids-accent-light); }
 .class-card--future h3 { color: var(--gold-light); }
 .class-card .class-instructor { font-size: 14px; color: var(--text-body); font-weight: 400; }
 .class-card .class-instructor strong { color: var(--white-soft); font-weight: 500; }
 .class-note { margin-top: 24px; padding: 16px 20px; background: rgba(212, 168, 83, 0.05); border-left: 2px solid var(--gold); font-size: 13px; line-height: 1.8; color: var(--text-body); }
 
-/* ===== DUAL PANEL (KIDS / FUTURE comparison) ===== */
+/* ===== PANEL ===== */
 .dual-panel { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 32px; }
 .panel {
   background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(212, 168, 83, 0.12);
@@ -242,8 +234,6 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
 .panel::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
 }
-.panel--kids { border-color: rgba(255, 107, 53, 0.2); }
-.panel--kids::before { background: linear-gradient(90deg, transparent, var(--kids-accent), transparent); }
 .panel--future { border-color: rgba(212, 168, 83, 0.2); }
 .panel--future::before { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
 .panel-title {
@@ -251,7 +241,6 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
   letter-spacing: 3px; margin-bottom: 20px; padding-bottom: 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-.panel--kids .panel-title { color: var(--kids-accent-light); }
 .panel--future .panel-title { color: var(--gold-light); }
 .panel-subtitle {
   font-size: 12px; font-weight: 400; letter-spacing: 1px; color: var(--white-muted);
@@ -262,7 +251,6 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
 .panel-body ul { list-style: none; padding: 0; }
 .panel-body li { padding: 6px 0; padding-left: 16px; position: relative; }
 .panel-body li::before { content: ''; position: absolute; left: 0; top: 14px; width: 6px; height: 6px; border-radius: 50%; }
-.panel--kids .panel-body li::before { background: var(--kids-accent); opacity: 0.5; }
 .panel--future .panel-body li::before { background: var(--gold); opacity: 0.5; }
 
 /* ===== POINT LIST ===== */
@@ -370,8 +358,6 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
   border: 1.5px solid var(--gold); color: var(--gold); font-family: 'Oswald', sans-serif;
   font-size: 13px; font-weight: 500; border-radius: 50%; position: relative; z-index: 1; background: var(--navy);
 }
-.sec-extra .step-number { background: var(--navy-light); }
-.sec-anagawa .step-number { background: var(--navy-light); }
 .step-text { font-size: 13px; font-weight: 300; line-height: 1.8; color: var(--text-body); padding-top: 3px; }
 
 /* ===== ENVELOPE EXAMPLE ===== */
@@ -406,13 +392,6 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
   font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 2px; color: var(--white-muted);
 }
 
-/* ===== KIDS-ONLY BADGE ===== */
-.kids-only-badge {
-  display: inline-block; padding: 4px 14px; background: var(--kids-accent-dim);
-  border: 1px solid rgba(255, 107, 53, 0.3); border-radius: 50px;
-  font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 500;
-  letter-spacing: 2px; color: var(--kids-accent-light); margin-bottom: 16px; text-transform: uppercase;
-}
 
 /* ===== CONTACT ===== */
 .contact { background: linear-gradient(180deg, var(--navy) 0%, #080F19 100%); text-align: center; }
@@ -506,7 +485,7 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
 }
 
 /* === PERFORMANCE === */
-.sec-cancel, .sec-dotacan, .sec-fewer, .sec-venue, .sec-extra, .sec-anagawa, .sec-withdraw, .instagram, .contact, footer {
+.sec-cancel, .sec-dotacan, .sec-fewer, .sec-venue, .sec-withdraw, .instagram, .contact, footer {
   content-visibility: auto; contain-intrinsic-size: auto 600px;
 }
 
@@ -603,12 +582,8 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
       <h2 class="section-heading-jp">クラスの種類</h2>
       <div class="gold-line"></div>
     </div>
-    <div class="class-cards">
-      <div class="class-card class-card--kids reveal reveal-delay-1">
-        <h3>KIDS</h3>
-        <p class="class-instructor"><strong>NaNaMi</strong>先生</p>
-      </div>
-      <div class="class-card class-card--future reveal reveal-delay-2">
+    <div class="class-cards" style="grid-template-columns:1fr;max-width:400px;margin-left:auto;margin-right:auto;">
+      <div class="class-card class-card--future reveal reveal-delay-1">
         <h3>FUTURE</h3>
         <p class="class-instructor"><strong>JUNJUN</strong>先生</p>
       </div>
@@ -635,31 +610,14 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
       <h2 class="section-heading-jp">申し込み方法</h2>
       <div class="gold-line"></div>
     </div>
-    <div class="dual-panel">
-      <div class="panel panel--kids reveal reveal-delay-1">
-        <h3 class="panel-title">KIDS<span class="panel-subtitle"><a href="members-page.html" style="color:var(--kids-accent-light);text-decoration:underline;">会員ページ</a>から予約</span></h3>
-        <div class="panel-body">
-          <ul>
-            <li><strong>申し込み日:</strong> 会報でお知らせします（22:00〜を予定）</li>
-            <li style="font-size:12px; color:var(--kids-accent-light);">※予約開始時間より前のご予約はキャンセルとなります</li>
-            <li><strong>方法:</strong> <a href="members-page.html" style="color:var(--kids-accent-light);text-decoration:underline;">会員ページ</a>から各自ご予約</li>
-            <li><strong>先行予約:</strong> 1クラス2枠まで</li>
-            <li><strong>本予約:</strong> 1クラス2枠まで</li>
-            <li><strong>希望予約:</strong> 空き枠自由</li>
-            <li><strong>予約順:</strong> 先着</li>
-            <li><strong>スケジュール:</strong> 会報のTimeスケジュールをご参照ください</li>
-          </ul>
-        </div>
-      </div>
-      <div class="panel panel--future reveal reveal-delay-2">
-        <h3 class="panel-title">FUTURE<span class="panel-subtitle">口頭で承ります</span></h3>
-        <div class="panel-body">
-          <ul>
-            <li>時間・場所・回数のご希望をお知らせください</li>
-            <li>希望者をこちらで振り分けいたします</li>
-            <li>受講終了後、次回の日程を決めましょう</li>
-          </ul>
-        </div>
+    <div class="content-body reveal">
+      <div class="class-note" style="margin-top:0;">
+        <p style="margin-bottom:8px;"><strong style="color:var(--gold-light);">口頭で承ります</strong></p>
+        <ul style="list-style:none;padding:0;">
+          <li style="padding:4px 0;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:12px;width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:0.5;"></span>時間・場所・回数のご希望をお知らせください</li>
+          <li style="padding:4px 0;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:12px;width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:0.5;"></span>希望者をこちらで振り分けいたします</li>
+          <li style="padding:4px 0;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:12px;width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:0.5;"></span>受講終了後、次回の日程を決めましょう</li>
+        </ul>
       </div>
     </div>
   </div>
@@ -681,35 +639,10 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
       <div class="gold-line"></div>
     </div>
 
-    <div class="dual-panel">
-      <div class="panel panel--kids reveal reveal-delay-1">
-        <h3 class="panel-title">KIDS</h3>
-        <div class="pricing-highlight" style="margin-top:0;">
-          <div class="price-unit">1枠</div>
-          <div class="price-amount">&yen;2,200</div>
-          <p class="price-note">2枠は2倍 / 3枠は3倍</p>
-        </div>
-        <div class="panel-body" style="margin-top: 20px;">
-          <ul>
-            <li><strong>入金方法:</strong> 封筒に日にちとお名前を記入し、おつりのないよう封をしてご提出ください</li>
-          </ul>
-        </div>
-        <div class="envelope-example">
-          <div class="env-label">封筒記入例</div>
-          <div class="env-content">
-            日にち: <strong>3/20 (5)(3)</strong><br>
-            名前: <strong>東淳子</strong>
-          </div>
-        </div>
-      </div>
-      <div class="panel panel--future reveal reveal-delay-2">
-        <h3 class="panel-title">FUTURE</h3>
-        <div class="pricing-highlight" style="margin-top:0;">
-          <div class="price-unit">1枠</div>
-          <div class="price-amount">&yen;2,200</div>
-          <p class="price-note">+ 場所代人数割</p>
-        </div>
-      </div>
+    <div class="pricing-highlight reveal" style="max-width:400px;margin-left:auto;margin-right:auto;">
+      <div class="price-unit">1枠</div>
+      <div class="price-amount">&yen;2,200</div>
+      <p class="price-note">+ 場所代人数割</p>
     </div>
   </div>
 </section>
@@ -731,29 +664,13 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
       <div class="gold-line"></div>
     </div>
 
-    <div class="dual-panel">
-      <div class="panel panel--kids reveal reveal-delay-1">
-        <h3 class="panel-title">KIDS</h3>
-        <div class="panel-body">
-          <ul>
-            <li>キャンセルは<strong>振付マスターLINE</strong>へご連絡ください</li>
-            <li style="font-size:12px; color:var(--kids-accent-light);">※会員ページからのキャンセルはできません</li>
-            <li><strong>前日まで</strong>のキャンセル: 無料</li>
-            <li><strong>当日キャンセル:</strong> 200円のご負担</li>
-            <li>事前にわかっている場合は早めにお知らせください</li>
-            <li><strong>キャンセル代未納の場合、</strong>各自必ずご確認のうえ納入してください</li>
-          </ul>
-        </div>
-      </div>
-      <div class="panel panel--future reveal reveal-delay-2">
-        <h3 class="panel-title">FUTURE</h3>
-        <div class="panel-body">
-          <ul>
-            <li>キャンセル代は<strong>場所代のみ</strong>のご負担</li>
-            <li><strong>JUNJUN先生の個人LINE</strong>へご連絡ください</li>
-            <li>なるべく早めにお願いいたします</li>
-          </ul>
-        </div>
+    <div class="content-body reveal">
+      <div class="class-note" style="margin-top:0;">
+        <ul style="list-style:none;padding:0;">
+          <li style="padding:4px 0;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:12px;width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:0.5;"></span>キャンセル代は<strong>場所代のみ</strong>のご負担</li>
+          <li style="padding:4px 0;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:12px;width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:0.5;"></span><strong>JUNJUN先生の個人LINE</strong>へご連絡ください</li>
+          <li style="padding:4px 0;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:12px;width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:0.5;"></span>なるべく早めにお願いいたします</li>
+        </ul>
       </div>
     </div>
   </div>
@@ -886,111 +803,6 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
   </svg>
 </div>
 
-<!-- ===== SECTION 9: 増枠について ===== -->
-<section class="sec-extra" id="extra">
-  <div class="section-inner">
-    <div class="reveal">
-      <span class="kids-only-badge">KIDS ONLY</span>
-      <p class="section-label">Extra Slots</p>
-      <h2 class="section-heading-jp">増枠について</h2>
-      <div class="gold-line"></div>
-    </div>
-
-    <div class="content-body reveal">
-      <p>予約枠がすべて埋まった場合はお知らせください。可能な範囲で増枠し公開いたします。</p>
-      <p>空きがある場合は、なるべく空き枠へのご予約にご協力ください。</p>
-      <p>※急なご予約は場所の確保ができない場合がございます。ご了承ください。</p>
-    </div>
-
-    <div class="reveal" style="margin-top:32px;">
-      <p class="section-label">Steps</p>
-      <h3 style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:500; letter-spacing:3px; color:var(--gold); margin-bottom:8px;">増枠手順</h3>
-    </div>
-
-    <div class="step-list reveal">
-      <div class="step-item">
-        <div class="step-number">1</div>
-        <div class="step-text">NaNaMi先生と相談、了解</div>
-      </div>
-      <div class="step-item">
-        <div class="step-number">2</div>
-        <div class="step-text">場所予約可能か確認</div>
-      </div>
-      <div class="step-item">
-        <div class="step-number">3</div>
-        <div class="step-text">振付マスターグループLINEで @JUNJUN先生に希望枠報告</div>
-      </div>
-      <div class="step-item">
-        <div class="step-number">4</div>
-        <div class="step-text">JUNJUN先生が会員ページで予約を登録（各自での予約は不要です）</div>
-      </div>
-      <div class="step-item">
-        <div class="step-number">5</div>
-        <div class="step-text">空き枠はどなたでも<a href="members-page.html" style="color:var(--gold);text-decoration:underline;">会員ページ</a>からご予約いただけます</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== ELEGANT DIVIDER ===== -->
-<div class="elegant-divider">
-  <div class="line"></div>
-  <div class="diamond"></div>
-  <div class="line"></div>
-</div>
-
-<!-- ===== SECTION 10: (穴)ご利用の方へ ===== -->
-<section class="sec-anagawa" id="anagawa">
-  <div class="section-inner">
-    <div class="reveal">
-      <span class="kids-only-badge">KIDS ONLY</span>
-      <p class="section-label">Anagawa Guide</p>
-      <h2 class="section-heading-jp">(穴) ご利用の方へ</h2>
-      <div class="gold-line"></div>
-    </div>
-
-    <div class="content-body reveal">
-      <p>振付マスター当日、最初にご利用の方へ:<br>
-      インストラクターは施設利用料の支払いができないため、お手数ですがお支払いと精算をお願いいたします。</p>
-    </div>
-
-    <div class="reveal" style="margin-top:32px;">
-      <p class="section-label">Steps</p>
-      <h3 style="font-family:'Oswald',sans-serif; font-size:16px; font-weight:500; letter-spacing:3px; color:var(--gold); margin-bottom:8px;">手順</h3>
-    </div>
-
-    <div class="step-list reveal">
-      <div class="step-item">
-        <div class="step-number">1</div>
-        <div class="step-text">ホワイトボードで使用場所確認</div>
-      </div>
-      <div class="step-item">
-        <div class="step-number">2</div>
-        <div class="step-text">販売機でチケット購入</div>
-      </div>
-      <div class="step-item">
-        <div class="step-number">3</div>
-        <div class="step-text">受付へ提出</div>
-      </div>
-      <div class="step-item">
-        <div class="step-number">4</div>
-        <div class="step-text">カギを受け取る</div>
-      </div>
-      <div class="step-item">
-        <div class="step-number">5</div>
-        <div class="step-text">NaNaMi先生に精算</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== WAVE DIVIDER ===== -->
-<div class="wave-divider">
-  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="#0D1B2A" opacity="0.5"/>
-    <path d="M0,50 C320,20 640,70 960,40 C1200,15 1360,55 1440,50 L1440,80 L0,80 Z" fill="#0D1B2A"/>
-  </svg>
-</div>
 
 <!-- ===== SECTION 11: 退会の際のキャンセル ===== -->
 <section class="sec-withdraw" id="withdraw">
