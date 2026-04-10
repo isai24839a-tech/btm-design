@@ -19,6 +19,7 @@
 split-landing.html (トップ)
 ├── kids-page.html (KIDSサイト) ── kids-news.html (KIDSブログ)
 ├── future-page.html (FUTUREサイト) ── future-news.html (FUTUREブログ)
+│                                    └── future-trial.html (体験レッスンの方へ)
 └── members-page.html (会員専用)
      ├── スケジュール (Google Sheets自動表示)
      ├── 予約 (Google Apps Script)
@@ -118,10 +119,36 @@ split-landing.html (トップ)
 - [x] **お知らせKIDS/FUTUREタグ**: 管理画面にトグル追加、バッジ表示（KIDS=コーラル/FUTURE=ネイビー）
 - [x] **PC+スマホ動作確認OK**
 
+## 完了済み（体験レッスンページ 2026-04-09）
+- [x] **体験レッスンの方へページ** (`future-trial.html`): 旧Jimdoの画像ベースページをHTML化
+  - Lesson内容（Stretch 40分/Dance 40分/休憩 10分）+ JDAC Dance License実物写真
+  - 料金一覧6ポイント（入会金/チケット/無期限/全studio対応/ビジター料金等）
+  - 規約&割引クーポン6ポイント（皆勤/紹介/家族割/口コミクーポン）+ スタジオ一覧
+  - 体験後アンケートQ1〜Q7 + 入会フォーム表示 + コピーボタン（LINE/メール返信用）
+  - Instagram リンク + お問い合わせ
+  - 持ち物セクション（旧にはないが追加）
+- [x] **FUTUREページナビに「体験の方へ」リンク追加**
+- [x] **デプロイ済み**: `btm-design.pages.dev/future-trial.html`
+- [x] **先生フィードバック対応 (2026-04-10)**:
+  - FUTUREヒーローにKIDSと同じ「クラスを見る」ボタン追加(→#programs)
+  - 「体験レッスンに申し込む」→「体験レッスン参加の方へ」(→future-trial.html)に変更
+  - フローティングバナー・お問い合わせボタンもfuture-trial.htmlにリンク変更
+  - GASメール通知先を2アドレスに(beat.the.mix7386 + isai24839a)
+- [ ] **振付マスターとはページ**: 素材待ち
+
 ## 次にやること
 - [ ] **★定期レッスンデータ入力**: スプレッドシートの「定期レッスン」シートに曜日/スタジオ/時間/クラス/カテゴリを入力
 - [ ] **Google Search Console登録**: サイトマップ送信
-- [ ] tibadance.comドメイン移管（Jimdo → Cloudflare DNS）
+- [ ] **tibadance.comドメイン移管（進行中 2026-04-03）**:
+  - [x] Jimdoからauthコード取得済み: `Xf+0wN9yAnPoLWCL`
+  - [x] Cloudflareにサイト追加済み（Pending状態）
+  - [x] Cloudflare NS: `etta.ns.cloudflare.com` / `zeus.ns.cloudflare.com`
+  - [x] Cloudflare Zone ID: `be92ea4630e078f9320d4dec5dd4c232`
+  - [ ] **★Jimdoサポートにネームサーバー変更可否を問い合わせ中**（回答待ち）
+    - 変更可能な場合 → JimdoでNS変更 → Cloudflare Active化 → 完了（最速）
+    - 変更不可の場合 → Namecheap等に移管 → NS変更 → Cloudflare Active化
+  - [ ] Cloudflare Active化後、DNS設定でCloudflare Pagesに向ける
+  - [ ] 目標: 来週月曜（4/7）に新サイト切り替え
 - [ ] tibadance.comをCloudflare Pagesにカスタムドメイン追加
 - [ ] 旧サイト（GitHub Pages / Jimdo）停止
 
@@ -131,6 +158,7 @@ C:\Users\shirasaki910\Desktop\dance-studio\
 ├── split-landing.html      # ★トップ: KIDS/FUTURE振り分け
 ├── kids-page.html           # KIDSメインサイト
 ├── future-page.html         # FUTUREメインサイト
+├── future-trial.html        # FUTURE体験レッスンの方へ（パンフレット的ページ）
 ├── kids-news.html           # KIDSニュース/ブログ
 ├── future-news.html         # FUTUREニュース/ブログ
 ├── members-page.html        # 会員専用(パスワード認証)

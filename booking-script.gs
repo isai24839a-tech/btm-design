@@ -15,7 +15,7 @@
  */
 
 // ===== 設定 =====
-var ADMIN_EMAIL = 'beat.the.mix7386@gmail.com';
+var ADMIN_EMAILS = ['beat.the.mix7386@gmail.com', 'isai24839a@gmail.com'];
 var ADMIN_KEY = 'potofu7386'; // members-page.htmlのADMIN_PASSWORDと合わせる
 var IMAGE_FOLDER_NAME = 'BTM_お知らせ画像';
 
@@ -266,7 +266,7 @@ function sendBookingNotification(date, studio, time, className, name, email) {
       + '━━━━━━━━━━━━━━━━━━━━\n\n'
       + 'スプレッドシートで確認:\n'
       + SpreadsheetApp.getActiveSpreadsheet().getUrl();
-    GmailApp.sendEmail(ADMIN_EMAIL, subject, body);
+    ADMIN_EMAILS.forEach(function(email) { GmailApp.sendEmail(email, subject, body); });
   } catch (e) {
     Logger.log('メール送信エラー: ' + e.message);
   }
