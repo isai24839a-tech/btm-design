@@ -240,15 +240,6 @@ function bookSlot(params) {
     return jsonResponse({ success: false, error: 'このレッスンは満員です' });
   }
 
-  // Duplicate check
-  for (var i = 1; i < bookingData.length; i++) {
-    var row = bookingData[i];
-    var rowKey = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
-    if (rowKey === key && row[4] === name) {
-      return jsonResponse({ success: false, error: name + 'さんは既にこのレッスンを予約済みです' });
-    }
-  }
-
   bookingSheet.appendRow([date, studio, time, className, name, email, new Date()]);
 
   sendBookingNotification(date, studio, time, className, name, email);
