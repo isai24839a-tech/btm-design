@@ -144,10 +144,16 @@ function getAvailableSlots() {
 
   var bookingData = bookingSheet.getDataRange().getValues();
   var bookingCounts = {};
+  var bookingMembers = {};
   for (var i = 1; i < bookingData.length; i++) {
     var row = bookingData[i];
     var key = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
     bookingCounts[key] = (bookingCounts[key] || 0) + 1;
+    if (!bookingMembers[key]) bookingMembers[key] = [];
+    bookingMembers[key].push({
+      name: String(row[4]),
+      booked_at: row[6] instanceof Date ? Utilities.formatDate(row[6], 'Asia/Tokyo', 'MM/dd HH:mm') : String(row[6] || '')
+    });
   }
 
   var slots = [];
@@ -178,7 +184,8 @@ function getAvailableSlots() {
       max: maxCapacity,
       booked: booked,
       available: Math.max(0, available),
-      category: String(category)
+      category: String(category),
+      members: bookingMembers[key] || []
     });
   }
 
