@@ -266,7 +266,7 @@ function sendBookingNotification(date, studio, time, className, name, email) {
       + '━━━━━━━━━━━━━━━━━━━━\n\n'
       + 'スプレッドシートで確認:\n'
       + SpreadsheetApp.getActiveSpreadsheet().getUrl();
-    ADMIN_EMAILS.forEach(function(email) { GmailApp.sendEmail(email, subject, body); });
+    ADMIN_EMAILS.forEach(function(addr) { GmailApp.sendEmail(addr, subject, body); });
   } catch (e) {
     Logger.log('メール送信エラー: ' + e.message);
   }

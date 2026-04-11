@@ -1914,20 +1914,21 @@ body.category-future .navbar {
 }
 
 .admin-cancel-btn {
-  width: 24px;
-  height: 24px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(229, 57, 53, 0.1);
+  padding: 3px 10px;
+  border: 1.5px solid #e53935;
+  border-radius: 14px;
+  background: rgba(229, 57, 53, 0.08);
   color: #e53935;
-  font-size: 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 500;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 3px;
   flex-shrink: 0;
-  transition: background 0.2s;
-  line-height: 1;
+  transition: all 0.2s;
+  line-height: 1.4;
+  font-family: 'Noto Sans JP', sans-serif;
 }
 
 .admin-cancel-btn:hover {
@@ -2913,10 +2914,34 @@ function getRegularLessonsForDate(dateStr) {
 }
 
 function fetchSlotsFromAPI(callback) {
+  var slotsOk = false, bookingsOk = false;
+  var bookingData = [];
+
+  function mergeAndFinish() {
+    if (!slotsOk || !bookingsOk) return;
+    // Merge booking members into allSlots
+    bookingData.forEach(function(dateGroup) {
+      (dateGroup.slots || []).forEach(function(bSlot) {
+        allSlots.forEach(function(slot) {
+          if (slot.date === dateGroup.date && slot.studio === bSlot.studio &&
+              slot.time === bSlot.time && slot.class_name === bSlot.class_name) {
+            slot.members = bSlot.members || [];
+          }
+        });
+      });
+    });
+    if (callback) callback();
+  }
+
   fetch(APPS_SCRIPT_URL + '?action=slots', { redirect: 'follow' })
     .then(function(r) { return r.json(); })
-    .then(function(data) { allSlots = data; if (callback) callback(); })
-    .catch(function() { allSlots = []; if (callback) callback(); });
+    .then(function(data) { allSlots = data; slotsOk = true; mergeAndFinish(); })
+    .catch(function() { allSlots = []; slotsOk = true; mergeAndFinish(); });
+
+  fetch(APPS_SCRIPT_URL + '?action=list', { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { bookingData = Array.isArray(data) ? data : []; bookingsOk = true; mergeAndFinish(); })
+    .catch(function() { bookingsOk = true; mergeAndFinish(); });
 }
 
 function renderCalendar() {
@@ -3164,7 +3189,7 @@ function renderDayLessons(dateStr) {
         if (isAdminMode) {
           html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
             JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,name:m.name}).replace(/'/g, "\\'") +
-            ')\'>&times;</button>';
+            ')\'>削除</button>';
         }
         html += '</div>';
       });
