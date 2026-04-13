@@ -3,4 +3,14 @@ Allow: /
 Disallow: /members-page.html
 Disallow: /admin-manual.html
 Disallow: /member-manual.html
+Disallow: /design-a-energy.html
+Disallow: /design-b-modern.html
+Disallow: /design-c-dark.html
+Disallow: /design-d-cinematic.html
+Disallow: /design-e-glass.html
+Disallow: /design-f-editorial.html
+Disallow: /design-g-premium.html
+Disallow: /design-h-dynamic.html
+Disallow: /design-i-warm.html
+Disallow: /design-comparison.html
 Sitemap: https://tibadance.com/sitemap.xml
