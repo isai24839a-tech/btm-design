@@ -55,3 +55,7 @@
 # --- 旧Jimdoサイトマップ ---
 /sitemap/* /sitemap.xml 301
 /sitemap /sitemap.xml 301
+
+# --- 旧Jimdo会員エリア ---
+/protected/* /members-page.html 301
+/protected /members-page.html 301
