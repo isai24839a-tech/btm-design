@@ -1,11 +1,57 @@
 # Old Jimdo URLs → New pages (301 permanent redirect)
+
+# --- 具体的な旧Jimdoページ（優先マッチ） ---
 /若葉studio/ / 301
 /若葉studio / 301
-/見学体験お問い合わせ/ /future-trial.html 301
-/見学体験お問い合わせ /future-trial.html 301
 /稲毛studio/ / 301
 /稲毛studio / 301
+/見学体験お問い合わせ/ /future-trial.html 301
+/見学体験お問い合わせ /future-trial.html 301
 /future-40歳以上部門-とは/ /future-page.html 301
 /future-40歳以上部門-とは /future-page.html 301
 /会員-各種予約状況/ /members-page.html 301
 /会員-各種予約状況 /members-page.html 301
+
+# --- 旧Jimdo深層パス: beat-the-mix-top配下（末尾のファイル名で振り分け） ---
+/beat-the-mix-top/レッスン内容-kids/kids-page.html /kids-page.html 301
+/beat-the-mix-top/レッスン内容-kids/future-page.html /future-page.html 301
+/beat-the-mix-top/レッスン内容-kids/members-page.html /members-page.html 301
+/beat-the-mix-top/レッスン内容-kids/* /kids-page.html 301
+/beat-the-mix-top/レッスン内容-kids /kids-page.html 301
+
+/beat-the-mix-top/レッスン内容-future/kids-page.html /kids-page.html 301
+/beat-the-mix-top/レッスン内容-future/future-page.html /future-page.html 301
+/beat-the-mix-top/レッスン内容-future/members-page.html /members-page.html 301
+/beat-the-mix-top/レッスン内容-future/* /future-page.html 301
+/beat-the-mix-top/レッスン内容-future /future-page.html 301
+
+/beat-the-mix-top/インストラクター紹介/* / 301
+/beat-the-mix-top/インストラクター紹介 / 301
+/beat-the-mix-top/* / 301
+/beat-the-mix-top / 301
+
+# --- 体験の方ご説明ページ-future 配下 ---
+/体験の方ご説明ページ-future/kids-page.html /kids-page.html 301
+/体験の方ご説明ページ-future/future-page.html /future-page.html 301
+/体験の方ご説明ページ-future/members-page.html /members-page.html 301
+/体験の方ご説明ページ-future/* /future-trial.html 301
+/体験の方ご説明ページ-future /future-trial.html 301
+
+# --- about配下（Jimdoの自動生成パス） ---
+/about/kids-page.html /kids-page.html 301
+/about/future-page.html /future-page.html 301
+/about/members-page.html /members-page.html 301
+/about/* / 301
+/about / 301
+
+# --- 第1階層の旧Jimdoカテゴリ ---
+/インストラクター紹介/* / 301
+/インストラクター紹介 / 301
+/レッスン内容-future/* /future-page.html 301
+/レッスン内容-future /future-page.html 301
+/レッスン内容-kids/* /kids-page.html 301
+/レッスン内容-kids /kids-page.html 301
+
+# --- 旧Jimdoサイトマップ ---
+/sitemap/* /sitemap.xml 301
+/sitemap /sitemap.xml 301
