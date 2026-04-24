@@ -429,15 +429,16 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
   .lesson-grid { grid-template-columns: 1fr; gap: 16px; }
 }
 @media (max-width: 768px) {
-  .nav-links { display: none; }
-  .nav-links.open {
+  .nav-links {
     display: flex; flex-direction: column; position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
     width: 100vw; height: calc(100vh - 64px); height: calc(100dvh - 64px);
     background: #0d1b2a;
     background: linear-gradient(180deg, #0d1b2a 0%, #1a2a3f 100%);
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     justify-content: center; align-items: center; gap: 32px; z-index: 999;
+    transform: translateY(-110%); transition: transform 0.35s ease;
   }
+  .nav-links.open { transform: translateY(0); }
   .nav-links.open a { font-size: 16px; color: var(--white-soft); }
   .nav-hamburger { display: flex; }
   .hero { min-height: 340px; }

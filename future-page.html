@@ -1727,9 +1727,7 @@ section {
     border-bottom-color: rgba(212, 168, 83, 0.25);
   }
 
-  .nav-links { display: none; }
-
-  .nav-links.open {
+  .nav-links {
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -1750,6 +1748,12 @@ section {
     margin: 0;
     padding: 0;
     z-index: 1001;
+    transform: translateY(-110%);
+    transition: transform 0.35s ease;
+  }
+
+  .nav-links.open {
+    transform: translateY(0);
   }
 
   .nav-links.open a {
