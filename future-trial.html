@@ -111,7 +111,7 @@ body {
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 clamp(20px, 4vw, 48px); height: 64px;
-  background: rgba(13, 27, 42, 0.6);
+  background: rgba(13, 27, 42, 0.92);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(212, 168, 83, 0.12);
   transition: background 0.4s ease;
@@ -432,7 +432,9 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
   .nav-links { display: none; }
   .nav-links.open {
     display: flex; flex-direction: column; position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
-    background: rgba(13, 27, 42, 0.97); backdrop-filter: blur(20px);
+    background: #0d1b2a;
+    background: linear-gradient(180deg, #0d1b2a 0%, #1a2a3f 100%);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     justify-content: center; align-items: center; gap: 32px; z-index: 999;
   }
   .nav-links.open a { font-size: 16px; color: var(--white-soft); }
