@@ -2405,6 +2405,16 @@ body {
   gtag('js', new Date());
   gtag('config', 'G-K4HDNN4D8N');
   gtag('config', 'AW-17939947576');
+  // 体験フォームクリック計測（Googleフォームへの全リンクを補足）
+  document.addEventListener('click', function(e) {
+    var link = e.target.closest('a[href*="docs.google.com/forms"]');
+    if (link) {
+      gtag('event', 'trial_form_click', {
+        'event_category': 'conversion',
+        'event_label': location.pathname
+      });
+    }
+  }, true);
 </script>
 </head>
 <body>
