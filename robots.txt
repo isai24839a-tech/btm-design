@@ -13,4 +13,6 @@ Disallow: /design-g-premium.html
 Disallow: /design-h-dynamic.html
 Disallow: /design-i-warm.html
 Disallow: /design-comparison.html
+Disallow: /protected/
+Disallow: /protected
 Sitemap: https://tibadance.com/sitemap.xml
