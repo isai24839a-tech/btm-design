@@ -37,6 +37,17 @@
 /体験の方ご説明ページ-future/* /future-trial.html 301
 /体験の方ご説明ページ-future /future-trial.html 301
 
+# --- 体験の方へご説明 配下（Jimdoの別表記パス） ---
+/体験の方へご説明/kids-page.html /kids-page.html 301
+/体験の方へご説明/future-page.html /future-page.html 301
+/体験の方へご説明/members-page.html /members-page.html 301
+/体験の方へご説明/* /future-trial.html 301
+/体験の方へご説明 /future-trial.html 301
+/体験の方へご説明/ /future-trial.html 301
+
+# --- /login（旧Jimdo会員ログイン） ---
+/login /members-page.html 301
+
 # --- about配下（Jimdoの自動生成パス） ---
 /about/kids-page.html /kids-page.html 301
 /about/future-page.html /future-page.html 301
