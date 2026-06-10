@@ -694,6 +694,33 @@ body.category-future .navbar {
   outline-color: var(--navy);
 }
 
+/* Full day - all bookable slots are booked (grayed out so it stands out at a glance) */
+.calendar-day.has-lessons.is-full,
+.category-future .calendar-day.has-lessons.is-full {
+  background: var(--gray-500);
+}
+.calendar-day.has-lessons.is-full.has-regular,
+.category-future .calendar-day.has-lessons.is-full.has-regular {
+  outline-color: var(--gray-500);
+}
+.calendar-day.has-lessons.is-full .day-number {
+  color: #fff !important;
+}
+.calendar-day.has-lessons.is-full.selected,
+.category-future .calendar-day.has-lessons.is-full.selected {
+  background: #5f594f;
+}
+.day-full-label {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(0,0,0,0.28);
+  padding: 1px 6px;
+  border-radius: 8px;
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+}
+
 /* Regular lesson card */
 .slot-card.regular-lesson {
   border-left: 4px solid var(--coral);
@@ -2919,7 +2946,12 @@ function getRegularLessonsForDate(dateStr) {
   var filterFn = currentCategory === 'kids' ? isKidsSlot : isFutureSlot;
 
   return regularLessons.filter(function(r) {
-    if (r.dayOfWeek !== dow || !filterFn(r)) return false;
+    if (!filterFn(r)) return false;
+    // Oneshot: 実施日と完全一致のみ（曜日チェックはスキップ）
+    if (r.frequency === 'oneshot') {
+      return r.startDate === dateStr;
+    }
+    if (r.dayOfWeek !== dow) return false;
     // Biweekly check
     if (r.frequency === 'biweekly' && r.startDate) {
       var sp = r.startDate.split('/');
@@ -2979,7 +3011,21 @@ function renderCalendar() {
 
   var filteredSlots = getFilteredSlots();
   var lessonDates = {};
-  filteredSlots.forEach(function(s) { lessonDates[s.date] = true; });
+  var slotsByDate = {};
+  filteredSlots.forEach(function(s) {
+    lessonDates[s.date] = true;
+    (slotsByDate[s.date] = slotsByDate[s.date] || []).push(s);
+  });
+  // A date is "full" when it has slots and every slot is full (not unlimited & available<=0)
+  var fullDates = {};
+  Object.keys(slotsByDate).forEach(function(date) {
+    var allFull = slotsByDate[date].every(function(s) {
+      var isUnlimited = s.max === 0 || s.max === '0';
+      var available = isUnlimited ? 999 : (s.available || 0);
+      return !isUnlimited && available <= 0;
+    });
+    if (allFull) fullDates[date] = true;
+  });
 
   var html = '';
 
@@ -3013,11 +3059,17 @@ function renderCalendar() {
       html += '<span class="holiday-label">休</span>';
       html += '</div>';
     } else {
+      var isFullDay = lessonDates[dateStr] && fullDates[dateStr];
       if (lessonDates[dateStr]) classes.push('has-lessons');
       if (hasRegular && !allRegularsCancelled) classes.push('has-regular');
+      if (isFullDay) classes.push('is-full');
       html += '<div class="' + classes.join(' ') + '" onclick="selectDate(\'' + dateStr + '\')">';
       html += '<span class="day-number">' + d + '</span>';
-      if (lessonDates[dateStr] || (hasRegular && !allRegularsCancelled)) html += '<span class="day-dot"></span>';
+      if (isFullDay) {
+        html += '<span class="day-full-label">満</span>';
+      } else if (lessonDates[dateStr] || (hasRegular && !allRegularsCancelled)) {
+        html += '<span class="day-dot"></span>';
+      }
       html += '</div>';
     }
   }
@@ -3566,7 +3618,7 @@ function initAdminSlotForm() {
     regContainer.innerHTML =
       '<div class="admin-add-form" style="margin-top:2rem;border-top:2px solid var(--gray-200);padding-top:1.5rem">' +
         '<h3>定期レッスンを追加（' + catLabel + '）</h3>' +
-        '<p style="font-size:0.8rem;color:var(--gray-500);margin:-0.5rem 0 1rem">毎週または隔週の決まった曜日のレッスン。カレンダーに塗りつぶしで表示されます。</p>' +
+        '<p style="font-size:0.8rem;color:var(--gray-500);margin:-0.5rem 0 1rem">毎週・隔週・単発から選択。カレンダーに塗りつぶしで表示されます。</p>' +
         '<div class="admin-form-grid">' +
           '<select id="admin-regular-dow">' + dowOptionsReg + '</select>' +
           '<select id="admin-regular-studio">' + buildStudioOptions(activeCat) + '</select>' +
@@ -3579,9 +3631,10 @@ function initAdminSlotForm() {
           '<div class="admin-mode-toggle" style="margin:0">' +
             '<button type="button" class="active" id="admin-regular-freq-weekly" onclick="setRegularFreq(\'weekly\',this)">毎週</button>' +
             '<button type="button" id="admin-regular-freq-biweekly" onclick="setRegularFreq(\'biweekly\',this)">隔週</button>' +
+            '<button type="button" id="admin-regular-freq-oneshot" onclick="setRegularFreq(\'oneshot\',this)">単発</button>' +
           '</div>' +
           '<div id="admin-regular-startdate-wrap" style="display:none">' +
-            '<label style="font-size:0.8rem;color:var(--gray-600)">隔週の基準日（この日から2週ごと）</label>' +
+            '<label id="admin-regular-startdate-label" style="font-size:0.8rem;color:var(--gray-600)">隔週の基準日（この日から2週ごと）</label>' +
             '<input type="date" id="admin-regular-startdate">' +
           '</div>' +
         '</div>' +
@@ -4349,8 +4402,11 @@ function renderAdminRegularLessons(items, container) {
     html += '<div class="slot-card regular-lesson" style="position:relative">';
     html += '<div class="slot-card-info">';
     html += '<span class="regular-lesson-badge" style="background:var(--' + catClass + ')">' + escapeHtml(r.category || 'KIDS') + '</span>';
-    var freqLabel = (r.frequency === 'biweekly') ? '隔週' : '毎週';
+    var freqLabel = (r.frequency === 'biweekly') ? '隔週' : (r.frequency === 'oneshot' ? '単発' : '毎週');
     html += '<span class="slot-tag" style="font-weight:600">' + freqLabel + escapeHtml(r.dayOfWeek || '') + '曜</span>';
+    if (r.frequency === 'oneshot' && r.startDate) {
+      html += '<span class="slot-tag" style="background:#fff3e0;color:#e55a28">' + escapeHtml(r.startDate) + '</span>';
+    }
     if (r.studio) html += '<span class="slot-tag studio">' + escapeHtml(r.studio) + '</span>';
     if (r.time) html += '<span class="slot-tag time">' + escapeHtml(r.time) + '</span>';
     html += '<span class="slot-tag">' + escapeHtml(r.class_name || '') + '</span>';
@@ -4366,7 +4422,12 @@ var _regularFreq = 'weekly';
 function setRegularFreq(freq, btn) {
   _regularFreq = freq;
   var wrap = document.getElementById('admin-regular-startdate-wrap');
-  if (wrap) wrap.style.display = freq === 'biweekly' ? 'block' : 'none';
+  var label = document.getElementById('admin-regular-startdate-label');
+  if (wrap) wrap.style.display = (freq === 'biweekly' || freq === 'oneshot') ? 'block' : 'none';
+  if (label) {
+    if (freq === 'biweekly') label.textContent = '隔週の基準日（この日から2週ごと）';
+    else if (freq === 'oneshot') label.textContent = '実施日（この日だけ表示されます）';
+  }
   var btns = btn.parentElement.querySelectorAll('button');
   btns.forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
@@ -4385,6 +4446,9 @@ function adminAddRegularLesson() {
   if (frequency === 'biweekly') {
     startDate = document.getElementById('admin-regular-startdate').value;
     if (!startDate) { alert('隔週の基準日を選択してください'); return; }
+  } else if (frequency === 'oneshot') {
+    startDate = document.getElementById('admin-regular-startdate').value;
+    if (!startDate) { alert('単発レッスンの実施日を選択してください'); return; }
   }
 
   if (!dow || !className) { alert('曜日とクラス名を入力してください'); return; }
