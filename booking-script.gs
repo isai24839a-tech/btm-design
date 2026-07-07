@@ -31,9 +31,9 @@ function setupSheets() {
 
   var sheets = [
     { name: 'スケジュール', headers: ['日付', 'スタジオ', '時間', 'クラス', '定員', 'category'] },
-    { name: '予約一覧', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時'] },
+    { name: '予約一覧', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時', '登録スタジオ'] },
     { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像', 'カテゴリ', 'ピン留め'] },
-    { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ', '頻度', '基準日'] },
+    { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ', '頻度', '基準日', '定員'] },
     { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: '全体ニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
@@ -152,7 +152,8 @@ function getAvailableSlots() {
     if (!bookingMembers[key]) bookingMembers[key] = [];
     bookingMembers[key].push({
       name: String(row[4]),
-      booked_at: row[6] instanceof Date ? Utilities.formatDate(row[6], 'Asia/Tokyo', 'MM/dd HH:mm') : String(row[6] || '')
+      booked_at: row[6] instanceof Date ? Utilities.formatDate(row[6], 'Asia/Tokyo', 'MM/dd HH:mm') : String(row[6] || ''),
+      home: row[7] ? true : false
     });
   }
 
@@ -208,6 +209,7 @@ function bookSlot(params) {
   var className = params.class_name || '';
   var name = params.name || '';
   var email = params.email || '';
+  var homeStudio = params.home_studio === '1';
 
   if (!name) {
     return jsonResponse({ success: false, error: 'お名前を入力してください' });
@@ -223,42 +225,87 @@ function bookSlot(params) {
     if (rowKey === key) currentBookings++;
   }
 
-  // Find max capacity
+  // Find max capacity (schedule slots first, then regular lessons)
   var scheduleData = scheduleSheet.getDataRange().getValues();
   var maxCapacity = 10;
+  var isRegularLesson = false;
+  var foundInSchedule = false;
   for (var i = 1; i < scheduleData.length; i++) {
     var row = scheduleData[i];
     var schedKey = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
     if (schedKey === key) {
       maxCapacity = (row[4] !== '' && row[4] != null) ? parseInt(row[4]) : 10;
+      foundInSchedule = true;
       break;
     }
   }
 
-  // maxCapacity=0 means unlimited
-  if (maxCapacity > 0 && currentBookings >= maxCapacity) {
-    return jsonResponse({ success: false, error: 'このレッスンは満員です' });
+  if (!foundInSchedule) {
+    var regCap = findRegularLessonCapacity(date, studio, time, className);
+    if (regCap !== null) {
+      isRegularLesson = true;
+      maxCapacity = regCap; // 0 = unlimited
+    }
   }
 
-  bookingSheet.appendRow([date, studio, time, className, name, email, new Date()]);
+  // maxCapacity=0 means unlimited.
+  // Regular lessons: when full, home-studio members (✅) can still book as priority; others are rejected.
+  var overCapacity = false;
+  if (maxCapacity > 0 && currentBookings >= maxCapacity) {
+    if (isRegularLesson && homeStudio) {
+      overCapacity = true;
+    } else {
+      return jsonResponse({ success: false, error: 'このレッスンは満員です' });
+    }
+  }
 
-  sendBookingNotification(date, studio, time, className, name, email);
+  bookingSheet.appendRow([date, studio, time, className, name, email, new Date(), homeStudio ? '✅' : '']);
+
+  sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity);
   if (email) sendBookingConfirmation(email, date, studio, time, className, name);
 
-  return jsonResponse({ success: true, message: '予約が完了しました' });
+  var msg = overCapacity ? '予約が完了しました（登録スタジオ生・優先受付）' : '予約が完了しました';
+  return jsonResponse({ success: true, message: msg });
+}
+
+// ===== 定期レッスンの定員を検索（該当なしはnull） =====
+function findRegularLessonCapacity(dateStr, studio, time, className) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('定期レッスン');
+  if (!sheet || sheet.getLastRow() <= 1) return null;
+
+  var parts = String(dateStr).split('/');
+  if (parts.length !== 3) return null;
+  var dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  var dowNames = ['日', '月', '火', '水', '木', '金', '土'];
+  var dayName = dowNames[dObj.getDay()];
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    var matchDay = String(row[0]) === dayName || String(row[5]) === 'oneshot';
+    if (matchDay && String(row[1] || '') === String(studio) &&
+        String(row[2] || '') === String(time) && String(row[3] || '') === String(className)) {
+      return (row[7] !== '' && row[7] != null) ? parseInt(row[7]) : 0;
+    }
+  }
+  return null;
 }
 
 // ===== 予約通知メール =====
-function sendBookingNotification(date, studio, time, className, name, email) {
+function sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity) {
   try {
     var subject = '【BTM予約】' + name + 'さん — ' + date + ' ' + className;
+    if (overCapacity) subject = '【BTM予約・⚠定員超過優先受付】' + name + 'さん — ' + date + ' ' + className;
     var body = '新しい予約が入りました\n\n'
+      + (overCapacity ? '⚠️ 定員超過ですが登録スタジオ生のため優先受付しました。調整が必要な場合はご対応ください。\n\n' : '')
       + '━━━━━━━━━━━━━━━━━━━━\n'
       + '日付: ' + date + '\n'
       + 'スタジオ: ' + studio + '\n'
       + '時間: ' + time + '\n'
       + 'クラス: ' + className + '\n'
       + 'お名前: ' + name + '\n'
+      + '登録スタジオ生: ' + (homeStudio ? '✅ はい' : '—') + '\n'
       + 'メール: ' + (email || '未入力') + '\n'
       + '予約日時: ' + Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm') + '\n'
       + '━━━━━━━━━━━━━━━━━━━━\n\n'
@@ -314,6 +361,18 @@ function getBookingList() {
     capacityMap[k] = (r[4] !== '' && r[4] != null) ? parseInt(r[4]) : 10;
   }
 
+  // Regular lesson capacities (keyed by studio|time|class, resolved when schedule has no entry)
+  var regSheet = ss.getSheetByName('定期レッスン');
+  var regCapMap = {};
+  if (regSheet && regSheet.getLastRow() > 1) {
+    var regData = regSheet.getDataRange().getValues();
+    for (var i = 1; i < regData.length; i++) {
+      var rr = regData[i];
+      if (!rr[0]) continue;
+      regCapMap[rr[1] + '|' + rr[2] + '|' + rr[3]] = (rr[7] !== '' && rr[7] != null) ? parseInt(rr[7]) : 0;
+    }
+  }
+
   var grouped = {};
   for (var i = 1; i < bookingData.length; i++) {
     var row = bookingData[i];
@@ -326,15 +385,19 @@ function getBookingList() {
 
     if (!grouped[dateStr]) grouped[dateStr] = {};
     if (!grouped[dateStr][slotKey]) {
+      var cap = capacityMap[capKey];
+      if (cap === undefined && regCapMap[slotKey] !== undefined) cap = regCapMap[slotKey];
+      if (cap === undefined) cap = 10;
       grouped[dateStr][slotKey] = {
         studio: studio, time: time, class_name: className,
-        max: capacityMap[capKey] || 10, members: []
+        max: cap, members: []
       };
     }
     grouped[dateStr][slotKey].members.push({
       name: String(row[4]),
       email: String(row[5] || ''),
-      booked_at: row[6] instanceof Date ? Utilities.formatDate(row[6], 'Asia/Tokyo', 'MM/dd HH:mm') : String(row[6])
+      booked_at: row[6] instanceof Date ? Utilities.formatDate(row[6], 'Asia/Tokyo', 'MM/dd HH:mm') : String(row[6]),
+      home: row[7] ? true : false
     });
   }
 
@@ -409,6 +472,7 @@ function getRegularLessons() {
       category: String(row[4] || 'KIDS').toUpperCase(),
       frequency: String(row[5] || 'weekly'),
       startDate: row[6] ? formatDate(row[6]) : '',
+      max: (row[7] !== '' && row[7] != null) ? parseInt(row[7]) : 0,
       row: i + 1
     });
   }
@@ -573,8 +637,9 @@ function adminAddRegularLesson(params) {
 
   var frequency = params.frequency || 'weekly';
   var startDate = params.startDate || '';
+  var max = (params.max !== undefined && params.max !== '') ? parseInt(params.max) : '';
 
-  sheet.appendRow([dayOfWeek, studio, time, className, category, frequency, startDate]);
+  sheet.appendRow([dayOfWeek, studio, time, className, category, frequency, startDate, max]);
   return jsonResponse({ success: true, message: '定期レッスンを追加しました' });
 }
 
@@ -608,6 +673,9 @@ function adminEditRegularLesson(params) {
   var category = params.category || 'KIDS';
 
   sheet.getRange(row, 1, 1, 5).setValues([[dayOfWeek, studio, time, className, category]]);
+  if (params.max !== undefined) {
+    sheet.getRange(row, 8).setValue(params.max === '' ? '' : parseInt(params.max));
+  }
   return jsonResponse({ success: true, message: '更新しました' });
 }
 
