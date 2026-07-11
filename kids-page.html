@@ -529,6 +529,58 @@ body {
   fill: none;
 }
 
+/* Notice card under hero buttons (July = 見学のみ / after July = 空き枠わずか, swapped by JS) */
+.hero-notice {
+  margin: 1.8rem auto 0;
+  max-width: 600px;
+  background: rgba(255,255,255,0.94);
+  border-radius: 16px;
+  padding: 1.1rem 1.5rem;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+.hero-notice-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  color: var(--white);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 3px 14px;
+  border-radius: 20px;
+  margin-bottom: 0.5rem;
+}
+
+.hero-notice-text {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--dark-text);
+  line-height: 1.8;
+}
+
+.hero-notice-text strong {
+  color: var(--coral);
+  font-weight: 700;
+}
+
+.contact-notice {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  margin-top: 1.5rem;
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 14px;
+  padding: 0.8rem 1.3rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.contact-notice strong {
+  color: var(--yellow);
+}
+
 .hero-scroll-hint {
   position: absolute;
   bottom: 2.5rem;
@@ -2480,6 +2532,10 @@ body {
         <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
       </a>
     </div>
+    <div class="hero-notice">
+      <span class="hero-notice-badge" id="heroNoticeBadge">7月のご案内</span>
+      <p class="hero-notice-text" id="heroNoticeText">おかげさまでお申込みが殺到中🎉<br>7月中は<strong>見学のみ</strong>のご案内となります。<br>まずはお気軽に、レッスンの雰囲気を見に来てください✨</p>
+    </div>
   </div>
   <div class="hero-scroll-hint">
     <span>SCROLL</span>
@@ -3119,6 +3175,9 @@ if ('IntersectionObserver' in window) {
         ご質問など、お気軽にどうぞ。
       </p>
     </div>
+    <div class="contact-notice fade-in">
+      <p id="contactNoticeText">🎉 おかげさまでお申込みが殺到中！<br>7月中は<strong>見学のみ</strong>のご案内となります。見学のお申込みも下記フォームからどうぞ✨</p>
+    </div>
     <div class="contact-trial fade-in delay-1">
       <a href="https://docs.google.com/forms/d/e/1FAIpQLSck2gvaKBhbpE8hJqAwyume9r-ghJhlEAOaOUUXefHl5jGflQ/viewform?usp=header" target="_blank" rel="noopener" class="contact-trial-btn">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
@@ -3431,6 +3490,17 @@ function toggleFaq(el) {
 </div>
 
 <script>
+// 2026年8月以降は「7月は見学のみ」告知を自動で「空き枠わずか」訴求に切り替える
+(function() {
+  if (new Date() < new Date(2026, 7, 1)) return; // 〜2026/07/31 は7月版のまま
+  var heroBadge = document.getElementById('heroNoticeBadge');
+  var heroText = document.getElementById('heroNoticeText');
+  var contactText = document.getElementById('contactNoticeText');
+  if (heroBadge) heroBadge.textContent = 'ご好評につき';
+  if (heroText) heroText.innerHTML = 'おかげさまでお申込みが殺到中🎉<br>クラスによっては<strong>空き枠わずか</strong>となっています。<br>体験・見学のお申込みはお早めに✨';
+  if (contactText) contactText.innerHTML = '🎉 おかげさまでお申込みが殺到中！クラスによっては<strong>空き枠わずか</strong>です。<br>体験・見学のお申込みはお早めにどうぞ✨';
+})();
+
 (function() {
   var banner = document.getElementById('trialFloatBanner');
   var closeBtn = document.getElementById('trialFloatClose');
