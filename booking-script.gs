@@ -255,30 +255,14 @@ function bookSlot(params) {
     }
   }
 
-  // FUTURE lessons: one active booking per person — must cancel the existing one first
+  // FUTURE lessons: one slot per lesson per person — block booking the same lesson twice
   if (lessonCategory === 'FUTURE') {
-    var todayStr = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd');
     var nameTrim = String(name).trim();
     for (var i = 1; i < bookingData.length; i++) {
       var bRow = bookingData[i];
-      if (String(bRow[4] || '').trim() !== nameTrim) continue;
-      var bDate = formatDate(bRow[0]);
-      if (bDate < todayStr) continue;
-      var bCat = '';
-      var bKey = bDate + '|' + bRow[1] + '|' + bRow[2] + '|' + bRow[3];
-      for (var j = 1; j < scheduleData.length; j++) {
-        var sRow = scheduleData[j];
-        if (formatDate(sRow[0]) + '|' + sRow[1] + '|' + sRow[2] + '|' + sRow[3] === bKey) {
-          bCat = String(sRow[5] || '').toUpperCase();
-          break;
-        }
-      }
-      if (!bCat) {
-        var bReg = matchRegularLesson(regData, bDate, String(bRow[1] || ''), String(bRow[2] || ''), String(bRow[3] || ''));
-        if (bReg !== null) bCat = String(bReg[4] || 'KIDS').toUpperCase();
-      }
-      if (bCat === 'FUTURE') {
-        return jsonResponse({ success: false, error: '既に ' + bDate + '「' + bRow[3] + '」をご予約済みです。ご予約はお一人1枠までです。変更する場合は先に既存の予約をキャンセルしてください' });
+      var bKey = formatDate(bRow[0]) + '|' + bRow[1] + '|' + bRow[2] + '|' + bRow[3];
+      if (bKey === key && String(bRow[4] || '').trim() === nameTrim) {
+        return jsonResponse({ success: false, error: '既に ' + date + '「' + className + '」をご予約済みです。同じレッスンのご予約はお一人1枠までです' });
       }
     }
   }
