@@ -3305,6 +3305,9 @@ function renderDayLessons(dateStr) {
         html += '<button class="slot-book-btn" onclick=\'openBookingModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>' + regBtnLabel + '</button>';
       }
       html += '</div>';
+      if (rIsFull && !isAdminMode) {
+        html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--navy);border:1.5px solid var(--navy)" onclick=\'openWaitlistModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>&#128276; キャンセル待ち登録</button></div>';
+      }
 
       if (rMembers.length > 0) {
         html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--gray-100)">';
@@ -3366,6 +3369,9 @@ function renderDayLessons(dateStr) {
     } else if (available > 0) {
       html += '<button class="slot-book-btn" onclick=\'openBookingModal(' +
         JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>予約する</button>';
+    } else if (currentCategory === 'future' && !DEMO_MODE) {
+      html += '<button class="slot-book-btn" style="background:transparent;color:var(--navy);border:1.5px solid var(--navy)" onclick=\'openWaitlistModal(' +
+        JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>&#128276; キャンセル待ち</button>';
     } else {
       html += '<button class="slot-book-btn" disabled>満員</button>';
     }
@@ -3480,6 +3486,99 @@ function openBookingModal(slot) {
 function closeBookingModal() {
   document.getElementById('booking-modal').classList.remove('active');
   currentBookingSlot = null;
+  currentWaitlistSlot = null;
+}
+
+// ===== WAITLIST (FUTURE: full lesson -> email when a spot opens) =====
+var currentWaitlistSlot = null;
+
+function openWaitlistModal(slot) {
+  currentWaitlistSlot = slot;
+  currentBookingSlot = null;
+  var modal = document.getElementById('booking-modal');
+
+  var slotHtml =
+    '<span class="slot-tag">' + escapeHtml(slot.date || '') + '</span>' +
+    '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>' +
+    '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>' +
+    '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
+
+  document.getElementById('booking-modal-body').innerHTML =
+    '<h3>キャンセル待ち登録</h3>' +
+    '<p class="booking-modal-sub">満員のため現在ご予約いただけません。空きが出たらメールでお知らせします（通知後のご予約は先着順・自動では予約されません）</p>' +
+    '<div class="booking-modal-slot">' + slotHtml + '</div>' +
+    '<form id="booking-form" onsubmit="event.preventDefault();submitWaitlist()">' +
+      '<div class="booking-field">' +
+        '<label>ニックネーム <span class="required-mark" style="color:var(--navy)">*</span></label>' +
+        '<input type="text" id="booking-name" required placeholder="タロウ" autocomplete="nickname">' +
+      '</div>' +
+      '<div class="booking-field">' +
+        '<label>メールアドレス <span class="required-mark" style="color:var(--navy)">*</span></label>' +
+        '<input type="email" id="booking-email" required placeholder="example@gmail.com" autocomplete="email">' +
+        '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">空きが出た時の通知先です</span>' +
+      '</div>' +
+      '<div class="booking-modal-actions">' +
+        '<button type="button" class="booking-cancel-btn" onclick="closeBookingModal()">閉じる</button>' +
+        '<button type="submit" class="booking-submit-btn" id="booking-submit-btn">登録する</button>' +
+      '</div>' +
+    '</form>';
+
+  modal.classList.remove('modal-future');
+  if (currentCategory === 'future') modal.classList.add('modal-future');
+  modal.classList.add('active');
+
+  // Restore saved name/email from localStorage
+  try {
+    var savedName = localStorage.getItem('btm_booking_name');
+    var savedEmail = localStorage.getItem('btm_booking_email');
+    if (savedName) document.getElementById('booking-name').value = savedName;
+    if (savedEmail) document.getElementById('booking-email').value = savedEmail;
+  } catch(e) {}
+}
+
+function submitWaitlist() {
+  if (!currentWaitlistSlot) return;
+
+  var name = document.getElementById('booking-name').value.trim();
+  var email = document.getElementById('booking-email').value.trim();
+  if (!name) { document.getElementById('booking-name').focus(); return; }
+  if (!email) { document.getElementById('booking-email').focus(); return; }
+
+  try { localStorage.setItem('btm_booking_name', name); } catch(e) {}
+  try { localStorage.setItem('btm_booking_email', email); } catch(e) {}
+
+  var btn = document.getElementById('booking-submit-btn');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+
+  var params = new URLSearchParams({
+    action: 'waitlist',
+    date: currentWaitlistSlot.date || '',
+    studio: currentWaitlistSlot.studio || '',
+    time: currentWaitlistSlot.time || '',
+    class_name: currentWaitlistSlot.class_name || '',
+    name: name, email: email
+  });
+
+  fetch(APPS_SCRIPT_URL + '?' + params.toString(), { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) { showWaitlistSuccess(); }
+      else { btn.disabled = false; btn.textContent = '登録する'; showBookingError(result.error || '登録に失敗しました'); }
+    })
+    .catch(function() { btn.disabled = false; btn.textContent = '登録する'; showBookingError('通信エラーが発生しました'); });
+}
+
+function showWaitlistSuccess() {
+  var body = document.getElementById('booking-modal-body');
+  body.innerHTML =
+    '<div class="booking-success">' +
+      '<div class="booking-success-icon">&#10003;</div>' +
+      '<h4>キャンセル待ちに登録しました</h4>' +
+      '<p>空きが出たらメールでお知らせします<br>（通知後のご予約は先着順です）</p>' +
+      '<br>' +
+      '<button class="slot-book-btn" onclick="closeBookingModal()">閉じる</button>' +
+    '</div>';
 }
 
 // FUTURE: check if this name already booked the same lesson (one slot per lesson rule)

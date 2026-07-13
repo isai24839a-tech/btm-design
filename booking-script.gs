@@ -40,7 +40,8 @@ function setupSheets() {
     { name: '定期休み', headers: ['曜日', 'スタジオ', 'category'] },
     { name: '臨時キャンセル', headers: ['日付', 'スタジオ', '時間', 'クラス', 'カテゴリ'] },
     { name: '不定休', headers: ['日付', '理由', 'カテゴリ'] },
-    { name: '臨時メモ', headers: ['日付', 'スタジオ', '時間', 'メモ', 'カテゴリ'] }
+    { name: '臨時メモ', headers: ['日付', 'スタジオ', '時間', 'メモ', 'カテゴリ'] },
+    { name: 'キャンセル待ち', headers: ['日付', 'スタジオ', '時間', 'クラス', 'ニックネーム', 'メール', '登録日時'] }
   ];
 
   sheets.forEach(function(def) {
@@ -76,6 +77,7 @@ function doGet(e) {
   // Public actions (read-only)
   if (action === 'slots') return getAvailableSlots();
   if (action === 'book') return bookSlot(e.parameter);
+  if (action === 'waitlist') return joinWaitlist(e.parameter);
   if (action === 'list') return getBookingList();
   if (action === 'announcements') return getAnnouncements();
   if (action === 'regularlessons') return getRegularLessons();
@@ -560,7 +562,9 @@ function adminCancelBooking(params) {
   for (var i = data.length - 1; i >= 1; i--) {
     var row = data[i];
     if (formatDate(row[0]) === date && String(row[1]) === studio && String(row[2]) === time && String(row[4]) === name) {
+      var cancelledClass = String(row[3] || '');
       sheet.deleteRow(i + 1);
+      notifyWaitlistIfVacancy(date, studio, time, cancelledClass);
       return jsonResponse({ success: true, message: name + 'さんの予約をキャンセルしました' });
     }
   }
@@ -602,6 +606,7 @@ function memberCancelBooking(params) {
       sheet.deleteRow(i + 1);
       sendCancelNotification(date, studio, time, className, name);
       if (email) sendCancelConfirmation(email, date, studio, time, className, name);
+      notifyWaitlistIfVacancy(date, studio, time, className);
       return jsonResponse({ success: true, message: '予約をキャンセルしました' });
     }
   }
@@ -651,6 +656,182 @@ function sendCancelConfirmation(email, date, studio, time, className, name) {
     GmailApp.sendEmail(email, subject, body);
   } catch (e) {
     Logger.log('キャンセル確認メール送信エラー: ' + e.message);
+  }
+}
+
+// ===== キャンセル待ちシート取得（無ければ作成・既存デプロイでもsetupSheets再実行不要） =====
+function getWaitlistSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('キャンセル待ち');
+  if (!sheet) {
+    sheet = ss.insertSheet('キャンセル待ち');
+    var headers = ['日付', 'スタジオ', '時間', 'クラス', 'ニックネーム', 'メール', '登録日時'];
+    var range = sheet.getRange(1, 1, 1, headers.length);
+    range.setValues([headers]);
+    range.setFontWeight('bold');
+    range.setBackground('#4285f4');
+    range.setFontColor('#ffffff');
+  }
+  return sheet;
+}
+
+// ===== 現在の予約数と定員を取得（スケジュール優先→定期レッスン。max 0=無制限） =====
+function getLessonOccupancy(date, studio, time, className) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var key = date + '|' + studio + '|' + time + '|' + className;
+
+  var current = 0;
+  var bookingSheet = ss.getSheetByName('予約一覧');
+  if (bookingSheet) {
+    var bookingData = bookingSheet.getDataRange().getValues();
+    for (var i = 1; i < bookingData.length; i++) {
+      var row = bookingData[i];
+      if (formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3] === key) current++;
+    }
+  }
+
+  var max = 10;
+  var found = false;
+  var scheduleSheet = ss.getSheetByName('スケジュール');
+  if (scheduleSheet) {
+    var scheduleData = scheduleSheet.getDataRange().getValues();
+    for (var i = 1; i < scheduleData.length; i++) {
+      var row = scheduleData[i];
+      if (formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3] === key) {
+        max = (row[4] !== '' && row[4] != null) ? parseInt(row[4]) : 10;
+        found = true;
+        break;
+      }
+    }
+  }
+  if (!found) {
+    var regRow = matchRegularLesson(getRegularLessonData(), date, studio, time, className);
+    if (regRow !== null) max = (regRow[7] !== '' && regRow[7] != null) ? parseInt(regRow[7]) : 0;
+  }
+  return { current: current, max: max };
+}
+
+// ===== キャンセル待ち登録（満員レッスンのみ・メール必須） =====
+function joinWaitlist(params) {
+  var date = params.date || '';
+  var studio = params.studio || '';
+  var time = params.time || '';
+  var className = params.class_name || '';
+  var name = String(params.name || '').trim();
+  var email = String(params.email || '').trim();
+
+  if (!name) return jsonResponse({ success: false, error: 'ニックネームを入力してください' });
+  if (!email) return jsonResponse({ success: false, error: '空き通知の送信先メールアドレスを入力してください' });
+
+  var occ = getLessonOccupancy(date, studio, time, className);
+  if (occ.max === 0 || occ.current < occ.max) {
+    return jsonResponse({ success: false, error: '現在このレッスンには空きがあります。そのままご予約ください' });
+  }
+
+  var sheet = getWaitlistSheet();
+  var key = date + '|' + studio + '|' + time + '|' + className;
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    var rowKey = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
+    if (rowKey === key && (String(row[4] || '').trim() === name || String(row[5] || '').trim().toLowerCase() === email.toLowerCase())) {
+      return jsonResponse({ success: false, error: '既にこのレッスンのキャンセル待ちに登録済みです' });
+    }
+  }
+
+  sheet.appendRow([date, studio, time, className, name, email, new Date()]);
+  sendWaitlistConfirmation(email, date, studio, time, className, name);
+  return jsonResponse({ success: true, message: 'キャンセル待ちに登録しました' });
+}
+
+// ===== キャンセル発生時: 空きが出ていればキャンセル待ち全員へ通知して登録解除（予約は先着順） =====
+function notifyWaitlistIfVacancy(date, studio, time, className) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('キャンセル待ち');
+    if (!sheet || sheet.getLastRow() <= 1) return;
+
+    var parts = String(date).split('/');
+    if (parts.length === 3) {
+      var lessonDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (lessonDate < today) return;
+    }
+
+    // Home-studio priority can overbook; only notify when a spot is actually open
+    var occ = getLessonOccupancy(date, studio, time, className);
+    if (occ.max > 0 && occ.current >= occ.max) return;
+
+    var key = date + '|' + studio + '|' + time + '|' + className;
+    var data = sheet.getDataRange().getValues();
+    var notified = [];
+    for (var i = data.length - 1; i >= 1; i--) {
+      var row = data[i];
+      var rowKey = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
+      if (rowKey !== key) continue;
+      var email = String(row[5] || '').trim();
+      var name = String(row[4] || '').trim();
+      if (email) notified.push({ email: email, name: name });
+      sheet.deleteRow(i + 1);
+    }
+    notified.forEach(function(w) {
+      sendWaitlistVacancyEmail(w.email, date, studio, time, className, w.name);
+    });
+  } catch (e) {
+    Logger.log('キャンセル待ち通知エラー: ' + e.message);
+  }
+}
+
+// ===== キャンセル待ち受付メール（登録者宛） =====
+function sendWaitlistConfirmation(email, date, studio, time, className, name) {
+  try {
+    var subject = '【BEAT THE MIX】キャンセル待ち受付 — ' + date + ' ' + className;
+    var body = name + ' 様\n\n'
+      + '以下のレッスンのキャンセル待ちを受け付けました。\n\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n'
+      + '日付: ' + date + '\n'
+      + 'スタジオ: ' + studio + '\n'
+      + '時間: ' + time + '\n'
+      + 'クラス: ' + className + '\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n\n'
+      + '空きが出ましたら、このメールアドレスにお知らせします。\n'
+      + '※通知後のご予約は先着順です（自動では予約されません）。\n\n'
+      + 'BEAT THE MIX ダンススタジオ\n\n'
+      + '─────────────────────\n'
+      + '※このメールは送信専用です。\n'
+      + '　このメールに返信しても届きませんので\n'
+      + '　ご了承ください。';
+    GmailApp.sendEmail(email, subject, body);
+  } catch (e) {
+    Logger.log('キャンセル待ち受付メール送信エラー: ' + e.message);
+  }
+}
+
+// ===== 空き発生通知メール（キャンセル待ち登録者宛） =====
+function sendWaitlistVacancyEmail(email, date, studio, time, className, name) {
+  try {
+    var subject = '【BEAT THE MIX】空きが出ました — ' + date + ' ' + className;
+    var body = name + ' 様\n\n'
+      + 'キャンセル待ちいただいていた以下のレッスンに空きが出ました。\n\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n'
+      + '日付: ' + date + '\n'
+      + 'スタジオ: ' + studio + '\n'
+      + '時間: ' + time + '\n'
+      + 'クラス: ' + className + '\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n\n'
+      + 'ご希望の場合は、会員ページからご予約ください（先着順）。\n'
+      + 'https://tibadance.com/members-page\n\n'
+      + '※この通知をもってキャンセル待ちの登録は解除されます。\n'
+      + '　再び満員になった場合は、お手数ですが再度キャンセル待ちにご登録ください。\n\n'
+      + 'BEAT THE MIX ダンススタジオ\n\n'
+      + '─────────────────────\n'
+      + '※このメールは送信専用です。\n'
+      + '　このメールに返信しても届きませんので\n'
+      + '　ご了承ください。';
+    GmailApp.sendEmail(email, subject, body);
+  } catch (e) {
+    Logger.log('空き通知メール送信エラー: ' + e.message);
   }
 }
 
