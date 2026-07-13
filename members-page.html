@@ -2992,6 +2992,8 @@ function fetchRegularLessons(callback) {
               category: (item.category || 'KIDS').toUpperCase(),
               frequency: item.frequency || 'weekly',
               startDate: item.startDate || '',
+              periodStart: item.periodStart || '',
+              periodEnd: item.periodEnd || '',
               max: (item.max !== undefined && item.max !== '') ? parseInt(item.max) : 0,
               row: item.row
             });
@@ -3001,6 +3003,13 @@ function fetchRegularLessons(callback) {
       if (callback) callback();
     })
     .catch(function() { if (callback) callback(); });
+}
+
+function parsePeriodDate(s) {
+  if (!s) return null;
+  var p = String(s).split(/[\/\-]/);
+  if (p.length !== 3) return null;
+  return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
 }
 
 function getRegularLessonsForDate(dateStr) {
@@ -3016,6 +3025,11 @@ function getRegularLessonsForDate(dateStr) {
       return r.startDate === dateStr;
     }
     if (r.dayOfWeek !== dow) return false;
+    // 期間設定: 開催期間外の日には表示しない
+    var ps = parsePeriodDate(r.periodStart);
+    var pe = parsePeriodDate(r.periodEnd);
+    if (ps && dateObj < ps) return false;
+    if (pe && dateObj > pe) return false;
     // Biweekly check
     if (r.frequency === 'biweekly' && r.startDate) {
       var sp = r.startDate.split('/');
@@ -3968,6 +3982,14 @@ function initAdminSlotForm() {
             '<label id="admin-regular-startdate-label" style="font-size:0.8rem;color:var(--gray-600)">隔週の基準日（この日から2週ごと）</label>' +
             '<input type="date" id="admin-regular-startdate">' +
           '</div>' +
+          '<div id="admin-regular-period-wrap">' +
+            '<label style="font-size:0.8rem;color:var(--gray-600)">開催期間（任意・空欄=ずっと開催）</label>' +
+            '<div style="display:flex;align-items:center;gap:0.4rem">' +
+              '<input type="date" id="admin-regular-period-start" style="flex:1">' +
+              '<span style="color:var(--gray-500)">〜</span>' +
+              '<input type="date" id="admin-regular-period-end" style="flex:1">' +
+            '</div>' +
+          '</div>' +
         '</div>' +
         '<button class="admin-add-btn" onclick="adminAddRegularLesson()" style="margin-top:0.75rem">追加する</button>' +
       '</div>' +
@@ -4645,6 +4667,15 @@ function showEditRegularForm(r, cardId) {
       '</div>' +
       '<input id="edit-reg-class-' + cardId + '" value="' + escapeHtml(r.class_name || '') + '" placeholder="クラス名">' +
       '<input type="number" id="edit-reg-max-' + cardId + '" min="0" value="' + (r.max > 0 ? r.max : '') + '" placeholder="定員（空欄=無制限）">' +
+      (r.frequency === 'oneshot' ? '' :
+        '<div style="grid-column:1/-1">' +
+          '<label style="font-size:0.8rem;color:var(--gray-600)">開催期間（任意・空欄=ずっと開催）</label>' +
+          '<div style="display:flex;align-items:center;gap:0.4rem">' +
+            '<input type="date" id="edit-reg-ps-' + cardId + '" value="' + String(r.periodStart || '').replace(/\//g, '-') + '" style="flex:1">' +
+            '<span style="color:var(--gray-500)">〜</span>' +
+            '<input type="date" id="edit-reg-pe-' + cardId + '" value="' + String(r.periodEnd || '').replace(/\//g, '-') + '" style="flex:1">' +
+          '</div>' +
+        '</div>') +
     '</div>' +
     '<div class="edit-actions">' +
       '<button class="edit-save-btn" onclick=\'saveEditRegular(' + (r.row || 0) + ',"' + cardId + '")\'>保存</button>' +
@@ -4671,14 +4702,23 @@ function saveEditRegular(row, cardId) {
 
   if (!dow || !className) { alert('曜日とクラス名を入力してください'); return; }
 
+  var psEl = document.getElementById('edit-reg-ps-' + cardId);
+  var peEl = document.getElementById('edit-reg-pe-' + cardId);
+  var periodStart = psEl ? psEl.value : '';
+  var periodEnd = peEl ? peEl.value : '';
+  if (periodStart && periodEnd && periodEnd < periodStart) { alert('開催期間の終了日が開始日より前になっています'); return; }
+
   var maxLabel = maxVal !== '' && parseInt(maxVal) > 0 ? '定員' + maxVal + '名' : '定員なし';
-  if (!confirm(dow + '曜 ' + studio + ' ' + time + ' ' + className + '（' + maxLabel + '）\nこの内容で保存しますか？')) return;
+  var periodLabel = (periodStart || periodEnd) ? '\n開催期間: ' + (periodStart || '') + '〜' + (periodEnd || '') : '';
+  if (!confirm(dow + '曜 ' + studio + ' ' + time + ' ' + className + '（' + maxLabel + '）' + periodLabel + '\nこの内容で保存しますか？')) return;
 
   var params = new URLSearchParams({
     action: 'editRegularLesson', adminKey: ADMIN_PASSWORD,
     row: row, dayOfWeek: dow, studio: studio, time: time, class_name: className, category: category,
     max: maxVal
   });
+  // 単発（期間input無し）の時はperiodStart/End自体を送らない → GAS側は既存値を維持
+  if (psEl) { params.append('periodStart', periodStart); params.append('periodEnd', periodEnd); }
   apiCall(params, function() {
     fetchRegularLessons(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); });
     fetchAdminRegularLessons();
@@ -4774,6 +4814,9 @@ function renderAdminRegularLessons(items, container) {
     if (r.frequency === 'oneshot' && r.startDate) {
       html += '<span class="slot-tag" style="background:#fff3e0;color:#e55a28">' + escapeHtml(r.startDate) + '</span>';
     }
+    if (r.frequency !== 'oneshot' && (r.periodStart || r.periodEnd)) {
+      html += '<span class="slot-tag" style="background:#e3f2fd;color:#1565c0">📅 ' + escapeHtml(r.periodStart || '') + '〜' + escapeHtml(r.periodEnd || '') + '</span>';
+    }
     if (r.studio) html += '<span class="slot-tag studio">' + escapeHtml(r.studio) + '</span>';
     if (r.time) html += '<span class="slot-tag time">' + escapeHtml(r.time) + '</span>';
     html += '<span class="slot-tag">' + escapeHtml(r.class_name || '') + '</span>';
@@ -4781,7 +4824,8 @@ function renderAdminRegularLessons(items, container) {
     html += '</div>';
     var editData = {
       dayOfWeekName: r.dayOfWeek || '', studio: r.studio || '', time: r.time || '',
-      class_name: r.class_name || '', max: maxNum, row: r.row
+      class_name: r.class_name || '', max: maxNum, row: r.row,
+      frequency: r.frequency || 'weekly', periodStart: r.periodStart || '', periodEnd: r.periodEnd || ''
     };
     html += '<button class="admin-edit-btn" onclick=\'showEditRegularForm(' + JSON.stringify(editData).replace(/'/g, "\\'") + ',"' + cardId + '")\'>' +
       '<svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>';
@@ -4799,6 +4843,9 @@ function setRegularFreq(freq, btn) {
   var wrap = document.getElementById('admin-regular-startdate-wrap');
   var label = document.getElementById('admin-regular-startdate-label');
   if (wrap) wrap.style.display = (freq === 'biweekly' || freq === 'oneshot') ? 'block' : 'none';
+  // 単発は実施日固定なので開催期間の入力は不要
+  var periodWrap = document.getElementById('admin-regular-period-wrap');
+  if (periodWrap) periodWrap.style.display = (freq === 'oneshot') ? 'none' : 'block';
   if (label) {
     if (freq === 'biweekly') label.textContent = '隔週の基準日（この日から2週ごと）';
     else if (freq === 'oneshot') label.textContent = '実施日（この日だけ表示されます）';
@@ -4831,15 +4878,27 @@ function adminAddRegularLesson() {
   var maxEl = document.getElementById('admin-regular-max');
   var maxVal = maxEl && maxEl.value !== '' ? maxEl.value : '';
 
+  var periodStart = '', periodEnd = '';
+  var psEl = document.getElementById('admin-regular-period-start');
+  var peEl = document.getElementById('admin-regular-period-end');
+  if (frequency !== 'oneshot') {
+    periodStart = psEl ? psEl.value : '';
+    periodEnd = peEl ? peEl.value : '';
+    if (periodStart && periodEnd && periodEnd < periodStart) { alert('開催期間の終了日が開始日より前になっています'); return; }
+  }
+
   var params = new URLSearchParams({
     action: 'addRegularLesson', adminKey: ADMIN_PASSWORD,
     dayOfWeek: dow, studio: studio, time: time, class_name: className, category: category,
-    frequency: frequency, startDate: startDate, max: maxVal
+    frequency: frequency, startDate: startDate, max: maxVal,
+    periodStart: periodStart, periodEnd: periodEnd
   });
 
   apiCall(params, function() {
     document.getElementById('admin-regular-class').value = '';
     if (maxEl) maxEl.value = '';
+    if (psEl) psEl.value = '';
+    if (peEl) peEl.value = '';
     document.getElementById('admin-regular-time-start').selectedIndex = 0;
     document.getElementById('admin-regular-time-end').selectedIndex = 0;
     fetchAdminRegularLessons();

@@ -33,7 +33,7 @@ function setupSheets() {
     { name: 'スケジュール', headers: ['日付', 'スタジオ', '時間', 'クラス', '定員', 'category'] },
     { name: '予約一覧', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時', '登録スタジオ'] },
     { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像', 'カテゴリ', 'ピン留め'] },
-    { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ', '頻度', '基準日', '定員'] },
+    { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ', '頻度', '基準日', '定員', '期間開始', '期間終了'] },
     { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: '全体ニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
@@ -304,6 +304,15 @@ function getRegularLessonData() {
   return sheet.getDataRange().getValues();
 }
 
+// ===== 期間設定の値をDateに変換（Date型/文字列両対応・無効はnull） =====
+function parsePeriodDate(v) {
+  if (!v) return null;
+  if (v instanceof Date) return new Date(v.getFullYear(), v.getMonth(), v.getDate());
+  var p = String(v).split(/[\/\-]/);
+  if (p.length !== 3) return null;
+  return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+}
+
 // ===== 定期レッスン行を検索（該当なしはnull） =====
 function matchRegularLesson(regData, dateStr, studio, time, className) {
   if (!regData) return null;
@@ -318,6 +327,13 @@ function matchRegularLesson(regData, dateStr, studio, time, className) {
     var matchDay = String(row[0]) === dayName || String(row[5]) === 'oneshot';
     if (matchDay && String(row[1] || '') === String(studio) &&
         String(row[2] || '') === String(time) && String(row[3] || '') === String(className)) {
+      // 期間設定（oneshot以外）: 開催期間外の日はこの定期レッスンに該当しない
+      if (String(row[5]) !== 'oneshot') {
+        var ps = parsePeriodDate(row[8]);
+        var pe = parsePeriodDate(row[9]);
+        if (ps && dObj < ps) continue;
+        if (pe && dObj > pe) continue;
+      }
       return row;
     }
   }
@@ -505,6 +521,8 @@ function getRegularLessons() {
       frequency: String(row[5] || 'weekly'),
       startDate: row[6] ? formatDate(row[6]) : '',
       max: (row[7] !== '' && row[7] != null) ? parseInt(row[7]) : 0,
+      periodStart: row[8] ? formatDate(row[8]) : '',
+      periodEnd: row[9] ? formatDate(row[9]) : '',
       row: i + 1
     });
   }
@@ -937,9 +955,19 @@ function adminAddRegularLesson(params) {
   var frequency = params.frequency || 'weekly';
   var startDate = params.startDate || '';
   var max = (params.max !== undefined && params.max !== '') ? parseInt(params.max) : '';
+  var periodStart = params.periodStart || '';
+  var periodEnd = params.periodEnd || '';
 
-  sheet.appendRow([dayOfWeek, studio, time, className, category, frequency, startDate, max]);
+  if (periodStart || periodEnd) ensureRegularPeriodColumns(sheet);
+  sheet.appendRow([dayOfWeek, studio, time, className, category, frequency, startDate, max, periodStart, periodEnd]);
   return jsonResponse({ success: true, message: '定期レッスンを追加しました' });
+}
+
+// ===== 定期レッスンシートに期間列（I:期間開始/J:期間終了）を確保 =====
+function ensureRegularPeriodColumns(sheet) {
+  if (sheet.getMaxColumns() < 10) sheet.insertColumnsAfter(sheet.getMaxColumns(), 10 - sheet.getMaxColumns());
+  if (String(sheet.getRange(1, 9).getValue() || '') === '') sheet.getRange(1, 9).setValue('期間開始');
+  if (String(sheet.getRange(1, 10).getValue() || '') === '') sheet.getRange(1, 10).setValue('期間終了');
 }
 
 // ===== 管理者: 定期レッスン削除 =====
@@ -974,6 +1002,11 @@ function adminEditRegularLesson(params) {
   sheet.getRange(row, 1, 1, 5).setValues([[dayOfWeek, studio, time, className, category]]);
   if (params.max !== undefined) {
     sheet.getRange(row, 8).setValue(params.max === '' ? '' : parseInt(params.max));
+  }
+  // 期間設定（パラメータ未送信=単発編集時は既存値を維持）
+  if (params.periodStart !== undefined || params.periodEnd !== undefined) {
+    ensureRegularPeriodColumns(sheet);
+    sheet.getRange(row, 9, 1, 2).setValues([[params.periodStart || '', params.periodEnd || '']]);
   }
   return jsonResponse({ success: true, message: '更新しました' });
 }
