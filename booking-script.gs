@@ -352,6 +352,9 @@ function bookSlot(params) {
       isRegularLesson = true;
       maxCapacity = (regRow[7] !== '' && regRow[7] != null) ? parseInt(regRow[7]) : 0; // 0 = unlimited
       lessonCategory = String(regRow[4] || 'KIDS').toUpperCase();
+    } else {
+      // スケジュール枠にも定期レッスン（開催期間内・隔週該当日）にも一致しない日は予約を受け付けない
+      return jsonResponse({ success: false, error: 'この日はこのレッスンの開催日ではないため予約できません' });
     }
   }
 
