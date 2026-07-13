@@ -228,26 +228,58 @@ function bookSlot(params) {
     if (rowKey === key) currentBookings++;
   }
 
-  // Find max capacity (schedule slots first, then regular lessons)
+  // Find max capacity and category (schedule slots first, then regular lessons)
   var scheduleData = scheduleSheet.getDataRange().getValues();
   var maxCapacity = 10;
   var isRegularLesson = false;
   var foundInSchedule = false;
+  var lessonCategory = '';
   for (var i = 1; i < scheduleData.length; i++) {
     var row = scheduleData[i];
     var schedKey = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
     if (schedKey === key) {
       maxCapacity = (row[4] !== '' && row[4] != null) ? parseInt(row[4]) : 10;
+      lessonCategory = String(row[5] || '').toUpperCase();
       foundInSchedule = true;
       break;
     }
   }
 
+  var regData = getRegularLessonData();
   if (!foundInSchedule) {
-    var regCap = findRegularLessonCapacity(date, studio, time, className);
-    if (regCap !== null) {
+    var regRow = matchRegularLesson(regData, date, studio, time, className);
+    if (regRow !== null) {
       isRegularLesson = true;
-      maxCapacity = regCap; // 0 = unlimited
+      maxCapacity = (regRow[7] !== '' && regRow[7] != null) ? parseInt(regRow[7]) : 0; // 0 = unlimited
+      lessonCategory = String(regRow[4] || 'KIDS').toUpperCase();
+    }
+  }
+
+  // FUTURE lessons: one active booking per person — must cancel the existing one first
+  if (lessonCategory === 'FUTURE') {
+    var todayStr = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd');
+    var nameTrim = String(name).trim();
+    for (var i = 1; i < bookingData.length; i++) {
+      var bRow = bookingData[i];
+      if (String(bRow[4] || '').trim() !== nameTrim) continue;
+      var bDate = formatDate(bRow[0]);
+      if (bDate < todayStr) continue;
+      var bCat = '';
+      var bKey = bDate + '|' + bRow[1] + '|' + bRow[2] + '|' + bRow[3];
+      for (var j = 1; j < scheduleData.length; j++) {
+        var sRow = scheduleData[j];
+        if (formatDate(sRow[0]) + '|' + sRow[1] + '|' + sRow[2] + '|' + sRow[3] === bKey) {
+          bCat = String(sRow[5] || '').toUpperCase();
+          break;
+        }
+      }
+      if (!bCat) {
+        var bReg = matchRegularLesson(regData, bDate, String(bRow[1] || ''), String(bRow[2] || ''), String(bRow[3] || ''));
+        if (bReg !== null) bCat = String(bReg[4] || 'KIDS').toUpperCase();
+      }
+      if (bCat === 'FUTURE') {
+        return jsonResponse({ success: false, error: '既に ' + bDate + '「' + bRow[3] + '」をご予約済みです。ご予約はお一人1枠までです。変更する場合は先に既存の予約をキャンセルしてください' });
+      }
     }
   }
 
@@ -271,25 +303,29 @@ function bookSlot(params) {
   return jsonResponse({ success: true, message: msg });
 }
 
-// ===== 定期レッスンの定員を検索（該当なしはnull） =====
-function findRegularLessonCapacity(dateStr, studio, time, className) {
+// ===== 定期レッスンシートの全行を取得（ヘッダー込み・シート無しはnull） =====
+function getRegularLessonData() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('定期レッスン');
   if (!sheet || sheet.getLastRow() <= 1) return null;
+  return sheet.getDataRange().getValues();
+}
 
+// ===== 定期レッスン行を検索（該当なしはnull） =====
+function matchRegularLesson(regData, dateStr, studio, time, className) {
+  if (!regData) return null;
   var parts = String(dateStr).split('/');
   if (parts.length !== 3) return null;
   var dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
   var dowNames = ['日', '月', '火', '水', '木', '金', '土'];
   var dayName = dowNames[dObj.getDay()];
 
-  var data = sheet.getDataRange().getValues();
-  for (var i = 1; i < data.length; i++) {
-    var row = data[i];
+  for (var i = 1; i < regData.length; i++) {
+    var row = regData[i];
     var matchDay = String(row[0]) === dayName || String(row[5]) === 'oneshot';
     if (matchDay && String(row[1] || '') === String(studio) &&
         String(row[2] || '') === String(time) && String(row[3] || '') === String(className)) {
-      return (row[7] !== '' && row[7] != null) ? parseInt(row[7]) : 0;
+      return row;
     }
   }
   return null;

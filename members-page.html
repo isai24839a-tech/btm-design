@@ -3480,6 +3480,51 @@ function closeBookingModal() {
   currentBookingSlot = null;
 }
 
+// FUTURE: find an existing upcoming booking by this name (one-booking-per-person rule)
+function findUpcomingFutureBooking(name) {
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+  for (var i = 0; i < allBookingData.length; i++) {
+    var group = allBookingData[i];
+    var p = String(group.date || '').split('/');
+    if (p.length !== 3) continue;
+    var d = new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+    if (d < today) continue;
+    var slots = group.slots || [];
+    for (var j = 0; j < slots.length; j++) {
+      var s = slots[j];
+      if (!bookedSlotIsFuture(group.date, s)) continue;
+      var members = s.members || [];
+      for (var k = 0; k < members.length; k++) {
+        if (String(members[k].name || '').trim() === name) {
+          return { date: group.date, class_name: s.class_name, studio: s.studio, time: s.time };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+// Resolve a booked slot's category: schedule slots first, then regular lessons, then class-name heuristic
+function bookedSlotIsFuture(dateStr, s) {
+  for (var i = 0; i < allSlots.length; i++) {
+    var sl = allSlots[i];
+    if (sl.date === dateStr && sl.studio === s.studio && sl.time === s.time && sl.class_name === s.class_name) {
+      return isFutureSlot(sl);
+    }
+  }
+  var p = dateStr.split('/');
+  var dow = new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2])).getDay();
+  for (var i = 0; i < regularLessons.length; i++) {
+    var r = regularLessons[i];
+    if (r.studio === s.studio && r.time === s.time && r.class_name === s.class_name &&
+        (r.frequency === 'oneshot' ? r.startDate === dateStr : r.dayOfWeek === dow)) {
+      return isFutureSlot(r);
+    }
+  }
+  return isFutureSlot({ class_name: s.class_name });
+}
+
 function submitBooking() {
   if (!currentBookingSlot) return;
 
@@ -3500,6 +3545,15 @@ function submitBooking() {
       currentBookingSlot.booked >= currentBookingSlot.max && !homeStudio) {
     showBookingError('満員のため、登録スタジオの生徒のみ予約できます');
     return;
+  }
+
+  // FUTURE: one active booking per person — block a second booking before sending
+  if (currentCategory === 'future' && !DEMO_MODE) {
+    var existingFuture = findUpcomingFutureBooking(name);
+    if (existingFuture) {
+      showBookingError('既に' + existingFuture.date + '「' + existingFuture.class_name + '」をご予約済みです。ご予約はお一人1枠までです。変更する場合は先に既存の予約をキャンセルしてください');
+      return;
+    }
   }
 
   // Save name/email to localStorage for next time
