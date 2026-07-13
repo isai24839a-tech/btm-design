@@ -31,7 +31,8 @@ function setupSheets() {
 
   var sheets = [
     { name: 'スケジュール', headers: ['日付', 'スタジオ', '時間', 'クラス', '定員', 'category'] },
-    { name: '予約一覧', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時', '登録スタジオ'] },
+    { name: '予約一覧KIDS', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時', '登録スタジオ'] },
+    { name: '予約一覧FUTURE', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時', '登録スタジオ'] },
     { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像', 'カテゴリ', 'ピン留め'] },
     { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ', '頻度', '基準日', '定員', '期間開始', '期間終了'] },
     { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
@@ -68,6 +69,102 @@ function setupSheets() {
   }
 
   SpreadsheetApp.getUi().alert('セットアップ完了！ 5シート作成しました。\n\n次は「デプロイ」→「新しいデプロイ」→「ウェブアプリ」でデプロイしてください。');
+}
+
+// ===== 予約シート（KIDS/FUTURE分割） =====
+var BOOKING_HEADERS = ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時', '登録スタジオ'];
+
+// カテゴリに対応する予約シートを取得（無ければ作成・再デプロイのみでOK）
+function getBookingSheetByCategory(category) {
+  var name = (String(category || '').toUpperCase() === 'FUTURE') ? '予約一覧FUTURE' : '予約一覧KIDS';
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(name);
+  if (!sheet) {
+    sheet = ss.insertSheet(name);
+    var range = sheet.getRange(1, 1, 1, BOOKING_HEADERS.length);
+    range.setValues([BOOKING_HEADERS]);
+    range.setFontWeight('bold');
+    range.setBackground('#4285f4');
+    range.setFontColor('#ffffff');
+  }
+  return sheet;
+}
+
+// 予約が入っている全シート（KIDS/FUTURE）。旧「予約一覧」が残っていれば先に自動移行する
+function getBookingSheets() {
+  migrateLegacyBookingSheet();
+  return [getBookingSheetByCategory('KIDS'), getBookingSheetByCategory('FUTURE')];
+}
+
+// 全予約行を連結して返す（ヘッダー行なし・列構成は旧「予約一覧」と同じ）
+function getAllBookingRows() {
+  var rows = [];
+  getBookingSheets().forEach(function(sheet) {
+    if (sheet.getLastRow() <= 1) return;
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) rows.push(data[i]);
+  });
+  return rows;
+}
+
+// 予約行をまとめて追記（列数を8列に正規化）
+function appendBookingRows(sheet, rows) {
+  if (!rows.length) return;
+  var norm = rows.map(function(r) {
+    var out = r.slice(0, BOOKING_HEADERS.length);
+    while (out.length < BOOKING_HEADERS.length) out.push('');
+    return out;
+  });
+  sheet.getRange(sheet.getLastRow() + 1, 1, norm.length, BOOKING_HEADERS.length).setValues(norm);
+}
+
+// 旧「予約一覧」シートの行をカテゴリ判定してKIDS/FUTUREへ移し、旧シートを削除（初回1回だけ動く）
+function migrateLegacyBookingSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var legacy = ss.getSheetByName('予約一覧');
+  if (!legacy) return;
+
+  var kidsRows = [];
+  var futureRows = [];
+  if (legacy.getLastRow() > 1) {
+    var scheduleCat = {};
+    var scheduleSheet = ss.getSheetByName('スケジュール');
+    if (scheduleSheet && scheduleSheet.getLastRow() > 1) {
+      var sData = scheduleSheet.getDataRange().getValues();
+      for (var i = 1; i < sData.length; i++) {
+        var r = sData[i];
+        scheduleCat[formatDate(r[0]) + '|' + r[1] + '|' + r[2] + '|' + r[3]] = String(r[5] || '');
+      }
+    }
+    var regData = getRegularLessonData();
+    var data = legacy.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      var row = data[i];
+      if (!row[0] && !row[3] && !row[4]) continue; // 空行はスキップ
+      var key = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
+      var cat = scheduleCat[key];
+      if (!cat) cat = findRegularLessonCategoryLoose(regData, row[1], row[2], row[3]);
+      if (String(cat || '').toUpperCase() === 'FUTURE') futureRows.push(row);
+      else kidsRows.push(row); // 判定不能はKIDS扱い（読み取りは両シート横断なので機能影響なし）
+    }
+  }
+
+  appendBookingRows(getBookingSheetByCategory('KIDS'), kidsRows);
+  appendBookingRows(getBookingSheetByCategory('FUTURE'), futureRows);
+  ss.deleteSheet(legacy);
+}
+
+// 移行時のカテゴリ判定用: スタジオ+時間+クラス名一致で定期レッスンのカテゴリを引く（期間・曜日は問わない）
+function findRegularLessonCategoryLoose(regData, studio, time, className) {
+  if (!regData) return '';
+  for (var i = 1; i < regData.length; i++) {
+    var row = regData[i];
+    if (String(row[1] || '') === String(studio) && String(row[2] || '') === String(time) &&
+        String(row[3] || '') === String(className)) {
+      return String(row[4] || '');
+    }
+  }
+  return '';
 }
 
 // ===== メインルーター =====
@@ -141,19 +238,18 @@ function adminGuardPost(payload, fn) {
 function getAvailableSlots() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var scheduleSheet = ss.getSheetByName('スケジュール');
-  var bookingSheet = ss.getSheetByName('予約一覧');
 
-  if (!scheduleSheet || !bookingSheet) {
+  if (!scheduleSheet) {
     return jsonResponse({ error: 'シートが見つかりません' });
   }
 
   var scheduleData = scheduleSheet.getDataRange().getValues();
   if (scheduleData.length <= 1) return jsonResponse([]);
 
-  var bookingData = bookingSheet.getDataRange().getValues();
+  var bookingData = getAllBookingRows();
   var bookingCounts = {};
   var bookingMembers = {};
-  for (var i = 1; i < bookingData.length; i++) {
+  for (var i = 0; i < bookingData.length; i++) {
     var row = bookingData[i];
     var key = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
     bookingCounts[key] = (bookingCounts[key] || 0) + 1;
@@ -204,10 +300,9 @@ function getAvailableSlots() {
 // ===== 予約登録 =====
 function bookSlot(params) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var bookingSheet = ss.getSheetByName('予約一覧');
   var scheduleSheet = ss.getSheetByName('スケジュール');
 
-  if (!bookingSheet || !scheduleSheet) {
+  if (!scheduleSheet) {
     return jsonResponse({ success: false, error: 'シートが見つかりません' });
   }
 
@@ -223,11 +318,11 @@ function bookSlot(params) {
     return jsonResponse({ success: false, error: 'お名前を入力してください' });
   }
 
-  var bookingData = bookingSheet.getDataRange().getValues();
+  var bookingData = getAllBookingRows();
   var key = date + '|' + studio + '|' + time + '|' + className;
   var currentBookings = 0;
 
-  for (var i = 1; i < bookingData.length; i++) {
+  for (var i = 0; i < bookingData.length; i++) {
     var row = bookingData[i];
     var rowKey = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
     if (rowKey === key) currentBookings++;
@@ -267,7 +362,7 @@ function bookSlot(params) {
   // FUTURE lessons: one slot per lesson per person — block booking the same lesson twice
   if (lessonCategory === 'FUTURE') {
     var nameTrim = String(name).trim();
-    for (var i = 1; i < bookingData.length; i++) {
+    for (var i = 0; i < bookingData.length; i++) {
       var bRow = bookingData[i];
       var bKey = formatDate(bRow[0]) + '|' + bRow[1] + '|' + bRow[2] + '|' + bRow[3];
       if (bKey === key && String(bRow[4] || '').trim() === nameTrim) {
@@ -287,7 +382,8 @@ function bookSlot(params) {
     }
   }
 
-  bookingSheet.appendRow([date, studio, time, className, name, email, new Date(), homeStudio ? '✅' : '']);
+  // カテゴリ別の予約シートに記録（FUTURE以外はKIDSシートへ）
+  getBookingSheetByCategory(lessonCategory).appendRow([date, studio, time, className, name, email, new Date(), homeStudio ? '✅' : '']);
 
   sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity);
   if (email) sendBookingConfirmation(email, date, studio, time, className, name);
@@ -394,12 +490,11 @@ function sendBookingConfirmation(email, date, studio, time, className, name) {
 // ===== 予約一覧（日付別グループ） =====
 function getBookingList() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var bookingSheet = ss.getSheetByName('予約一覧');
   var scheduleSheet = ss.getSheetByName('スケジュール');
 
-  if (!bookingSheet || !scheduleSheet) return jsonResponse({ error: 'シートが見つかりません' });
+  if (!scheduleSheet) return jsonResponse({ error: 'シートが見つかりません' });
 
-  var bookingData = bookingSheet.getDataRange().getValues();
+  var bookingData = getAllBookingRows();
   var scheduleData = scheduleSheet.getDataRange().getValues();
 
   var capacityMap = {};
@@ -422,7 +517,7 @@ function getBookingList() {
   }
 
   var grouped = {};
-  for (var i = 1; i < bookingData.length; i++) {
+  for (var i = 0; i < bookingData.length; i++) {
     var row = bookingData[i];
     var dateStr = formatDate(row[0]);
     var studio = String(row[1]);
@@ -574,23 +669,24 @@ function adminDeleteSlot(params) {
 
 // ===== 管理者: 予約キャンセル =====
 function adminCancelBooking(params) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('予約一覧');
-  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
-
   var date = params.date || '';
   var studio = params.studio || '';
   var time = params.time || '';
   var name = params.name || '';
 
-  var data = sheet.getDataRange().getValues();
-  for (var i = data.length - 1; i >= 1; i--) {
-    var row = data[i];
-    if (formatDate(row[0]) === date && String(row[1]) === studio && String(row[2]) === time && String(row[4]) === name) {
-      var cancelledClass = String(row[3] || '');
-      sheet.deleteRow(i + 1);
-      notifyWaitlistIfVacancy(date, studio, time, cancelledClass);
-      return jsonResponse({ success: true, message: name + 'さんの予約をキャンセルしました' });
+  var sheets = getBookingSheets();
+  for (var s = 0; s < sheets.length; s++) {
+    var sheet = sheets[s];
+    if (sheet.getLastRow() <= 1) continue;
+    var data = sheet.getDataRange().getValues();
+    for (var i = data.length - 1; i >= 1; i--) {
+      var row = data[i];
+      if (formatDate(row[0]) === date && String(row[1]) === studio && String(row[2]) === time && String(row[4]) === name) {
+        var cancelledClass = String(row[3] || '');
+        sheet.deleteRow(i + 1);
+        notifyWaitlistIfVacancy(date, studio, time, cancelledClass);
+        return jsonResponse({ success: true, message: name + 'さんの予約をキャンセルしました' });
+      }
     }
   }
 
@@ -599,10 +695,6 @@ function adminCancelBooking(params) {
 
 // ===== 予約者本人によるキャンセル（会員ページから・過去日は不可） =====
 function memberCancelBooking(params) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('予約一覧');
-  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
-
   var date = params.date || '';
   var studio = params.studio || '';
   var time = params.time || '';
@@ -622,17 +714,22 @@ function memberCancelBooking(params) {
     }
   }
 
-  var data = sheet.getDataRange().getValues();
-  for (var i = data.length - 1; i >= 1; i--) {
-    var row = data[i];
-    if (formatDate(row[0]) === date && String(row[1]) === studio && String(row[2]) === time &&
-        String(row[3]) === className && String(row[4]) === name) {
-      var email = String(row[5] || '');
-      sheet.deleteRow(i + 1);
-      sendCancelNotification(date, studio, time, className, name);
-      if (email) sendCancelConfirmation(email, date, studio, time, className, name);
-      notifyWaitlistIfVacancy(date, studio, time, className);
-      return jsonResponse({ success: true, message: '予約をキャンセルしました' });
+  var sheets = getBookingSheets();
+  for (var s = 0; s < sheets.length; s++) {
+    var sheet = sheets[s];
+    if (sheet.getLastRow() <= 1) continue;
+    var data = sheet.getDataRange().getValues();
+    for (var i = data.length - 1; i >= 1; i--) {
+      var row = data[i];
+      if (formatDate(row[0]) === date && String(row[1]) === studio && String(row[2]) === time &&
+          String(row[3]) === className && String(row[4]) === name) {
+        var email = String(row[5] || '');
+        sheet.deleteRow(i + 1);
+        sendCancelNotification(date, studio, time, className, name);
+        if (email) sendCancelConfirmation(email, date, studio, time, className, name);
+        notifyWaitlistIfVacancy(date, studio, time, className);
+        return jsonResponse({ success: true, message: '予約をキャンセルしました' });
+      }
     }
   }
 
@@ -706,13 +803,10 @@ function getLessonOccupancy(date, studio, time, className) {
   var key = date + '|' + studio + '|' + time + '|' + className;
 
   var current = 0;
-  var bookingSheet = ss.getSheetByName('予約一覧');
-  if (bookingSheet) {
-    var bookingData = bookingSheet.getDataRange().getValues();
-    for (var i = 1; i < bookingData.length; i++) {
-      var row = bookingData[i];
-      if (formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3] === key) current++;
-    }
+  var bookingData = getAllBookingRows();
+  for (var i = 0; i < bookingData.length; i++) {
+    var row = bookingData[i];
+    if (formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3] === key) current++;
   }
 
   var max = 10;
