@@ -389,7 +389,7 @@ function bookSlot(params) {
   getBookingSheetByCategory(lessonCategory).appendRow([date, studio, time, className, name, email, new Date(), homeStudio ? '✅' : '']);
 
   sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity);
-  if (email) sendBookingConfirmation(email, date, studio, time, className, name);
+  if (email) sendBookingConfirmation(email, date, studio, time, className, name, lessonCategory);
 
   var msg = overCapacity ? '予約が完了しました（登録スタジオ生・優先受付）' : '予約が完了しました';
   return jsonResponse({ success: true, message: msg });
@@ -464,9 +464,23 @@ function sendBookingNotification(date, studio, time, className, name, email, hom
   }
 }
 
-function sendBookingConfirmation(email, date, studio, time, className, name) {
+function sendBookingConfirmation(email, date, studio, time, className, name, lessonCategory) {
   try {
     var subject = '【BEAT THE MIX】予約確認 — ' + date + ' ' + className;
+    // FUTUREは会員ページから本人キャンセル可（予約時と同じ端末のみ）。KIDSは従来どおりLINE連絡
+    var cancelInfo;
+    if (String(lessonCategory || '').toUpperCase() === 'FUTURE') {
+      cancelInfo = '■ キャンセル方法\n'
+        + '会員ページでご予約日のレッスンを開き、\n'
+        + '予約者一覧のご自身のニックネームの横にある\n'
+        + '「キャンセル」ボタンからお手続きください。\n'
+        + 'https://tibadance.com/members-page\n'
+        + '※ご予約時と同じスマホ・ブラウザからのみ操作できます。\n'
+        + '　操作できない場合はLINEにてご連絡ください。\n\n';
+    } else {
+      cancelInfo = 'キャンセル・変更のご連絡:\n'
+        + 'LINEにてご連絡ください。\n\n';
+    }
     var body = name + ' 様\n\n'
       + 'ご予約ありがとうございます。\n'
       + '以下の内容で予約を受け付けました。\n\n'
@@ -476,8 +490,7 @@ function sendBookingConfirmation(email, date, studio, time, className, name) {
       + '時間: ' + time + '\n'
       + 'クラス: ' + className + '\n'
       + '━━━━━━━━━━━━━━━━━━━━\n\n'
-      + 'キャンセル・変更のご連絡:\n'
-      + 'LINEにてご連絡ください。\n\n'
+      + cancelInfo
       + '当日お会いできることを楽しみにしています！\n\n'
       + 'BEAT THE MIX ダンススタジオ\n\n'
       + '─────────────────────\n'
