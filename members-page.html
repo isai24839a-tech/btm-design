@@ -3317,6 +3317,10 @@ function renderDayLessons(dateStr) {
             html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
               JSON.stringify({date: dateStr, studio: r.studio, time: r.time, name: m.name}).replace(/'/g, "\\'") +
               ')\'>削除</button>';
+          } else if (isOwnBooking(m.name)) {
+            html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'memberCancelBooking(' +
+              JSON.stringify({date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name, name: m.name}).replace(/'/g, "\\'") +
+              ')\'>キャンセル</button>';
           }
           html += '</div>';
         });
@@ -4127,6 +4131,27 @@ function adminCancelBooking(info) {
     date: info.date, studio: info.studio, time: info.time, name: info.name
   });
   apiCall(params, function() { fetchSlotsFromAPI(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); }); });
+}
+
+// ===== MEMBER SELF-CANCEL (予約者本人によるキャンセル) =====
+function isOwnBooking(name) {
+  try {
+    var saved = localStorage.getItem('btm_booking_name');
+    return !!saved && saved === name;
+  } catch (e) { return false; }
+}
+
+function memberCancelBooking(info) {
+  if (!confirm(info.date + ' ' + info.time + '\n' + info.class_name + ' の予約をキャンセルしますか？')) return;
+
+  var params = new URLSearchParams({
+    action: 'memberCancelBooking',
+    date: info.date, studio: info.studio, time: info.time, class_name: info.class_name, name: info.name
+  });
+  apiCall(params, function(result) {
+    alert(result.message || '予約をキャンセルしました');
+    fetchSlotsFromAPI(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); });
+  });
 }
 
 function fetchAdminAnnouncements() {

@@ -119,6 +119,9 @@ function doPost(e) {
   if (action === 'addlessonnote') return adminGuardPost(payload, adminAddLessonNote);
   if (action === 'deletelessonnote') return adminGuardPost(payload, adminDeleteLessonNote);
 
+  // Member action (no adminKey): booker cancels their own reservation
+  if (action === 'membercancelbooking') return memberCancelBooking(payload);
+
   return jsonResponse({ error: 'Unknown action' });
 }
 
@@ -543,6 +546,92 @@ function adminCancelBooking(params) {
   }
 
   return jsonResponse({ success: false, error: '該当する予約が見つかりません' });
+}
+
+// ===== 予約者本人によるキャンセル（会員ページから・過去日は不可） =====
+function memberCancelBooking(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('予約一覧');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var date = params.date || '';
+  var studio = params.studio || '';
+  var time = params.time || '';
+  var className = params.class_name || '';
+  var name = params.name || '';
+
+  if (!name) return jsonResponse({ success: false, error: 'お名前が指定されていません' });
+
+  // Past lessons cannot be cancelled by members
+  var parts = String(date).split('/');
+  if (parts.length === 3) {
+    var lessonDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (lessonDate < today) {
+      return jsonResponse({ success: false, error: '過去のレッスンはキャンセルできません' });
+    }
+  }
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = data.length - 1; i >= 1; i--) {
+    var row = data[i];
+    if (formatDate(row[0]) === date && String(row[1]) === studio && String(row[2]) === time &&
+        String(row[3]) === className && String(row[4]) === name) {
+      var email = String(row[5] || '');
+      sheet.deleteRow(i + 1);
+      sendCancelNotification(date, studio, time, className, name);
+      if (email) sendCancelConfirmation(email, date, studio, time, className, name);
+      return jsonResponse({ success: true, message: '予約をキャンセルしました' });
+    }
+  }
+
+  return jsonResponse({ success: false, error: '該当する予約が見つかりません' });
+}
+
+// ===== キャンセル通知メール（管理者宛） =====
+function sendCancelNotification(date, studio, time, className, name) {
+  try {
+    var subject = '【BTMキャンセル】' + name + 'さん — ' + date + ' ' + className;
+    var body = '会員ページから予約がキャンセルされました\n\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n'
+      + '日付: ' + date + '\n'
+      + 'スタジオ: ' + studio + '\n'
+      + '時間: ' + time + '\n'
+      + 'クラス: ' + className + '\n'
+      + 'お名前: ' + name + '\n'
+      + 'キャンセル日時: ' + Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm') + '\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n\n'
+      + 'スプレッドシートで確認:\n'
+      + SpreadsheetApp.getActiveSpreadsheet().getUrl();
+    ADMIN_EMAILS.forEach(function(addr) { GmailApp.sendEmail(addr, subject, body); });
+  } catch (e) {
+    Logger.log('キャンセル通知メール送信エラー: ' + e.message);
+  }
+}
+
+// ===== キャンセル確認メール（予約者宛） =====
+function sendCancelConfirmation(email, date, studio, time, className, name) {
+  try {
+    var subject = '【BEAT THE MIX】キャンセル確認 — ' + date + ' ' + className;
+    var body = name + ' 様\n\n'
+      + '以下のご予約をキャンセルしました。\n\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n'
+      + '日付: ' + date + '\n'
+      + 'スタジオ: ' + studio + '\n'
+      + '時間: ' + time + '\n'
+      + 'クラス: ' + className + '\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n\n'
+      + 'またのご予約をお待ちしております。\n\n'
+      + 'BEAT THE MIX ダンススタジオ\n\n'
+      + '─────────────────────\n'
+      + '※このメールは送信専用です。\n'
+      + '　このメールに返信しても届きませんので\n'
+      + '　ご了承ください。';
+    GmailApp.sendEmail(email, subject, body);
+  } catch (e) {
+    Logger.log('キャンセル確認メール送信エラー: ' + e.message);
+  }
 }
 
 // ===== 管理者: お知らせ追加 =====
