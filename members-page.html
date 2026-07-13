@@ -2654,6 +2654,7 @@ var allBookingData = []; // ?action=list result — used to show members/counts 
 var regularHolidays = []; // { dayOfWeek: '月'~'日', studio: string, id: number }
 var lessonCancels = []; // { date, studio, time, class_name, category, row }
 var lessonNotes = []; // { date, studio, time, memo, category, row }
+var capacityOverrides = []; // { date, studio, time, class_name, max, category, row }
 var irregularHolidays = []; // { date, reason, category, row }
 
 // ===== DEMO DATA =====
@@ -2863,6 +2864,7 @@ function showMainContent() {
   fetchRegularHolidays();
   fetchLessonCancels();
   fetchLessonNotes();
+  fetchCapacityOverrides();
   fetchIrregularHolidays();
   if (isAdminMode) {
     initAdminSlotForm();
@@ -3239,6 +3241,7 @@ function renderDayLessons(dateStr) {
     var cancelled = isLessonCancelled(dateStr, r.studio, r.time);
     var cancelData = cancelled ? getLessonCancelData(dateStr, r.studio, r.time) : null;
     var noteData = getLessonNoteData(dateStr, r.studio, r.time);
+    var capOvr = getCapacityOverrideData(dateStr, r.studio, r.time, r.class_name);
     var cardClass = 'slot-card regular-lesson' + (cancelled ? ' cancelled-lesson' : '');
     html += '<div class="' + cardClass + '" id="regular-card-' + idx + '">';
     html += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
@@ -3277,14 +3280,25 @@ function renderDayLessons(dateStr) {
           JSON.stringify({date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name}).replace(/'/g, "\\'") +
           ')\'>📝 メモ追加</button>';
       }
+      if (currentCategory === 'future') {
+        html += ' <button class="admin-cancel-lesson-btn" style="background:#E3F2FD;color:#1565C0;border-color:#64B5F6;margin-left:0.3rem" onclick=\'adminSetCapacityOverride(' +
+          JSON.stringify({date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name, max: r.max || 0}).replace(/'/g, "\\'") +
+          ')\'>👥 この日の定員</button>';
+      }
       html += '</div>';
+      if (currentCategory === 'future' && capOvr) {
+        html += '<div style="margin-top:0.4rem;padding:0.4rem 0.7rem;background:#E3F2FD;border-left:3px solid #1565C0;border-radius:4px;font-size:0.8rem;color:#1565C0">' +
+          'この日だけ定員 <strong>' + (capOvr.max === 0 ? '無制限' : capOvr.max + '名') + '</strong>（通常: ' + ((r.max || 0) === 0 ? '無制限' : r.max + '名') + '）' +
+          ' <button class="admin-uncancel-btn" style="margin-left:0.4rem;font-size:0.75rem" onclick="adminDeleteCapacityOverride(' + (capOvr.row || 0) + ')">解除</button></div>';
+      }
     }
 
     // FUTURE regular lessons: capacity display + booking (home-studio members get priority when full)
     var todayD = new Date(); todayD.setHours(0, 0, 0, 0);
     var isPastDate = dateObj < todayD;
     if (!cancelled && !DEMO_MODE && currentCategory === 'future' && !isPastDate) {
-      var rMax = r.max || 0;
+      // Per-date capacity override (臨時定員) takes precedence over the regular capacity
+      var rMax = capOvr ? capOvr.max : (r.max || 0);
       var rMembers = getRegularLessonMembers(dateStr, r);
       var rBooked = rMembers.length;
       var rUnlimited = rMax === 0;
@@ -5107,6 +5121,93 @@ function adminDeleteLessonNote(row) {
     .then(function(result) {
       if (result.success) {
         fetchLessonNotes();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
+// ===== CAPACITY OVERRIDES (臨時定員 — per-date capacity for regular lessons) =====
+function fetchCapacityOverrides(callback) {
+  if (!APPS_SCRIPT_URL) {
+    if (callback) callback();
+    return;
+  }
+  fetch(APPS_SCRIPT_URL + '?action=capacityoverrides', { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && Array.isArray(data)) {
+        capacityOverrides = data;
+      }
+      if (callback) callback();
+      if (selectedDate) renderDayLessons(selectedDate);
+    })
+    .catch(function() {
+      capacityOverrides = [];
+      if (callback) callback();
+    });
+}
+
+function getCapacityOverrideData(dateStr, studio, time, className) {
+  return capacityOverrides.find(function(o) {
+    return o.date === dateStr && o.studio === studio && o.time === time && o.class_name === className;
+  }) || null;
+}
+
+function adminSetCapacityOverride(info) {
+  var existing = getCapacityOverrideData(info.date, info.studio, info.time, info.class_name);
+  var normalMax = info.max || 0;
+  var input = prompt(
+    info.class_name + '（' + info.studio + ' ' + info.time + '）\n' +
+    info.date + ' だけの定員を入力してください（0 = 無制限）\n' +
+    '通常の定員: ' + (normalMax === 0 ? '無制限' : normalMax + '名'),
+    String(existing ? existing.max : normalMax)
+  );
+  if (input === null) return;
+  var max = parseInt(String(input).trim(), 10);
+  if (isNaN(max) || max < 0) {
+    alert('定員は0以上の数字で入力してください');
+    return;
+  }
+
+  var body = {
+    action: 'addCapacityOverride',
+    adminKey: ADMIN_PASSWORD,
+    date: info.date,
+    studio: info.studio,
+    time: info.time,
+    class_name: info.class_name,
+    max: max,
+    category: currentCategory.toUpperCase()
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        fetchCapacityOverrides();
+      } else {
+        alert(result.error || 'エラーが発生しました');
+      }
+    })
+    .catch(function(e) { alert('通信エラー: ' + e.message); });
+}
+
+function adminDeleteCapacityOverride(row) {
+  if (!confirm('この日だけの定員設定を解除しますか？（通常の定員に戻ります）')) return;
+
+  var body = {
+    action: 'deleteCapacityOverride',
+    adminKey: ADMIN_PASSWORD,
+    row: row
+  };
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        fetchCapacityOverrides();
       } else {
         alert(result.error || 'エラーが発生しました');
       }

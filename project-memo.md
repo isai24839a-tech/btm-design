@@ -119,6 +119,19 @@ split-landing.html (トップ)
 - [x] **お知らせKIDS/FUTUREタグ**: 管理画面にトグル追加、バッジ表示（KIDS=コーラル/FUTURE=ネイビー）
 - [x] **PC+スマホ動作確認OK**
 
+## 完了済み（臨時定員=指定日だけ定員変更 2026-07-13）
+- [x] **臨時定員機能（FUTURE定期レッスン）**: 管理者モードの定期レッスンカードに「👥 この日の定員」ボタン → prompt入力（0=無制限）でその日だけ定員を上書き。「臨時定員」シート（日付/スタジオ/時間/クラス/定員/category・再デプロイ時に自動作成）に記録
+- [x] **GAS側**: `findCapacityOverride` が bookSlot（予約時判定）と getLessonOccupancy（キャンセル待ち通知判定）の両方に適用 → 残り枠・満員判定・✅優先予約・キャンセル待ちすべて臨時定員で動く。GET `capacityoverrides` / POST `addCapacityOverride`（同キー既存なら更新）/ `deleteCapacityOverride`
+- [x] **フロント側**: regSlot生成時に override 適用済み max を渡すため予約モーダル・送信チェックも自動反映。管理者には「この日だけ定員○名（通常: ○名）」バッジ+解除ボタン表示。KIDSには非表示
+- ⚠️ **GAS再デプロイ必要**（未デプロイ分: 本人キャンセル・同一レッスン1枠制限・キャンセル待ちとまとめて1回でOK）
+
+## 完了済み（GSCインデックスエラー対策 2026-04-20）
+- [x] **旧Jimdo URL群を301リダイレクト**: `_redirects`に包括的なルール追加してGSCの「代替ページ（適切なcanonicalタグあり）」エラーを解消へ
+  - 対象パターン: `/beat-the-mix-top/*`, `/体験の方ご説明ページ-future/*`, `/about/*`, `/インストラクター紹介/*`, `/レッスン内容-{kids,future}/*`, `/sitemap/*`
+  - 末尾が `kids-page.html` / `future-page.html` / `members-page.html` のURLは該当ページへ個別リダイレクト、それ以外はカテゴリ親ページへ
+  - commit: 589aa4a → Cloudflare Pages自動デプロイ
+- **備考**: 元々このエラーは「正常処理」扱いだったが、_redirects整備でGoogle再評価が早まり古いURLのインデックス除去を加速する狙い
+
 ## 完了済み（体験レッスンページ 2026-04-09）
 - [x] **体験レッスンの方へページ** (`future-trial.html`): 旧Jimdoの画像ベースページをHTML化
   - Lesson内容（Stretch 40分/Dance 40分/休憩 10分）+ JDAC Dance License実物写真

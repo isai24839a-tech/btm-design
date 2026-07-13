@@ -85,6 +85,7 @@ function doGet(e) {
   if (action === 'lessoncancels') return getLessonCancels();
   if (action === 'irregularholidays') return getIrregularHolidays();
   if (action === 'lessonnotes') return getLessonNotes();
+  if (action === 'capacityoverrides') return getCapacityOverrides();
 
   return jsonResponse({ error: 'Unknown action' });
 }
@@ -120,6 +121,8 @@ function doPost(e) {
   if (action === 'deleteirregularholiday') return adminGuardPost(payload, adminDeleteIrregularHoliday);
   if (action === 'addlessonnote') return adminGuardPost(payload, adminAddLessonNote);
   if (action === 'deletelessonnote') return adminGuardPost(payload, adminDeleteLessonNote);
+  if (action === 'addcapacityoverride') return adminGuardPost(payload, adminAddCapacityOverride);
+  if (action === 'deletecapacityoverride') return adminGuardPost(payload, adminDeleteCapacityOverride);
 
   // Member action (no adminKey): booker cancels their own reservation
   if (action === 'membercancelbooking') return memberCancelBooking(payload);
@@ -256,6 +259,10 @@ function bookSlot(params) {
       lessonCategory = String(regRow[4] || 'KIDS').toUpperCase();
     }
   }
+
+  // Per-date capacity override (臨時定員 sheet) takes precedence over both sources
+  var capOverride = findCapacityOverride(date, studio, time, className);
+  if (capOverride !== null) maxCapacity = capOverride;
 
   // FUTURE lessons: one slot per lesson per person — block booking the same lesson twice
   if (lessonCategory === 'FUTURE') {
@@ -708,6 +715,8 @@ function getLessonOccupancy(date, studio, time, className) {
     var regRow = matchRegularLesson(getRegularLessonData(), date, studio, time, className);
     if (regRow !== null) max = (regRow[7] !== '' && regRow[7] != null) ? parseInt(regRow[7]) : 0;
   }
+  var capOverride = findCapacityOverride(date, studio, time, className);
+  if (capOverride !== null) max = capOverride;
   return { current: current, max: max };
 }
 
@@ -1186,6 +1195,104 @@ function adminAddLessonNote(params) {
 function adminDeleteLessonNote(params) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('臨時メモ');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var row = parseInt(params.row);
+  if (!row || row < 2) return jsonResponse({ success: false, error: '無効な行番号です' });
+  if (row > sheet.getLastRow()) return jsonResponse({ success: false, error: '該当する行がありません' });
+
+  sheet.deleteRow(row);
+  return jsonResponse({ success: true, message: '削除しました' });
+}
+
+// ===== 臨時定員シート取得（無ければ作成・再デプロイのみでOK） =====
+function getCapacityOverrideSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('臨時定員');
+  if (!sheet) {
+    sheet = ss.insertSheet('臨時定員');
+    var headers = ['日付', 'スタジオ', '時間', 'クラス', '定員', 'category'];
+    var range = sheet.getRange(1, 1, 1, headers.length);
+    range.setValues([headers]);
+    range.setFontWeight('bold');
+    range.setBackground('#4285f4');
+    range.setFontColor('#ffffff');
+  }
+  return sheet;
+}
+
+// ===== 臨時定員取得 =====
+function getCapacityOverrides() {
+  var sheet = getCapacityOverrideSheet();
+  if (sheet.getLastRow() <= 1) return jsonResponse([]);
+
+  var data = sheet.getDataRange().getValues();
+  var items = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue;
+    items.push({
+      date: formatDate(row[0]),
+      studio: String(row[1] || ''),
+      time: String(row[2] || ''),
+      class_name: String(row[3] || ''),
+      max: (row[4] !== '' && row[4] != null) ? parseInt(row[4]) : 0,
+      category: String(row[5] || ''),
+      row: i + 1
+    });
+  }
+  return jsonResponse(items);
+}
+
+// ===== 臨時定員を検索（該当日だけの定員上書き。無ければnull、0=無制限） =====
+function findCapacityOverride(date, studio, time, className) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('臨時定員');
+  if (!sheet || sheet.getLastRow() <= 1) return null;
+
+  var key = date + '|' + studio + '|' + time + '|' + className;
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3] === key) {
+      return (row[4] !== '' && row[4] != null) ? parseInt(row[4]) : 0;
+    }
+  }
+  return null;
+}
+
+// ===== 管理者: 臨時定員追加（同キー既存なら定員だけ更新） =====
+function adminAddCapacityOverride(params) {
+  var sheet = getCapacityOverrideSheet();
+
+  var date = params.date || '';
+  var studio = params.studio || '';
+  var time = params.time || '';
+  var className = params.class_name || '';
+  var category = params.category || '';
+  var max = parseInt(params.max);
+
+  if (!date) return jsonResponse({ success: false, error: '日付は必須です' });
+  if (isNaN(max) || max < 0) return jsonResponse({ success: false, error: '定員は0以上の数字で指定してください' });
+
+  var key = date + '|' + studio + '|' + time + '|' + className;
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3] === key) {
+      sheet.getRange(i + 1, 5).setValue(max);
+      return jsonResponse({ success: true, message: 'この日の定員を更新しました' });
+    }
+  }
+
+  sheet.appendRow([date, studio, time, className, max, category]);
+  return jsonResponse({ success: true, message: 'この日の定員を設定しました' });
+}
+
+// ===== 管理者: 臨時定員削除 =====
+function adminDeleteCapacityOverride(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('臨時定員');
   if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
 
   var row = parseInt(params.row);
