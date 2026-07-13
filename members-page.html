@@ -2768,8 +2768,10 @@ function signOut() {
 function openHelp() {
   if (isAdminMode) {
     window.open('admin-manual.html', '_blank');
+  } else if (currentCategory === 'future') {
+    window.open('member-manual-future.html', '_blank');
   } else {
-    window.open('member-manual.html', '_blank');
+    window.open('member-manual-kids.html', '_blank');
   }
 }
 

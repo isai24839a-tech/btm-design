@@ -3,6 +3,8 @@ Allow: /
 Disallow: /members-page.html
 Disallow: /admin-manual.html
 Disallow: /member-manual.html
+Disallow: /member-manual-kids.html
+Disallow: /member-manual-future.html
 Disallow: /design-a-energy.html
 Disallow: /design-b-modern.html
 Disallow: /design-c-dark.html
