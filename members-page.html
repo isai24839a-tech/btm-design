@@ -3447,8 +3447,8 @@ function openBookingModal(slot) {
     '<div class="booking-modal-slot">' + slotHtml + '</div>' +
     '<form id="booking-form" onsubmit="event.preventDefault();submitBooking()">' +
       '<div class="booking-field">' +
-        '<label>お名前 <span class="required-mark" style="color:' + (currentCategory === 'future' ? 'var(--navy)' : 'var(--coral)') + '">*</span></label>' +
-        '<input type="text" id="booking-name" required placeholder="山田 太郎" autocomplete="name">' +
+        '<label>' + (currentCategory === 'future' ? 'ニックネーム' : 'お名前') + ' <span class="required-mark" style="color:' + (currentCategory === 'future' ? 'var(--navy)' : 'var(--coral)') + '">*</span></label>' +
+        '<input type="text" id="booking-name" required placeholder="' + (currentCategory === 'future' ? 'タロウ' : '山田 太郎') + '" autocomplete="' + (currentCategory === 'future' ? 'nickname' : 'name') + '">' +
       '</div>' +
       '<div class="booking-field">' +
         '<label>メールアドレス</label>' +
