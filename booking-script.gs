@@ -16,8 +16,8 @@
 
 // ===== 設定 =====
 var ADMIN_EMAILS = ['beat.the.mix7386@gmail.com', 'isai24839a@gmail.com'];
-// FUTUREの「予約が入りました」通知は beat.the.mix7386 宛て不要（2026-07-14指示）。KIDSは従来どおりADMIN_EMAILS全員
-var FUTURE_BOOKING_NOTIFY_EMAILS = ['isai24839a@gmail.com'];
+// FUTUREの「予約が入りました」通知は管理者宛て不要（2026-07-14指示・両アドレスとも停止）。KIDSは従来どおりADMIN_EMAILS全員
+var FUTURE_BOOKING_NOTIFY_EMAILS = [];
 var ADMIN_KEY = 'potofu7386'; // members-page.htmlのADMIN_PASSWORDと合わせる
 var IMAGE_FOLDER_NAME = 'BTM_お知らせ画像';
 
