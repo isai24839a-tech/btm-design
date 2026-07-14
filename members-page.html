@@ -3344,7 +3344,7 @@ function renderDayLessons(dateStr) {
         rMembers.forEach(function(m) {
           html += '<div class="bklist-member">';
           html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
-          html += '<span class="bklist-member-name">' + escapeHtml(m.name) + (m.home ? ' <span title="登録スタジオ生">✅</span>' : '') + '</span>';
+          html += '<span class="bklist-member-name">' + escapeHtml(m.name) + (m.home ? ' <span title="登録スタジオ生">✅</span>' : '') + (m.trial ? ' <span title="体験レッスン" style="font-size:0.68rem;background:#FFF3E0;color:#E65100;border:1px solid #FFB74D;border-radius:3px;padding:0 0.3rem;margin-left:0.25rem;vertical-align:middle">体験</span>' : '') + '</span>';
           if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
           if (isAdminMode) {
             html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
@@ -3415,7 +3415,7 @@ function renderDayLessons(dateStr) {
       members.forEach(function(m) {
         html += '<div class="bklist-member">';
         html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
-        html += '<span class="bklist-member-name">' + escapeHtml(m.name) + (m.home ? ' <span title="登録スタジオ生">✅</span>' : '') + '</span>';
+        html += '<span class="bklist-member-name">' + escapeHtml(m.name) + (m.home ? ' <span title="登録スタジオ生">✅</span>' : '') + (m.trial ? ' <span title="体験レッスン" style="font-size:0.68rem;background:#FFF3E0;color:#E65100;border:1px solid #FFB74D;border-radius:3px;padding:0 0.3rem;margin-left:0.25rem;vertical-align:middle">体験</span>' : '') + '</span>';
         if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
         if (isAdminMode) {
           html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
@@ -4926,7 +4926,7 @@ function fetchRegularHolidays(callback) {
     if (callback) callback();
     return;
   }
-  fetch(APPS_SCRIPT_URL + '?action=getRegularHolidays', { redirect: 'follow' })
+  fetch(APPS_SCRIPT_URL + '?action=regularholidays', { redirect: 'follow' })
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (data && Array.isArray(data)) {

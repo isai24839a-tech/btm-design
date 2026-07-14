@@ -470,6 +470,34 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
   .lesson-card:hover, .bring-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(212, 168, 83, 0.15); }
 }
 
+/* ===== TRIAL BOOKING ===== */
+.tb-intro { color: var(--text-body); font-size: 0.95rem; margin-bottom: 32px; }
+.tb-date-group { margin-bottom: 28px; }
+.tb-date-label { font-family: 'Oswald', 'Noto Sans JP', sans-serif; font-size: 0.95rem; letter-spacing: 2px; color: var(--gold-light); border-bottom: 1px solid rgba(212, 168, 83, 0.25); padding-bottom: 6px; margin-bottom: 12px; }
+.tb-card { padding: 16px 20px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(212, 168, 83, 0.12); border-radius: 2px; margin-bottom: 10px; }
+.tb-card-tags { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tb-tag { font-size: 0.78rem; padding: 2px 10px; border: 1px solid rgba(212, 168, 83, 0.35); color: var(--gold-light); border-radius: 2px; letter-spacing: 1px; }
+.tb-tag.class { color: var(--white-soft); border-color: rgba(255, 255, 255, 0.2); }
+.tb-card-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; gap: 12px; flex-wrap: wrap; }
+.tb-spots { font-size: 0.85rem; color: var(--white-muted); }
+.tb-spots strong { color: var(--gold); font-size: 1rem; }
+.tb-spots.full { color: #E57373; }
+.tb-book-btn { padding: 8px 26px; border: 1px solid var(--gold); background: transparent; color: var(--gold); font-family: inherit; font-size: 0.85rem; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; border-radius: 2px; }
+.tb-book-btn:hover { background: var(--gold); color: var(--navy); }
+.tb-book-btn:disabled, .tb-book-btn:disabled:hover { border-color: rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.3); background: transparent; cursor: default; }
+.tb-form { margin-top: 14px; padding-top: 14px; border-top: 1px dashed rgba(212, 168, 83, 0.25); display: flex; flex-direction: column; gap: 10px; }
+.tb-form label { font-size: 0.78rem; color: var(--white-muted); display: block; margin-bottom: 4px; }
+.tb-form input { width: 100%; padding: 10px 12px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(212, 168, 83, 0.25); border-radius: 2px; color: var(--white); font-family: inherit; font-size: 16px; }
+.tb-form input:focus { outline: none; border-color: var(--gold); }
+.tb-form-btns { display: flex; gap: 10px; margin-top: 4px; }
+.tb-submit-btn { flex: 1; padding: 11px; background: var(--gold); border: 1px solid var(--gold); color: var(--navy); font-weight: 600; font-family: inherit; font-size: 0.9rem; letter-spacing: 2px; cursor: pointer; border-radius: 2px; transition: opacity 0.3s; }
+.tb-submit-btn:disabled { opacity: 0.5; cursor: default; }
+.tb-cancel-btn { padding: 11px 18px; background: transparent; border: 1px solid rgba(255, 255, 255, 0.25); color: var(--white-muted); font-family: inherit; font-size: 0.85rem; cursor: pointer; border-radius: 2px; }
+.tb-error { color: #E57373; font-size: 0.82rem; }
+.tb-success { padding: 14px 16px; background: rgba(102, 187, 106, 0.08); border: 1px solid rgba(102, 187, 106, 0.4); border-radius: 2px; color: #A5D6A7; font-size: 0.88rem; line-height: 1.7; }
+.tb-loading, .tb-empty { color: var(--white-muted); font-size: 0.9rem; padding: 20px 0; line-height: 1.9; }
+.tb-note { margin-top: 28px; font-size: 0.8rem; color: var(--white-muted); line-height: 1.9; }
+
 /* === PERFORMANCE === */
 .rules, .questionnaire, .bring, .instagram, .contact, footer {
   content-visibility: auto; contain-intrinsic-size: auto 600px;
@@ -527,6 +555,7 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
   <ul class="nav-links" id="navLinks">
     <li><a href="future-page.html">FUTUREトップ</a></li>
     <li><a href="#flow">Lesson内容</a></li>
+    <li><a href="#trial-booking">体験予約</a></li>
     <li><a href="#pricing">料金</a></li>
     <li><a href="#rules">規約・割引</a></li>
     <li><a href="#contact">お問い合わせ</a></li>
@@ -624,6 +653,34 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
     <div class="lesson-note reveal">
       自分の体力に合わせてOK!
     </div>
+  </div>
+</section>
+
+<!-- ===== ELEGANT DIVIDER ===== -->
+<div class="elegant-divider">
+  <div class="line"></div>
+  <div class="diamond"></div>
+  <div class="line"></div>
+</div>
+
+<!-- ===== TRIAL BOOKING ===== -->
+<section class="trial-booking" id="trial-booking">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">Trial Reservation</p>
+      <h2 class="section-heading">体験Lesson予約</h2>
+      <div class="gold-line"></div>
+    </div>
+    <p class="tb-intro reveal">
+      体験レッスンのご参加は<strong style="color: var(--gold-light);">予約制</strong>です。<br>
+      ご希望の日のレッスンを選んで、お名前とメールアドレスだけでご予約いただけます。
+    </p>
+    <div id="tb-list"><div class="tb-loading">レッスン日程を読み込んでいます...</div></div>
+    <p class="tb-note">
+      ※ご予約後、確認メールをお送りします。<br>
+      ※キャンセル・変更はお電話（090-1817-9501）またはメール（beat.the.mix7386@gmail.com）にてご連絡ください。<br>
+      ※ご不明な点は<a href="#contact" style="color: var(--gold);">お問い合わせ</a>からどうぞ。
+    </p>
   </div>
 </section>
 
@@ -1104,6 +1161,272 @@ section { position: relative; padding: clamp(60px, 8vw, 100px) clamp(20px, 5vw, 
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
     });
+  });
+})();
+</script>
+
+<!-- ===== TRIAL BOOKING SCRIPT ===== -->
+<script>
+(function() {
+  'use strict';
+
+  var API = 'https://script.google.com/macros/s/AKfycby_j23qQkb6hhZ90wkwLUdwWFXLUpS5KWweJORvp0Z1EOXl0AuPkCAO1CUVQOpAXcoAQg/exec';
+  var DAYS_AHEAD = 30;
+  var FUTURE_STUDIOS = ['千葉studio', '美浜studio', '稲毛studio(穴川)', '若葉studio'];
+  var DAY_NAMES = ['日', '月', '火', '水', '木', '金', '土'];
+
+  var regulars = [], slots = [], bookingList = [], cancels = [], irregs = [], regHolidays = [], capOverrides = [];
+
+  function fetchJson(action) {
+    return fetch(API + '?action=' + action, { redirect: 'follow' })
+      .then(function(r) { return r.json(); })
+      .then(function(d) { return Array.isArray(d) ? d : []; })
+      .catch(function() { return []; });
+  }
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function fmtDate(d) { return d.getFullYear() + '/' + pad(d.getMonth() + 1) + '/' + pad(d.getDate()); }
+  function parseDate(s) {
+    var p = String(s || '').split(/[\/\-]/);
+    if (p.length !== 3) return null;
+    return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function isFutureCat(x) {
+    var c = String(x.category || '').toUpperCase();
+    if (c) return c === 'FUTURE';
+    return String(x.class_name || '').toLowerCase().indexOf('future') !== -1;
+  }
+
+  function bookedCount(dateStr, studio, time, cls) {
+    for (var i = 0; i < bookingList.length; i++) {
+      if (bookingList[i].date !== dateStr) continue;
+      var daySlots = bookingList[i].slots || [];
+      for (var j = 0; j < daySlots.length; j++) {
+        if (daySlots[j].studio === studio && daySlots[j].time === time && daySlots[j].class_name === cls) {
+          return (daySlots[j].members || []).length;
+        }
+      }
+    }
+    return 0;
+  }
+
+  function capOverrideFor(dateStr, studio, time, cls) {
+    for (var i = 0; i < capOverrides.length; i++) {
+      var o = capOverrides[i];
+      if (o.date === dateStr && o.studio === studio && o.time === time && o.class_name === cls) return o;
+    }
+    return null;
+  }
+
+  function isCancelled(dateStr, studio, time) {
+    return cancels.some(function(c) { return c.date === dateStr && c.studio === studio && c.time === time; });
+  }
+
+  function isHolidayDate(dateStr, dateObj) {
+    var irr = irregs.some(function(h) {
+      var cat = String(h.category || '').toUpperCase();
+      return h.date === dateStr && (cat === 'FUTURE' || cat === '全体' || cat === '');
+    });
+    if (irr) return true;
+    var dayName = DAY_NAMES[dateObj.getDay()];
+    return regHolidays.some(function(h) {
+      if (h.dayOfWeek !== dayName) return false;
+      if (h.studio) return FUTURE_STUDIOS.indexOf(h.studio) !== -1;
+      return true;
+    });
+  }
+
+  function lessonsForDate(dateStr, dateObj) {
+    if (isHolidayDate(dateStr, dateObj)) return [];
+    var out = [];
+    var dow = dateObj.getDay();
+
+    regulars.forEach(function(r) {
+      if (!isFutureCat(r)) return;
+      if (String(r.frequency || 'weekly') === 'oneshot') {
+        if (r.startDate !== dateStr) return;
+      } else {
+        if (DAY_NAMES.indexOf(String(r.dayOfWeek)) !== dow) return;
+        var ps = parseDate(r.periodStart), pe = parseDate(r.periodEnd);
+        if (ps && dateObj < ps) return;
+        if (pe && dateObj > pe) return;
+        if (r.frequency === 'biweekly' && r.startDate) {
+          var st = parseDate(r.startDate);
+          if (st) {
+            var diffWeeks = Math.round(Math.round((dateObj - st) / 86400000) / 7);
+            if (diffWeeks % 2 !== 0) return;
+          }
+        }
+      }
+      if (isCancelled(dateStr, r.studio, r.time)) return;
+      var ovr = capOverrideFor(dateStr, r.studio, r.time, r.class_name);
+      var max = ovr ? ovr.max : ((r.max !== undefined && r.max !== '' && r.max != null) ? parseInt(r.max, 10) : 0);
+      out.push({
+        date: dateStr, studio: r.studio || '', time: r.time || '', class_name: r.class_name || '',
+        max: max || 0, booked: bookedCount(dateStr, r.studio || '', r.time || '', r.class_name || '')
+      });
+    });
+
+    slots.forEach(function(s) {
+      if (s.date !== dateStr || !isFutureCat(s)) return;
+      if (isCancelled(dateStr, s.studio, s.time)) return;
+      var dup = out.some(function(o) { return o.studio === s.studio && o.time === s.time && o.class_name === s.class_name; });
+      if (dup) return;
+      var ovr = capOverrideFor(dateStr, s.studio, s.time, s.class_name);
+      var max = ovr ? ovr.max : (s.max || 0);
+      out.push({ date: dateStr, studio: s.studio || '', time: s.time || '', class_name: s.class_name || '', max: max || 0, booked: s.booked || 0 });
+    });
+
+    out.sort(function(a, b) { return String(a.time).localeCompare(String(b.time)); });
+    return out;
+  }
+
+  var lessonIndex = [];
+
+  function render() {
+    var container = document.getElementById('tb-list');
+    if (!container) return;
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var html = '';
+    lessonIndex = [];
+
+    for (var d = 0; d < DAYS_AHEAD; d++) {
+      var dateObj = new Date(today.getFullYear(), today.getMonth(), today.getDate() + d);
+      var dateStr = fmtDate(dateObj);
+      var lessons = lessonsForDate(dateStr, dateObj);
+      if (!lessons.length) continue;
+
+      html += '<div class="tb-date-group">';
+      html += '<div class="tb-date-label">' + (dateObj.getMonth() + 1) + '/' + dateObj.getDate() + '（' + DAY_NAMES[dateObj.getDay()] + '）</div>';
+      lessons.forEach(function(l) {
+        var idx = lessonIndex.length;
+        lessonIndex.push(l);
+        var unlimited = !l.max;
+        var left = unlimited ? 999 : Math.max(0, l.max - l.booked);
+        var full = !unlimited && left <= 0;
+        html += '<div class="tb-card" id="tb-card-' + idx + '">';
+        html += '<div class="tb-card-tags">';
+        if (l.studio) html += '<span class="tb-tag">' + esc(l.studio) + '</span>';
+        if (l.time) html += '<span class="tb-tag">' + esc(l.time) + '</span>';
+        html += '<span class="tb-tag class">' + esc(l.class_name) + '</span>';
+        html += '</div>';
+        html += '<div class="tb-card-foot">';
+        if (unlimited) html += '<span class="tb-spots">予約受付中</span>';
+        else if (full) html += '<span class="tb-spots full">満員</span>';
+        else html += '<span class="tb-spots">残り <strong>' + left + '</strong> 枠</span>';
+        if (full) html += '<button class="tb-book-btn" disabled>満員のため予約不可</button>';
+        else html += '<button class="tb-book-btn" onclick="tbOpenForm(' + idx + ')">体験予約する</button>';
+        html += '</div>';
+        html += '<div class="tb-form-area"></div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    if (!html) {
+      html = '<div class="tb-empty">現在ご案内できるレッスン日程がありません。<br>お手数ですが<a href="#contact" style="color: var(--gold);">お問い合わせ</a>よりご連絡ください。</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  window.tbOpenForm = function(idx) {
+    document.querySelectorAll('.tb-form').forEach(function(f) { f.remove(); });
+    var card = document.getElementById('tb-card-' + idx);
+    if (!card) return;
+    var savedName = '', savedEmail = '';
+    try {
+      savedName = localStorage.getItem('btm_trial_name') || '';
+      savedEmail = localStorage.getItem('btm_trial_email') || '';
+    } catch (e) {}
+    card.querySelector('.tb-form-area').innerHTML =
+      '<div class="tb-form">' +
+      '<div><label>お名前（必須）</label><input type="text" id="tb-name-' + idx + '" value="' + esc(savedName) + '" placeholder="例）山田 花子"></div>' +
+      '<div><label>メールアドレス（必須・確認メールをお送りします）</label><input type="email" id="tb-email-' + idx + '" value="' + esc(savedEmail) + '" placeholder="例）example@gmail.com"></div>' +
+      '<div class="tb-error" id="tb-error-' + idx + '" style="display:none"></div>' +
+      '<div class="tb-form-btns">' +
+      '<button class="tb-submit-btn" id="tb-submit-' + idx + '" onclick="tbSubmit(' + idx + ')">この内容で予約する</button>' +
+      '<button class="tb-cancel-btn" onclick="tbCloseForm(' + idx + ')">閉じる</button>' +
+      '</div></div>';
+  };
+
+  window.tbCloseForm = function(idx) {
+    var card = document.getElementById('tb-card-' + idx);
+    if (card) card.querySelector('.tb-form-area').innerHTML = '';
+  };
+
+  window.tbSubmit = function(idx) {
+    var l = lessonIndex[idx];
+    if (!l) return;
+    var name = (document.getElementById('tb-name-' + idx).value || '').trim();
+    var email = (document.getElementById('tb-email-' + idx).value || '').trim();
+    var errEl = document.getElementById('tb-error-' + idx);
+
+    function showErr(msg) { errEl.textContent = msg; errEl.style.display = 'block'; }
+    errEl.style.display = 'none';
+
+    if (!name) { showErr('お名前を入力してください'); return; }
+    if (!email || email.indexOf('@') === -1) { showErr('メールアドレスを正しく入力してください'); return; }
+
+    try {
+      localStorage.setItem('btm_trial_name', name);
+      localStorage.setItem('btm_trial_email', email);
+    } catch (e) {}
+
+    var btn = document.getElementById('tb-submit-' + idx);
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+
+    var params = new URLSearchParams({
+      action: 'book', date: l.date, studio: l.studio, time: l.time,
+      class_name: l.class_name, name: name, email: email, trial: '1'
+    });
+
+    fetch(API + '?' + params.toString(), { redirect: 'follow' })
+      .then(function(r) { return r.json(); })
+      .then(function(res) {
+        if (res.success) {
+          if (typeof gtag === 'function') {
+            gtag('event', 'trial_booking', { event_category: 'conversion', event_label: l.date + ' ' + l.class_name });
+          }
+          var card = document.getElementById('tb-card-' + idx);
+          card.querySelector('.tb-form-area').innerHTML =
+            '<div class="tb-form"><div class="tb-success">&#9989; 体験レッスンのご予約を受け付けました。<br>' +
+            esc(l.date) + '「' + esc(l.class_name) + '」<br>' +
+            '確認メールをお送りしましたのでご確認ください。<br>当日お会いできるのを楽しみにしています！</div></div>';
+          var footBtn = card.querySelector('.tb-book-btn');
+          if (footBtn) { footBtn.disabled = true; footBtn.textContent = '予約済み'; }
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'この内容で予約する';
+          showErr(res.error || '予約に失敗しました。時間をおいてお試しください');
+        }
+      })
+      .catch(function() {
+        btn.disabled = false;
+        btn.textContent = 'この内容で予約する';
+        showErr('通信エラーが発生しました。時間をおいてお試しください');
+      });
+  };
+
+  Promise.all([
+    fetchJson('regularlessons'),
+    fetchJson('slots'),
+    fetchJson('list'),
+    fetchJson('lessoncancels'),
+    fetchJson('irregularholidays'),
+    fetchJson('regularholidays'),
+    fetchJson('capacityoverrides')
+  ]).then(function(res) {
+    regulars = res[0]; slots = res[1]; bookingList = res[2];
+    cancels = res[3]; irregs = res[4]; regHolidays = res[5]; capOverrides = res[6];
+    render();
   });
 })();
 </script>

@@ -257,7 +257,8 @@ function getAvailableSlots() {
     bookingMembers[key].push({
       name: String(row[4]),
       booked_at: row[6] instanceof Date ? Utilities.formatDate(row[6], 'Asia/Tokyo', 'MM/dd HH:mm') : String(row[6] || ''),
-      home: row[7] ? true : false
+      home: String(row[7] || '') === '✅',
+      trial: String(row[7] || '') === '体験'
     });
   }
 
@@ -313,9 +314,14 @@ function bookSlot(params) {
   var name = params.name || '';
   var email = params.email || '';
   var homeStudio = params.home_studio === '1';
+  var isTrial = params.trial === '1';
+  if (isTrial) homeStudio = false; // 体験者は登録スタジオ生優先の対象外
 
   if (!name) {
     return jsonResponse({ success: false, error: 'お名前を入力してください' });
+  }
+  if (isTrial && !email) {
+    return jsonResponse({ success: false, error: 'メールアドレスを入力してください' });
   }
 
   var bookingData = getAllBookingRows();
@@ -385,13 +391,14 @@ function bookSlot(params) {
     }
   }
 
-  // カテゴリ別の予約シートに記録（FUTURE以外はKIDSシートへ）
-  getBookingSheetByCategory(lessonCategory).appendRow([date, studio, time, className, name, email, new Date(), homeStudio ? '✅' : '']);
+  // カテゴリ別の予約シートに記録（FUTURE以外はKIDSシートへ）。H列: ✅=登録スタジオ生 / 体験=体験参加
+  getBookingSheetByCategory(lessonCategory).appendRow([date, studio, time, className, name, email, new Date(), isTrial ? '体験' : (homeStudio ? '✅' : '')]);
 
-  sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity);
-  if (email) sendBookingConfirmation(email, date, studio, time, className, name, lessonCategory);
+  sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity, isTrial);
+  if (email) sendBookingConfirmation(email, date, studio, time, className, name, lessonCategory, isTrial);
 
-  var msg = overCapacity ? '予約が完了しました（登録スタジオ生・優先受付）' : '予約が完了しました';
+  var msg = overCapacity ? '予約が完了しました（登録スタジオ生・優先受付）'
+    : (isTrial ? '体験レッスンのご予約が完了しました' : '予約が完了しました');
   return jsonResponse({ success: true, message: msg });
 }
 
@@ -440,11 +447,12 @@ function matchRegularLesson(regData, dateStr, studio, time, className) {
 }
 
 // ===== 予約通知メール =====
-function sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity) {
+function sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity, isTrial) {
   try {
     var subject = '【BTM予約】' + name + 'さん — ' + date + ' ' + className;
-    if (overCapacity) subject = '【BTM予約・⚠定員超過優先受付】' + name + 'さん — ' + date + ' ' + className;
-    var body = '新しい予約が入りました\n\n'
+    if (isTrial) subject = '【BTM体験予約】' + name + 'さん — ' + date + ' ' + className;
+    else if (overCapacity) subject = '【BTM予約・⚠定員超過優先受付】' + name + 'さん — ' + date + ' ' + className;
+    var body = (isTrial ? '新しい体験レッスン予約が入りました\n\n' : '新しい予約が入りました\n\n')
       + (overCapacity ? '⚠️ 定員超過ですが登録スタジオ生のため優先受付しました。調整が必要な場合はご対応ください。\n\n' : '')
       + '━━━━━━━━━━━━━━━━━━━━\n'
       + '日付: ' + date + '\n'
@@ -452,6 +460,7 @@ function sendBookingNotification(date, studio, time, className, name, email, hom
       + '時間: ' + time + '\n'
       + 'クラス: ' + className + '\n'
       + 'お名前: ' + name + '\n'
+      + '種別: ' + (isTrial ? '🔰 体験レッスン' : '通常予約') + '\n'
       + '登録スタジオ生: ' + (homeStudio ? '✅ はい' : '—') + '\n'
       + 'メール: ' + (email || '未入力') + '\n'
       + '予約日時: ' + Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm') + '\n'
@@ -464,12 +473,21 @@ function sendBookingNotification(date, studio, time, className, name, email, hom
   }
 }
 
-function sendBookingConfirmation(email, date, studio, time, className, name, lessonCategory) {
+function sendBookingConfirmation(email, date, studio, time, className, name, lessonCategory, isTrial) {
   try {
-    var subject = '【BEAT THE MIX】予約確認 — ' + date + ' ' + className;
-    // FUTUREは会員ページから本人キャンセル可（予約時と同じ端末のみ）。KIDSは従来どおりLINE連絡
+    var subject = (isTrial ? '【BEAT THE MIX】体験レッスン予約確認 — ' : '【BEAT THE MIX】予約確認 — ') + date + ' ' + className;
+    // 体験者は会員ページに入れないため電話/メール連絡。FUTURE会員は会員ページから本人キャンセル可（予約時と同じ端末のみ）。KIDSは従来どおりLINE連絡
     var cancelInfo;
-    if (String(lessonCategory || '').toUpperCase() === 'FUTURE') {
+    if (isTrial) {
+      cancelInfo = '■ 当日の持ち物\n'
+        + '動きやすい服装・室内用シューズ・タオル\n'
+        + '※更衣スペースがございます。お着替えの方は\n'
+        + '　少し早めにお越しください。\n\n'
+        + '■ キャンセル・変更のご連絡\n'
+        + 'お電話（090-1817-9501）または\n'
+        + 'メール（beat.the.mix7386@gmail.com）にて\n'
+        + 'ご連絡ください。\n\n';
+    } else if (String(lessonCategory || '').toUpperCase() === 'FUTURE') {
       cancelInfo = '■ キャンセル方法\n'
         + '会員ページでご予約日のレッスンを開き、\n'
         + '予約者一覧のご自身のニックネームの横にある\n'
@@ -482,7 +500,7 @@ function sendBookingConfirmation(email, date, studio, time, className, name, les
         + 'LINEにてご連絡ください。\n\n';
     }
     var body = name + ' 様\n\n'
-      + 'ご予約ありがとうございます。\n'
+      + (isTrial ? '体験レッスンのご予約ありがとうございます。\n' : 'ご予約ありがとうございます。\n')
       + '以下の内容で予約を受け付けました。\n\n'
       + '━━━━━━━━━━━━━━━━━━━━\n'
       + '日付: ' + date + '\n'
@@ -556,7 +574,8 @@ function getBookingList() {
       name: String(row[4]),
       email: String(row[5] || ''),
       booked_at: row[6] instanceof Date ? Utilities.formatDate(row[6], 'Asia/Tokyo', 'MM/dd HH:mm') : String(row[6]),
-      home: row[7] ? true : false
+      home: String(row[7] || '') === '✅',
+      trial: String(row[7] || '') === '体験'
     });
   }
 
