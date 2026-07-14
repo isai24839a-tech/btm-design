@@ -16,6 +16,17 @@
 
 // ===== 設定 =====
 var ADMIN_EMAILS = ['beat.the.mix7386@gmail.com', 'isai24839a@gmail.com'];
+// 送信元表示: beat.the.mix7386がGmailエイリアス登録済みならfrom差し替え、未登録なら表示名のみ変更（送信は失敗させない）
+var MAIL_FROM_ADDRESS = 'beat.the.mix7386@gmail.com';
+var MAIL_FROM_NAME = 'BEAT THE MIX';
+
+function mailOptions() {
+  var opts = { name: MAIL_FROM_NAME };
+  try {
+    if (GmailApp.getAliases().indexOf(MAIL_FROM_ADDRESS) !== -1) opts.from = MAIL_FROM_ADDRESS;
+  } catch (e) {}
+  return opts;
+}
 // FUTUREの「予約が入りました」通知は管理者宛て不要（2026-07-14指示・両アドレスとも停止）。KIDSは従来どおりADMIN_EMAILS全員
 var FUTURE_BOOKING_NOTIFY_EMAILS = [];
 var ADMIN_KEY = 'potofu7386'; // members-page.htmlのADMIN_PASSWORDと合わせる
@@ -461,7 +472,7 @@ function sendBookingNotification(date, studio, time, className, name, email, hom
       + 'スプレッドシートで確認:\n'
       + SpreadsheetApp.getActiveSpreadsheet().getUrl();
     var recipients = String(lessonCategory || '').toUpperCase() === 'FUTURE' ? FUTURE_BOOKING_NOTIFY_EMAILS : ADMIN_EMAILS;
-    recipients.forEach(function(addr) { GmailApp.sendEmail(addr, subject, body); });
+    recipients.forEach(function(addr) { GmailApp.sendEmail(addr, subject, body, mailOptions()); });
   } catch (e) {
     Logger.log('メール送信エラー: ' + e.message);
   }
@@ -500,7 +511,7 @@ function sendBookingConfirmation(email, date, studio, time, className, name, les
       + '※このメールは送信専用です。\n'
       + '　このメールに返信しても届きませんので\n'
       + '　ご了承ください。';
-    GmailApp.sendEmail(email, subject, body);
+    GmailApp.sendEmail(email, subject, body, mailOptions());
   } catch (e) {
     Logger.log('確認メール送信エラー: ' + e.message);
   }
@@ -770,7 +781,7 @@ function sendCancelNotification(date, studio, time, className, name) {
       + '━━━━━━━━━━━━━━━━━━━━\n\n'
       + 'スプレッドシートで確認:\n'
       + SpreadsheetApp.getActiveSpreadsheet().getUrl();
-    ADMIN_EMAILS.forEach(function(addr) { GmailApp.sendEmail(addr, subject, body); });
+    ADMIN_EMAILS.forEach(function(addr) { GmailApp.sendEmail(addr, subject, body, mailOptions()); });
   } catch (e) {
     Logger.log('キャンセル通知メール送信エラー: ' + e.message);
   }
@@ -794,7 +805,7 @@ function sendCancelConfirmation(email, date, studio, time, className, name) {
       + '※このメールは送信専用です。\n'
       + '　このメールに返信しても届きませんので\n'
       + '　ご了承ください。';
-    GmailApp.sendEmail(email, subject, body);
+    GmailApp.sendEmail(email, subject, body, mailOptions());
   } catch (e) {
     Logger.log('キャンセル確認メール送信エラー: ' + e.message);
   }
@@ -942,7 +953,7 @@ function sendWaitlistConfirmation(email, date, studio, time, className, name) {
       + '※このメールは送信専用です。\n'
       + '　このメールに返信しても届きませんので\n'
       + '　ご了承ください。';
-    GmailApp.sendEmail(email, subject, body);
+    GmailApp.sendEmail(email, subject, body, mailOptions());
   } catch (e) {
     Logger.log('キャンセル待ち受付メール送信エラー: ' + e.message);
   }
@@ -969,7 +980,7 @@ function sendWaitlistVacancyEmail(email, date, studio, time, className, name) {
       + '※このメールは送信専用です。\n'
       + '　このメールに返信しても届きませんので\n'
       + '　ご了承ください。';
-    GmailApp.sendEmail(email, subject, body);
+    GmailApp.sendEmail(email, subject, body, mailOptions());
   } catch (e) {
     Logger.log('空き通知メール送信エラー: ' + e.message);
   }
