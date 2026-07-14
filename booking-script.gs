@@ -16,6 +16,8 @@
 
 // ===== 設定 =====
 var ADMIN_EMAILS = ['beat.the.mix7386@gmail.com', 'isai24839a@gmail.com'];
+// FUTUREの「予約が入りました」通知は beat.the.mix7386 宛て不要（2026-07-14指示）。KIDSは従来どおりADMIN_EMAILS全員
+var FUTURE_BOOKING_NOTIFY_EMAILS = ['isai24839a@gmail.com'];
 var ADMIN_KEY = 'potofu7386'; // members-page.htmlのADMIN_PASSWORDと合わせる
 var IMAGE_FOLDER_NAME = 'BTM_お知らせ画像';
 
@@ -388,7 +390,7 @@ function bookSlot(params) {
   // カテゴリ別の予約シートに記録（FUTURE以外はKIDSシートへ）
   getBookingSheetByCategory(lessonCategory).appendRow([date, studio, time, className, name, email, new Date(), homeStudio ? '✅' : '']);
 
-  sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity);
+  sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity, lessonCategory);
   if (email) sendBookingConfirmation(email, date, studio, time, className, name, lessonCategory);
 
   var msg = overCapacity ? '予約が完了しました（登録スタジオ生・優先受付）' : '予約が完了しました';
@@ -440,7 +442,7 @@ function matchRegularLesson(regData, dateStr, studio, time, className) {
 }
 
 // ===== 予約通知メール =====
-function sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity) {
+function sendBookingNotification(date, studio, time, className, name, email, homeStudio, overCapacity, lessonCategory) {
   try {
     var subject = '【BTM予約】' + name + 'さん — ' + date + ' ' + className;
     if (overCapacity) subject = '【BTM予約・⚠定員超過優先受付】' + name + 'さん — ' + date + ' ' + className;
@@ -458,7 +460,8 @@ function sendBookingNotification(date, studio, time, className, name, email, hom
       + '━━━━━━━━━━━━━━━━━━━━\n\n'
       + 'スプレッドシートで確認:\n'
       + SpreadsheetApp.getActiveSpreadsheet().getUrl();
-    ADMIN_EMAILS.forEach(function(addr) { GmailApp.sendEmail(addr, subject, body); });
+    var recipients = String(lessonCategory || '').toUpperCase() === 'FUTURE' ? FUTURE_BOOKING_NOTIFY_EMAILS : ADMIN_EMAILS;
+    recipients.forEach(function(addr) { GmailApp.sendEmail(addr, subject, body); });
   } catch (e) {
     Logger.log('メール送信エラー: ' + e.message);
   }
