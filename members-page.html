@@ -3331,6 +3331,10 @@ function renderDayLessons(dateStr) {
       if (!isAdminMode) {
         var regBtnLabel = rIsFull ? '登録スタジオ生の方はこちら' : '予約する';
         html += '<button class="slot-book-btn" onclick=\'openBookingModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>' + regBtnLabel + '</button>';
+      } else {
+        // Admin proxy booking: teacher books on behalf of a student (same book API, no GAS change)
+        regSlot.adminProxy = true;
+        html += '<button class="slot-book-btn" onclick=\'openBookingModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>&#128100; 生徒の予約を入れる</button>';
       }
       html += '</div>';
       if (rIsFull && !isAdminMode) {
@@ -3458,6 +3462,9 @@ function openBookingModal(slot) {
     '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>' +
     '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
 
+  // Admin proxy booking: teacher enters the student's name instead of their own
+  var isProxy = !!slot.adminProxy;
+
   // Regular lessons: home-studio checkbox (priority when full)
   var isRegular = !!slot.isRegular;
   var isFullPriority = isRegular && slot.max > 0 && slot.booked >= slot.max;
@@ -3469,25 +3476,28 @@ function openBookingModal(slot) {
       '<div class="booking-field">' +
         '<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-weight:500">' +
           '<input type="checkbox" id="booking-home-studio" style="width:auto;margin:0">' +
-          'このスタジオに登録している生徒です' +
+          (isProxy ? 'このスタジオに登録している生徒の予約です' : 'このスタジオに登録している生徒です') +
         '</label>' +
         '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">登録スタジオの生徒（✅）は満員時も優先的に予約できます</span>' +
       '</div>';
   }
 
+  var nameLabel = isProxy ? '生徒のニックネーム' : (currentCategory === 'future' ? 'ニックネーム' : 'お名前');
+  var emailNote = isProxy ? '任意。入力すると生徒本人に予約確認メールが届きます' : '予約確認メールをお送りします';
+
   document.getElementById('booking-modal-body').innerHTML =
-    '<h3>レッスン予約</h3>' +
-    '<p class="booking-modal-sub">以下のレッスンを予約します</p>' +
+    '<h3>' + (isProxy ? '生徒の代理予約' : 'レッスン予約') + '</h3>' +
+    '<p class="booking-modal-sub">' + (isProxy ? '先生が生徒に代わって予約を入れます' : '以下のレッスンを予約します') + '</p>' +
     '<div class="booking-modal-slot">' + slotHtml + '</div>' +
     '<form id="booking-form" onsubmit="event.preventDefault();submitBooking()">' +
       '<div class="booking-field">' +
-        '<label>' + (currentCategory === 'future' ? 'ニックネーム' : 'お名前') + ' <span class="required-mark" style="color:' + (currentCategory === 'future' ? 'var(--navy)' : 'var(--coral)') + '">*</span></label>' +
-        '<input type="text" id="booking-name" required placeholder="' + (currentCategory === 'future' ? 'タロウ' : '山田 太郎') + '" autocomplete="' + (currentCategory === 'future' ? 'nickname' : 'name') + '">' +
+        '<label>' + nameLabel + ' <span class="required-mark" style="color:' + (currentCategory === 'future' ? 'var(--navy)' : 'var(--coral)') + '">*</span></label>' +
+        '<input type="text" id="booking-name" required placeholder="' + (currentCategory === 'future' ? 'タロウ' : '山田 太郎') + '" autocomplete="' + (isProxy ? 'off' : (currentCategory === 'future' ? 'nickname' : 'name')) + '">' +
       '</div>' +
       '<div class="booking-field">' +
-        '<label>メールアドレス</label>' +
-        '<input type="email" id="booking-email" placeholder="example@gmail.com" autocomplete="email">' +
-        '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">予約確認メールをお送りします</span>' +
+        '<label>' + (isProxy ? '生徒のメールアドレス' : 'メールアドレス') + '</label>' +
+        '<input type="email" id="booking-email" placeholder="example@gmail.com" autocomplete="' + (isProxy ? 'off' : 'email') + '">' +
+        '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">' + emailNote + '</span>' +
       '</div>' +
       homeFieldHtml +
       '<div class="booking-modal-actions">' +
@@ -3500,15 +3510,17 @@ function openBookingModal(slot) {
   if (currentCategory === 'future') modal.classList.add('modal-future');
   modal.classList.add('active');
 
-  // Restore saved name/email from localStorage
-  try {
-    var savedName = localStorage.getItem('btm_booking_name');
-    var savedEmail = localStorage.getItem('btm_booking_email');
-    if (savedName) document.getElementById('booking-name').value = savedName;
-    if (savedEmail) document.getElementById('booking-email').value = savedEmail;
-    var homeCb = document.getElementById('booking-home-studio');
-    if (homeCb && localStorage.getItem('btm_booking_home') === '1') homeCb.checked = true;
-  } catch(e) {}
+  // Restore saved name/email from localStorage (skip for proxy: the teacher's own info must not autofill)
+  if (!isProxy) {
+    try {
+      var savedName = localStorage.getItem('btm_booking_name');
+      var savedEmail = localStorage.getItem('btm_booking_email');
+      if (savedName) document.getElementById('booking-name').value = savedName;
+      if (savedEmail) document.getElementById('booking-email').value = savedEmail;
+      var homeCb = document.getElementById('booking-home-studio');
+      if (homeCb && localStorage.getItem('btm_booking_home') === '1') homeCb.checked = true;
+    } catch(e) {}
+  }
 }
 
 function closeBookingModal() {
@@ -3657,10 +3669,12 @@ function submitBooking() {
     }
   }
 
-  // Save name/email to localStorage for next time
-  try { localStorage.setItem('btm_booking_name', name); } catch(e) {}
-  if (email) { try { localStorage.setItem('btm_booking_email', email); } catch(e) {} }
-  if (homeCb) { try { localStorage.setItem('btm_booking_home', homeStudio ? '1' : '0'); } catch(e) {} }
+  // Save name/email to localStorage for next time (skip for proxy: don't overwrite the teacher's own info)
+  if (!currentBookingSlot.adminProxy) {
+    try { localStorage.setItem('btm_booking_name', name); } catch(e) {}
+    if (email) { try { localStorage.setItem('btm_booking_email', email); } catch(e) {} }
+    if (homeCb) { try { localStorage.setItem('btm_booking_home', homeStudio ? '1' : '0'); } catch(e) {} }
+  }
 
   var btn = document.getElementById('booking-submit-btn');
   btn.disabled = true;
