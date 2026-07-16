@@ -775,6 +775,43 @@ body.category-future .navbar {
   gap: 1rem;
 }
 
+/* Back-to-calendar button under the day lesson list (sticky navbar needs scroll offset) */
+#calendar-container { scroll-margin-top: 70px; }
+
+.day-lessons-back {
+  margin-top: 1.2rem;
+  text-align: center;
+}
+
+.day-lessons-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.5rem;
+  background: #fff;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--gray-500);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.day-lessons-back-btn:hover {
+  color: var(--navy);
+  border-color: var(--navy);
+}
+
+.day-lessons-back-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+}
+
 /* ===== LOADING / ERROR ===== */
 .loading-container {
   display: flex;
@@ -3195,6 +3232,19 @@ function changeMonth(delta) {
   renderCalendar();
 }
 
+// Back-to-calendar button under the day lesson list (mobile scrolls down to the list on date tap)
+function backToCalendarHtml() {
+  return '<div class="day-lessons-back">' +
+    '<button type="button" class="day-lessons-back-btn" onclick="scrollBackToCalendar()">' +
+    '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>' +
+    'カレンダーへ戻る</button></div>';
+}
+
+function scrollBackToCalendar() {
+  var cal = document.getElementById('calendar-container');
+  if (cal) cal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function getSlotMembers(slot) {
   // API mode: members are included in slot data from GAS
   if (!DEMO_MODE) {
@@ -3243,7 +3293,8 @@ function renderDayLessons(dateStr) {
     }
     container.innerHTML =
       '<div class="day-lessons-header">' + escapeHtml(dateLabel) + '</div>' +
-      '<div class="day-lessons-empty">' + escapeHtml(emptyMsg) + '</div>';
+      '<div class="day-lessons-empty">' + escapeHtml(emptyMsg) + '</div>' +
+      backToCalendarHtml();
     return;
   }
 
@@ -3435,6 +3486,7 @@ function renderDayLessons(dateStr) {
   });
 
   html += '</div>';
+  html += backToCalendarHtml();
   container.innerHTML = html;
 }
 
