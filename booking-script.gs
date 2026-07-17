@@ -187,6 +187,7 @@ function doGet(e) {
   // Public actions (read-only)
   if (action === 'slots') return getAvailableSlots();
   if (action === 'book') return bookSlot(e.parameter);
+  if (action === 'absent') return markAbsent(e.parameter);
   if (action === 'waitlist') return joinWaitlist(e.parameter);
   if (action === 'list') return getBookingList();
   if (action === 'announcements') return getAnnouncements();
@@ -338,7 +339,7 @@ function bookSlot(params) {
   for (var i = 0; i < bookingData.length; i++) {
     var row = bookingData[i];
     var rowKey = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
-    if (rowKey === key) currentBookings++;
+    if (rowKey === key && String(row[7] || '').trim() !== '欠席') currentBookings++;
   }
 
   // Find max capacity and category (schedule slots first, then regular lessons)
@@ -376,12 +377,13 @@ function bookSlot(params) {
   if (capOverride !== null) maxCapacity = capOverride;
 
   // FUTURE lessons: one slot per lesson per person — block booking the same lesson twice
+  // (欠席行は予約ではないので重複扱いしない — 欠席連絡済みの人が予約し直すケース)
   if (lessonCategory === 'FUTURE') {
     var nameTrim = String(name).trim();
     for (var i = 0; i < bookingData.length; i++) {
       var bRow = bookingData[i];
       var bKey = formatDate(bRow[0]) + '|' + bRow[1] + '|' + bRow[2] + '|' + bRow[3];
-      if (bKey === key && String(bRow[4] || '').trim() === nameTrim) {
+      if (bKey === key && String(bRow[4] || '').trim() === nameTrim && String(bRow[7] || '').trim() !== '欠席') {
         return jsonResponse({ success: false, error: '既に ' + date + '「' + className + '」をご予約済みです。同じレッスンのご予約はお一人1枠までです' });
       }
     }
@@ -397,6 +399,9 @@ function bookSlot(params) {
       return jsonResponse({ success: false, error: 'このレッスンは満員です' });
     }
   }
+
+  // 同じ人の欠席連絡が残っていれば取り消してから予約（欠席→参加への変更）
+  removeBookingRows(date, studio, time, className, String(name).trim(), true);
 
   // カテゴリ別の予約シートに記録（FUTURE以外はKIDSシートへ）
   getBookingSheetByCategory(lessonCategory).appendRow([date, studio, time, className, name, email, new Date(), homeStudio ? '✅' : '']);
@@ -566,11 +571,13 @@ function getBookingList() {
         max: cap, members: []
       };
     }
+    var flag = String(row[7] || '').trim();
     grouped[dateStr][slotKey].members.push({
       name: String(row[4]),
       email: String(row[5] || ''),
       booked_at: row[6] instanceof Date ? Utilities.formatDate(row[6], 'Asia/Tokyo', 'MM/dd HH:mm') : String(row[6]),
-      home: row[7] ? true : false
+      home: flag === '✅',
+      absent: flag === '欠席'
     });
   }
 
@@ -730,6 +737,7 @@ function memberCancelBooking(params) {
   var time = params.time || '';
   var className = params.class_name || '';
   var name = params.name || '';
+  var absentOnly = params.absent === '1'; // 欠席連絡の取り消し（予約行は触らない）
 
   if (!name) return jsonResponse({ success: false, error: 'お名前が指定されていません' });
 
@@ -740,7 +748,7 @@ function memberCancelBooking(params) {
     var today = new Date();
     today.setHours(0, 0, 0, 0);
     if (lessonDate < today) {
-      return jsonResponse({ success: false, error: '過去のレッスンはキャンセルできません' });
+      return jsonResponse({ success: false, error: '過去のレッスンは操作できません' });
     }
   }
 
@@ -751,10 +759,15 @@ function memberCancelBooking(params) {
     var data = sheet.getDataRange().getValues();
     for (var i = data.length - 1; i >= 1; i--) {
       var row = data[i];
+      var rowAbsent = String(row[7] || '').trim() === '欠席';
       if (formatDate(row[0]) === date && String(row[1]) === studio && String(row[2]) === time &&
-          String(row[3]) === className && String(row[4]) === name) {
+          String(row[3]) === className && String(row[4]) === name && rowAbsent === absentOnly) {
         var email = String(row[5] || '');
         sheet.deleteRow(i + 1);
+        if (absentOnly) {
+          // 欠席取消は定員に影響しないためメール・キャンセル待ち通知なし
+          return jsonResponse({ success: true, message: '欠席連絡を取り消しました' });
+        }
         sendCancelNotification(date, studio, time, className, name);
         if (email) sendCancelConfirmation(email, date, studio, time, className, name);
         notifyWaitlistIfVacancy(date, studio, time, className);
@@ -763,7 +776,7 @@ function memberCancelBooking(params) {
     }
   }
 
-  return jsonResponse({ success: false, error: '該当する予約が見つかりません' });
+  return jsonResponse({ success: false, error: absentOnly ? '該当する欠席連絡が見つかりません' : '該当する予約が見つかりません' });
 }
 
 // ===== キャンセル通知メール（管理者宛） =====
@@ -811,6 +824,153 @@ function sendCancelConfirmation(email, date, studio, time, className, name) {
   }
 }
 
+// ===== 欠席連絡（FUTURE定期レッスン: 生徒が会員ページから「この日は休みます」を登録） =====
+// 予約シートにH列='欠席'で記録。定員には一切カウントされない。
+// 予約済みの人が欠席連絡した場合は予約を自動キャンセルして枠を空ける（キャンセル待ち通知も発火）。
+function markAbsent(params) {
+  var date = params.date || '';
+  var studio = params.studio || '';
+  var time = params.time || '';
+  var className = params.class_name || '';
+  var name = params.name || '';
+  var email = params.email || '';
+
+  if (!name) return jsonResponse({ success: false, error: 'お名前を入力してください' });
+
+  // 過去日は不可
+  var parts = String(date).split('/');
+  if (parts.length === 3) {
+    var lessonDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (lessonDate < today) {
+      return jsonResponse({ success: false, error: '過去のレッスンには欠席連絡できません' });
+    }
+  }
+
+  // レッスン特定（スケジュール枠→定期レッスンの順）。開催日でない日は受け付けない
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var key = date + '|' + studio + '|' + time + '|' + className;
+  var lessonCategory = '';
+  var foundInSchedule = false;
+  var scheduleSheet = ss.getSheetByName('スケジュール');
+  if (scheduleSheet) {
+    var scheduleData = scheduleSheet.getDataRange().getValues();
+    for (var i = 1; i < scheduleData.length; i++) {
+      var row = scheduleData[i];
+      if (formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3] === key) {
+        lessonCategory = String(row[5] || '').toUpperCase();
+        foundInSchedule = true;
+        break;
+      }
+    }
+  }
+  if (!foundInSchedule) {
+    var regRow = matchRegularLesson(getRegularLessonData(), date, studio, time, className);
+    if (regRow === null) {
+      return jsonResponse({ success: false, error: 'この日はこのレッスンの開催日ではありません' });
+    }
+    lessonCategory = String(regRow[4] || 'KIDS').toUpperCase();
+  }
+
+  // 同じレッスンに欠席連絡済みなら重複登録しない
+  var nameTrim = String(name).trim();
+  var bookingData = getAllBookingRows();
+  for (var i = 0; i < bookingData.length; i++) {
+    var bRow = bookingData[i];
+    var bKey = formatDate(bRow[0]) + '|' + bRow[1] + '|' + bRow[2] + '|' + bRow[3];
+    if (bKey === key && String(bRow[4] || '').trim() === nameTrim && String(bRow[7] || '').trim() === '欠席') {
+      return jsonResponse({ success: false, error: '既に ' + date + '「' + className + '」の欠席連絡を受け付けています' });
+    }
+  }
+
+  // 予約済みなら予約を取り消して欠席に変更（枠が空くのでキャンセル待ちに通知）
+  var hadBooking = removeBookingRows(date, studio, time, className, nameTrim, false);
+
+  getBookingSheetByCategory(lessonCategory).appendRow([date, studio, time, className, name, email, new Date(), '欠席']);
+
+  if (hadBooking) notifyWaitlistIfVacancy(date, studio, time, className);
+  sendAbsenceNotification(date, studio, time, className, name, hadBooking, lessonCategory);
+  if (email) sendAbsenceConfirmation(email, date, studio, time, className, name);
+
+  var msg = hadBooking ? '欠席連絡を受け付けました（ご予約は取り消しました）' : '欠席連絡を受け付けました';
+  return jsonResponse({ success: true, message: msg });
+}
+
+// ===== 指定レッスン×名前の行を削除（absent=true: 欠席行のみ / false: 予約行のみ）。1件でも消したらtrue =====
+function removeBookingRows(date, studio, time, className, nameTrim, absent) {
+  var deleted = false;
+  getBookingSheets().forEach(function(sheet) {
+    if (sheet.getLastRow() <= 1) return;
+    var data = sheet.getDataRange().getValues();
+    for (var i = data.length - 1; i >= 1; i--) {
+      var row = data[i];
+      var rowAbsent = String(row[7] || '').trim() === '欠席';
+      if (formatDate(row[0]) === date && String(row[1]) === studio && String(row[2]) === time &&
+          String(row[3]) === className && String(row[4] || '').trim() === nameTrim && rowAbsent === absent) {
+        sheet.deleteRow(i + 1);
+        deleted = true;
+      }
+    }
+  });
+  return deleted;
+}
+
+// ===== 欠席連絡通知メール（管理者宛・FUTUREは予約通知と同じ宛先設定に従う） =====
+function sendAbsenceNotification(date, studio, time, className, name, hadBooking, lessonCategory) {
+  try {
+    var recipients = String(lessonCategory || '').toUpperCase() === 'FUTURE' ? FUTURE_BOOKING_NOTIFY_EMAILS : ADMIN_EMAILS;
+    if (!recipients.length) return;
+    var subject = '【BTM欠席連絡】' + name + 'さん — ' + date + ' ' + className;
+    var body = '欠席連絡が入りました\n\n'
+      + (hadBooking ? '※ご予約済みだったため予約は取り消しました。\n\n' : '')
+      + '━━━━━━━━━━━━━━━━━━━━\n'
+      + '日付: ' + date + '\n'
+      + 'スタジオ: ' + studio + '\n'
+      + '時間: ' + time + '\n'
+      + 'クラス: ' + className + '\n'
+      + 'お名前: ' + name + '\n'
+      + '受付日時: ' + Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm') + '\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n\n'
+      + 'スプレッドシートで確認:\n'
+      + SpreadsheetApp.getActiveSpreadsheet().getUrl();
+    recipients.forEach(function(addr) { GmailApp.sendEmail(addr, subject, body, mailOptions()); });
+  } catch (e) {
+    Logger.log('欠席連絡通知メール送信エラー: ' + e.message);
+  }
+}
+
+// ===== 欠席連絡確認メール（本人宛・メール入力時のみ） =====
+function sendAbsenceConfirmation(email, date, studio, time, className, name) {
+  try {
+    var subject = '【BEAT THE MIX】欠席連絡を受け付けました — ' + date + ' ' + className;
+    var body = name + ' 様\n\n'
+      + '以下のレッスンの欠席連絡を受け付けました。\n\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n'
+      + '日付: ' + date + '\n'
+      + 'スタジオ: ' + studio + '\n'
+      + '時間: ' + time + '\n'
+      + 'クラス: ' + className + '\n'
+      + '━━━━━━━━━━━━━━━━━━━━\n\n'
+      + '■ 欠席連絡の取り消し方法\n'
+      + '会員ページでこのレッスンの日を開き、\n'
+      + '欠席のご自身のお名前の横にある\n'
+      + '「取消」ボタンからお手続きください。\n'
+      + 'https://tibadance.com/members-page\n'
+      + '※欠席連絡時と同じスマホ・ブラウザからのみ操作できます。\n'
+      + '　操作できない場合はLINEにてご連絡ください。\n\n'
+      + 'またのご参加をお待ちしています！\n\n'
+      + 'BEAT THE MIX ダンススタジオ\n\n'
+      + '─────────────────────\n'
+      + '※このメールは送信専用です。\n'
+      + '　このメールに返信しても届きませんので\n'
+      + '　ご了承ください。';
+    GmailApp.sendEmail(email, subject, body, mailOptions());
+  } catch (e) {
+    Logger.log('欠席確認メール送信エラー: ' + e.message);
+  }
+}
+
 // ===== キャンセル待ちシート取得（無ければ作成・既存デプロイでもsetupSheets再実行不要） =====
 function getWaitlistSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -836,7 +996,8 @@ function getLessonOccupancy(date, studio, time, className) {
   var bookingData = getAllBookingRows();
   for (var i = 0; i < bookingData.length; i++) {
     var row = bookingData[i];
-    if (formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3] === key) current++;
+    if (formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3] === key &&
+        String(row[7] || '').trim() !== '欠席') current++;
   }
 
   var max = 10;

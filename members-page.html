@@ -3365,7 +3365,10 @@ function renderDayLessons(dateStr) {
       // Per-date capacity override (臨時定員) takes precedence over the regular capacity
       var rMax = capOvr ? capOvr.max : (r.max || 0);
       var rMembers = getRegularLessonMembers(dateStr, r);
-      var rBooked = rMembers.length;
+      // 欠席連絡（absent）は定員にカウントしない
+      var rAttending = rMembers.filter(function(m) { return !m.absent; });
+      var rAbsent = rMembers.filter(function(m) { return m.absent; });
+      var rBooked = rAttending.length;
       var rUnlimited = rMax === 0;
       var rAvailable = rUnlimited ? 999 : Math.max(0, rMax - rBooked);
       var rIsFull = !rUnlimited && rMax - rBooked <= 0;
@@ -3391,27 +3394,52 @@ function renderDayLessons(dateStr) {
       if (rIsFull && !isAdminMode) {
         html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--navy);border:1.5px solid var(--navy)" onclick=\'openWaitlistModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>&#128276; キャンセル待ち登録</button></div>';
       }
+      // 欠席連絡: 満員でも入力できる（定員に関係しないため）
+      if (!isAdminMode) {
+        html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--gray-500);border:1.5px solid #ccc" onclick=\'openAbsenceModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>&#128587; 欠席連絡</button></div>';
+      }
 
       if (rMembers.length > 0) {
         html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--gray-100)">';
         var rCapLabel = rUnlimited ? '無制限' : (rMax + '名');
-        html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin-bottom:0.4rem;">予約者 (' + rMembers.length + '/' + rCapLabel + ')　✅=登録スタジオ生</div>';
-        rMembers.forEach(function(m) {
-          html += '<div class="bklist-member">';
-          html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
-          html += '<span class="bklist-member-name">' + escapeHtml(m.name) + (m.home ? ' <span title="登録スタジオ生">✅</span>' : '') + '</span>';
-          if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
-          if (isAdminMode) {
-            html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
-              JSON.stringify({date: dateStr, studio: r.studio, time: r.time, name: m.name}).replace(/'/g, "\\'") +
-              ')\'>削除</button>';
-          } else if (isOwnBooking(m.name)) {
-            html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'memberCancelBooking(' +
-              JSON.stringify({date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name, name: m.name}).replace(/'/g, "\\'") +
-              ')\'>キャンセル</button>';
-          }
-          html += '</div>';
-        });
+        if (rAttending.length > 0) {
+          html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin-bottom:0.4rem;">予約者 (' + rBooked + '/' + rCapLabel + ')　✅=登録スタジオ生</div>';
+          rAttending.forEach(function(m) {
+            html += '<div class="bklist-member">';
+            html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+            html += '<span class="bklist-member-name">' + escapeHtml(m.name) + (m.home ? ' <span title="登録スタジオ生">✅</span>' : '') + '</span>';
+            if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
+            if (isAdminMode) {
+              html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
+                JSON.stringify({date: dateStr, studio: r.studio, time: r.time, name: m.name}).replace(/'/g, "\\'") +
+                ')\'>削除</button>';
+            } else if (isOwnBooking(m.name)) {
+              html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'memberCancelBooking(' +
+                JSON.stringify({date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name, name: m.name}).replace(/'/g, "\\'") +
+                ')\'>キャンセル</button>';
+            }
+            html += '</div>';
+          });
+        }
+        if (rAbsent.length > 0) {
+          html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin:' + (rAttending.length > 0 ? '0.6rem' : '0') + ' 0 0.4rem;">&#10060; 欠席連絡 (' + rAbsent.length + '名)</div>';
+          rAbsent.forEach(function(m) {
+            html += '<div class="bklist-member" style="opacity:0.6">';
+            html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+            html += '<span class="bklist-member-name" style="text-decoration:line-through">' + escapeHtml(m.name) + '</span>';
+            if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
+            if (isAdminMode) {
+              html += '<button class="admin-cancel-btn" title="欠席連絡を削除" onclick=\'adminCancelBooking(' +
+                JSON.stringify({date: dateStr, studio: r.studio, time: r.time, name: m.name}).replace(/'/g, "\\'") +
+                ')\'>削除</button>';
+            } else if (isOwnBooking(m.name)) {
+              html += '<button class="admin-cancel-btn" title="欠席連絡を取り消す" onclick=\'memberCancelAbsence(' +
+                JSON.stringify({date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name, name: m.name}).replace(/'/g, "\\'") +
+                ')\'>取消</button>';
+            }
+            html += '</div>';
+          });
+        }
         html += '</div>';
       }
     }
@@ -3579,6 +3607,7 @@ function closeBookingModal() {
   document.getElementById('booking-modal').classList.remove('active');
   currentBookingSlot = null;
   currentWaitlistSlot = null;
+  currentAbsenceSlot = null;
 }
 
 // ===== WAITLIST (FUTURE: full lesson -> email when a spot opens) =====
@@ -3673,8 +3702,109 @@ function showWaitlistSuccess() {
     '</div>';
 }
 
+// ===== ABSENCE (FUTURE: 生徒が「この日は休みます」を連絡) =====
+var currentAbsenceSlot = null;
+
+function openAbsenceModal(slot) {
+  currentAbsenceSlot = slot;
+  currentBookingSlot = null;
+  currentWaitlistSlot = null;
+  var modal = document.getElementById('booking-modal');
+
+  var slotHtml =
+    '<span class="slot-tag">' + escapeHtml(slot.date || '') + '</span>' +
+    '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>' +
+    '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>' +
+    '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
+
+  document.getElementById('booking-modal-body').innerHTML =
+    '<h3>&#128587; 欠席連絡</h3>' +
+    '<p class="booking-modal-sub">以下のレッスンをお休みすることを先生にお知らせします。ご予約済みの場合は予約を取り消して欠席に変更します</p>' +
+    '<div class="booking-modal-slot">' + slotHtml + '</div>' +
+    '<form id="booking-form" onsubmit="event.preventDefault();submitAbsence()">' +
+      '<div class="booking-field">' +
+        '<label>ニックネーム <span class="required-mark" style="color:var(--navy)">*</span></label>' +
+        '<input type="text" id="booking-name" required placeholder="タロウ" autocomplete="nickname">' +
+      '</div>' +
+      '<div class="booking-field">' +
+        '<label>メールアドレス</label>' +
+        '<input type="email" id="booking-email" placeholder="example@gmail.com" autocomplete="email">' +
+        '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">任意。入力すると欠席連絡の確認メールが届きます</span>' +
+      '</div>' +
+      '<div class="booking-modal-actions">' +
+        '<button type="button" class="booking-cancel-btn" onclick="closeBookingModal()">閉じる</button>' +
+        '<button type="submit" class="booking-submit-btn" id="booking-submit-btn">欠席を連絡する</button>' +
+      '</div>' +
+    '</form>';
+
+  modal.classList.remove('modal-future');
+  if (currentCategory === 'future') modal.classList.add('modal-future');
+  modal.classList.add('active');
+
+  // Restore saved name/email from localStorage
+  try {
+    var savedName = localStorage.getItem('btm_booking_name');
+    var savedEmail = localStorage.getItem('btm_booking_email');
+    if (savedName) document.getElementById('booking-name').value = savedName;
+    if (savedEmail) document.getElementById('booking-email').value = savedEmail;
+  } catch(e) {}
+}
+
+function submitAbsence() {
+  if (!currentAbsenceSlot) return;
+
+  var name = document.getElementById('booking-name').value.trim();
+  var emailEl = document.getElementById('booking-email');
+  var email = emailEl ? emailEl.value.trim() : '';
+  if (!name) { document.getElementById('booking-name').focus(); return; }
+
+  // 同じレッスンに欠席連絡済みなら二重登録しない（サーバー側でも同じチェックあり）
+  if (hasSameLessonBooking(name, currentAbsenceSlot, true)) {
+    showBookingError('既に' + currentAbsenceSlot.date + '「' + currentAbsenceSlot.class_name + '」の欠席連絡を受け付けています');
+    return;
+  }
+
+  try { localStorage.setItem('btm_booking_name', name); } catch(e) {}
+  if (email) { try { localStorage.setItem('btm_booking_email', email); } catch(e) {} }
+
+  var btn = document.getElementById('booking-submit-btn');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+
+  var params = new URLSearchParams({
+    action: 'absent',
+    date: currentAbsenceSlot.date || '',
+    studio: currentAbsenceSlot.studio || '',
+    time: currentAbsenceSlot.time || '',
+    class_name: currentAbsenceSlot.class_name || '',
+    name: name, email: email
+  });
+
+  fetch(APPS_SCRIPT_URL + '?' + params.toString(), { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) { showAbsenceSuccess(result.message); }
+      else { btn.disabled = false; btn.textContent = '欠席を連絡する'; showBookingError(result.error || '欠席連絡に失敗しました'); }
+    })
+    .catch(function() { btn.disabled = false; btn.textContent = '欠席を連絡する'; showBookingError('通信エラーが発生しました'); });
+}
+
+function showAbsenceSuccess(message) {
+  var body = document.getElementById('booking-modal-body');
+  body.innerHTML =
+    '<div class="booking-success">' +
+      '<div class="booking-success-icon">&#10003;</div>' +
+      '<h4>欠席連絡を受け付けました</h4>' +
+      '<p>' + escapeHtml(message || 'お大事に！またのご参加をお待ちしています') + '</p>' +
+      '<br>' +
+      '<button class="slot-book-btn" onclick="closeAndRefreshBooking()">閉じる</button>' +
+    '</div>';
+}
+
 // FUTURE: check if this name already booked the same lesson (one slot per lesson rule)
-function hasSameLessonBooking(name, slot) {
+// absent=true で「欠席連絡済みか」のチェックに切り替え
+function hasSameLessonBooking(name, slot, absent) {
+  var wantAbsent = !!absent;
   for (var i = 0; i < allBookingData.length; i++) {
     var group = allBookingData[i];
     if (String(group.date || '') !== slot.date) continue;
@@ -3684,7 +3814,8 @@ function hasSameLessonBooking(name, slot) {
       if (s.studio !== slot.studio || s.time !== slot.time || s.class_name !== slot.class_name) continue;
       var members = s.members || [];
       for (var k = 0; k < members.length; k++) {
-        if (String(members[k].name || '').trim() === name) return true;
+        var m = members[k];
+        if (!!m.absent === wantAbsent && String(m.name || '').trim() === name) return true;
       }
     }
   }
@@ -4379,6 +4510,20 @@ function memberCancelBooking(info) {
   });
   apiCall(params, function(result) {
     alert(result.message || '予約をキャンセルしました');
+    fetchSlotsFromAPI(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); });
+  });
+}
+
+// 本人による欠席連絡の取り消し（欠席行のみ削除・メール送信なし）
+function memberCancelAbsence(info) {
+  if (!confirm(info.date + ' ' + info.time + '\n' + info.class_name + ' の欠席連絡を取り消しますか？')) return;
+
+  var params = new URLSearchParams({
+    action: 'memberCancelBooking', absent: '1',
+    date: info.date, studio: info.studio, time: info.time, class_name: info.class_name, name: info.name
+  });
+  apiCall(params, function(result) {
+    alert(result.message || '欠席連絡を取り消しました');
     fetchSlotsFromAPI(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); });
   });
 }
