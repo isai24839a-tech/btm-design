@@ -370,6 +370,8 @@ body {
     <li><a href="#sec-schedule">スケジュールの見方</a></li>
     <li><a href="#sec-booking">予約方法</a></li>
     <li><a href="#sec-cancel">予約のキャンセル</a></li>
+    <li><a href="#sec-waitlist">キャンセル待ちの方法（満員のとき）</a></li>
+    <li><a href="#sec-absence">欠席連絡の方法</a></li>
     <li><a href="#sec-news">お知らせ</a></li>
     <li><a href="#sec-pwa">ホーム画面に追加（アプリ化）</a></li>
     <li><a href="#sec-contact">お問い合わせ</a></li>
@@ -385,6 +387,8 @@ body {
     <li>レッスンスケジュールの確認</li>
     <li>レッスンの予約</li>
     <li>予約のキャンセル（ご自身で操作できます）</li>
+    <li>満員レッスンのキャンセル待ち登録</li>
+    <li>お休みするときの欠席連絡</li>
     <li>スタジオからのお知らせの確認</li>
   </ul>
   <div class="highlight">
@@ -568,7 +572,7 @@ body {
   <div class="highlight">
     <strong>予約が満員の場合</strong><br>
     「満員」と表示されているレッスンは予約できません。<br>
-    キャンセルが出ると再び予約できるようになります。
+    <a href="#sec-waitlist" style="color:#0D1B2A;font-weight:600;">キャンセル待ちに登録</a>すると、空きが出たときにメールでお知らせします。
   </div>
 </div>
 
@@ -615,9 +619,128 @@ body {
   </div>
 </div>
 
-<!-- ========== 6. お知らせ ========== -->
+<!-- ========== 6. キャンセル待ち ========== -->
+<div class="section" id="sec-waitlist">
+  <h2>6. キャンセル待ちの方法（満員のとき）</h2>
+
+  <p>満員のレッスンは「キャンセル待ち」に登録できます。空きが出ると、メールで自動的にお知らせします。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>満員のレッスンの「&#128276; キャンセル待ち」ボタンをタップ</strong></p>
+      <div class="mock-card">
+        <div class="flex-row" style="justify-content:space-between;">
+          <div class="flex-row">
+            <span class="mock-tag tag-studio">team kiki(千葉)</span>
+            <span class="mock-tag tag-time">19:10〜20:40</span>
+          </div>
+          <span class="mock-btn" style="background:#fff;color:#0D1B2A;border:1.5px solid #0D1B2A;font-size:0.75rem;padding:0.3rem 0.8rem;">&#128276; キャンセル待ち</span>
+        </div>
+        <div style="margin-top:0.5rem;font-size:0.85rem;color:#c62828;font-weight:600;">満員</div>
+      </div>
+      <p style="font-size:0.85rem;color:#666;margin-top:0.3rem;">このボタンは満員のレッスンにだけ表示されます。空きがあるレッスンは、そのままご予約ください。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>ニックネームとメールアドレスを入力して「登録する」をタップ</strong></p>
+      <div class="mock">
+        <div class="mock-label">キャンセル待ち登録</div>
+        <div style="margin-top:0.8rem;">
+          <small style="color:#666;">ニックネーム</small>
+          <input class="mock-input" type="text" value="タロウ" readonly>
+          <small style="color:#666;">メールアドレス（空きが出た時の通知先）</small>
+          <input class="mock-input" type="text" value="yamada@example.com" readonly>
+        </div>
+      </div>
+      <p style="margin-top:0.5rem;">「キャンセル待ちに登録しました」と表示されたら完了です。受付確認のメールも届きます。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>空きが出ると「空きが出ました」メールが届きます</strong></p>
+      <p>メールが届いたら、会員ページからいつも通りご予約ください。</p>
+    </div>
+  </div>
+
+  <div class="warning">
+    <strong>ご予約は先着順です</strong><br>
+    キャンセル待ちに登録しても、自動では予約されません。<br>
+    「空きが出ました」メールはキャンセル待ちの方全員に届くため、お早めのご予約をおすすめします。
+  </div>
+</div>
+
+<!-- ========== 7. 欠席連絡 ========== -->
+<div class="section" id="sec-absence">
+  <h2>7. 欠席連絡の方法</h2>
+
+  <p>レッスンをお休みするときは、会員ページから先生に欠席を連絡できます。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>カレンダーでお休みする日をタップし、レッスンの「&#128587; 欠席連絡」ボタンをタップ</strong></p>
+      <div class="mock-card">
+        <div class="flex-row" style="justify-content:space-between;">
+          <div class="flex-row">
+            <span class="mock-tag tag-studio">team kiki(千葉)</span>
+            <span class="mock-tag tag-time">19:10〜20:40</span>
+          </div>
+          <span class="mock-btn" style="background:#fff;color:#888;border:1.5px solid #ccc;font-size:0.75rem;padding:0.3rem 0.8rem;">&#128587; 欠席連絡</span>
+        </div>
+      </div>
+      <p style="font-size:0.85rem;color:#666;margin-top:0.3rem;">満員のレッスンでも欠席連絡はできます。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>ニックネームを入力して「欠席を連絡する」をタップ</strong></p>
+      <div class="mock">
+        <div class="mock-label">欠席連絡</div>
+        <div style="margin-top:0.8rem;">
+          <small style="color:#666;">ニックネーム</small>
+          <input class="mock-input" type="text" value="タロウ" readonly>
+          <small style="color:#666;">メールアドレス（任意）</small>
+          <input class="mock-input" type="text" value="" placeholder="入力すると確認メールが届きます" readonly>
+        </div>
+      </div>
+      <p style="margin-top:0.5rem;">「欠席連絡を受け付けました」と表示されたら完了です。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>欠席はレッスン詳細に表示されます</strong></p>
+      <p>予約者一覧の下に「&#10060; 欠席連絡」として表示され、先生にも伝わります。</p>
+      <div class="mock-card">
+        <div style="font-size:0.8rem;font-weight:500;color:#999;margin-bottom:0.4rem;">&#10060; 欠席連絡 (1名)</div>
+        <div style="display:flex;align-items:center;gap:0.5rem;opacity:0.6;">
+          <span style="font-size:0.9rem;font-weight:600;text-decoration:line-through;">タロウ</span>
+          <span style="margin-left:auto;font-size:0.75rem;font-weight:600;background:#fff;color:#c62828;border:1px solid #c62828;padding:0.2rem 0.7rem;border-radius:50px;">取消</span>
+        </div>
+      </div>
+      <p style="font-size:0.85rem;color:#666;margin-top:0.3rem;">間違えたときや出席できることになったときは、「取消」ボタンで欠席連絡を取り消せます。</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <strong>予約済みのレッスンに欠席連絡した場合</strong><br>
+    ご予約は自動で取り消され、欠席に変わります（キャンセル操作は不要です）。<br>
+    逆に、欠席連絡のあとに同じレッスンを予約し直すと、欠席連絡は自動で消えます。
+  </div>
+</div>
+
+<!-- ========== 8. お知らせ ========== -->
 <div class="section" id="sec-news">
-  <h2>6. お知らせ</h2>
+  <h2>8. お知らせ</h2>
 
   <p>会員ページの「お知らせ」エリアに、スタジオからの連絡事項が表示されます。</p>
 
@@ -678,9 +801,9 @@ body {
   </div>
 </div>
 
-<!-- ========== 7. ホーム画面に追加 ========== -->
+<!-- ========== 9. ホーム画面に追加 ========== -->
 <div class="section" id="sec-pwa">
-  <h2>7. ホーム画面に追加（アプリ化）</h2>
+  <h2>9. ホーム画面に追加（アプリ化）</h2>
 
   <p>ホーム画面に追加すると、アプリのようにワンタップでアクセスできます。</p>
 
@@ -715,9 +838,9 @@ body {
   </div>
 </div>
 
-<!-- ========== 8. お問い合わせ ========== -->
+<!-- ========== 10. お問い合わせ ========== -->
 <div class="contact-card" id="sec-contact">
-  <h2>8. お問い合わせ</h2>
+  <h2>10. お問い合わせ</h2>
   <p style="margin:1.5rem 0;">ご不明な点がございましたら、<br>お気軽にお問い合わせください。</p>
 
   <div style="margin:1.5rem 0;">
