@@ -265,13 +265,15 @@ function getAvailableSlots() {
   var bookingMembers = {};
   for (var i = 0; i < bookingData.length; i++) {
     var row = bookingData[i];
+    var flag = String(row[7] || '').trim();
+    if (flag === '欠席') continue; // 欠席連絡は枠を消費しない（欠席者一覧はlist API側で返す）
     var key = formatDate(row[0]) + '|' + row[1] + '|' + row[2] + '|' + row[3];
     bookingCounts[key] = (bookingCounts[key] || 0) + 1;
     if (!bookingMembers[key]) bookingMembers[key] = [];
     bookingMembers[key].push({
       name: String(row[4]),
       booked_at: row[6] instanceof Date ? Utilities.formatDate(row[6], 'Asia/Tokyo', 'MM/dd HH:mm') : String(row[6] || ''),
-      home: row[7] ? true : false
+      home: flag === '✅'
     });
   }
 

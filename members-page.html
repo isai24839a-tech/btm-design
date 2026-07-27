@@ -3448,7 +3448,14 @@ function renderDayLessons(dateStr) {
 
   slots.forEach(function(slot, idx) {
     var isUnlimited = slot.max === 0 || slot.max === '0';
+    // 欠席連絡（absent）は定員にカウントしない（membersはlist APIからマージ済みでabsentフラグを持つ）
+    var sMembers = getSlotMembers(slot);
+    var sAttending = sMembers.filter(function(m) { return !m.absent; });
+    var sAbsent = sMembers.filter(function(m) { return m.absent; });
     var available = isUnlimited ? 999 : (slot.available || 0);
+    if (!isUnlimited && !DEMO_MODE && sAbsent.length > 0) {
+      available = Math.max(0, (slot.max || 0) - sAttending.length);
+    }
     var spotClass = isUnlimited ? '' : (available <= 0 ? 'full' : available <= 2 ? 'few' : '');
 
     var isFull = !isUnlimited && available <= 0;
@@ -3489,24 +3496,50 @@ function renderDayLessons(dateStr) {
 
     html += '</div>';
 
-    // Show booked members
-    var members = getSlotMembers(slot);
-    if (members.length > 0) {
+    // 欠席連絡: FUTUREはカレンダー枠（スケジュール枠）でも受付。満員でも入力できる（定員に関係しないため）
+    if (currentCategory === 'future' && !DEMO_MODE && !isAdminMode) {
+      var absSlot = { date: slot.date, studio: slot.studio, time: slot.time, class_name: slot.class_name };
+      html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--gray-500);border:1.5px solid #ccc" onclick=\'openAbsenceModal(' + JSON.stringify(absSlot).replace(/'/g, "\\'") + ')\'>&#128587; 欠席連絡</button></div>';
+    }
+
+    // Show booked members (absent members listed separately)
+    if (sMembers.length > 0) {
       html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--gray-100)">';
       var capLabel = isUnlimited ? '無制限' : ((slot.max || 10) + '名');
-      html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin-bottom:0.4rem;">予約者 (' + members.length + '/' + capLabel + ')</div>';
-      members.forEach(function(m) {
-        html += '<div class="bklist-member">';
-        html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
-        html += '<span class="bklist-member-name">' + escapeHtml(m.name) + (m.home ? ' <span title="登録スタジオ生">✅</span>' : '') + '</span>';
-        if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
-        if (isAdminMode) {
-          html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
-            JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,name:m.name}).replace(/'/g, "\\'") +
-            ')\'>削除</button>';
-        }
-        html += '</div>';
-      });
+      if (sAttending.length > 0) {
+        html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin-bottom:0.4rem;">予約者 (' + sAttending.length + '/' + capLabel + ')</div>';
+        sAttending.forEach(function(m) {
+          html += '<div class="bklist-member">';
+          html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+          html += '<span class="bklist-member-name">' + escapeHtml(m.name) + (m.home ? ' <span title="登録スタジオ生">✅</span>' : '') + '</span>';
+          if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
+          if (isAdminMode) {
+            html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
+              JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,name:m.name}).replace(/'/g, "\\'") +
+              ')\'>削除</button>';
+          }
+          html += '</div>';
+        });
+      }
+      if (sAbsent.length > 0) {
+        html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin:' + (sAttending.length > 0 ? '0.6rem' : '0') + ' 0 0.4rem;">&#10060; 欠席連絡 (' + sAbsent.length + '名)</div>';
+        sAbsent.forEach(function(m) {
+          html += '<div class="bklist-member" style="opacity:0.6">';
+          html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+          html += '<span class="bklist-member-name" style="text-decoration:line-through">' + escapeHtml(m.name) + '</span>';
+          if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
+          if (isAdminMode) {
+            html += '<button class="admin-cancel-btn" title="欠席連絡を削除" onclick=\'adminCancelBooking(' +
+              JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,name:m.name}).replace(/'/g, "\\'") +
+              ')\'>削除</button>';
+          } else if (isOwnBooking(m.name)) {
+            html += '<button class="admin-cancel-btn" title="欠席連絡を取り消す" onclick=\'memberCancelAbsence(' +
+              JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,class_name:slot.class_name,name:m.name}).replace(/'/g, "\\'") +
+              ')\'>取消</button>';
+          }
+          html += '</div>';
+        });
+      }
       html += '</div>';
     }
 
