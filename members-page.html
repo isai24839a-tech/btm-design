@@ -3517,6 +3517,10 @@ function renderDayLessons(dateStr) {
             html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
               JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,name:m.name}).replace(/'/g, "\\'") +
               ')\'>削除</button>';
+          } else if (isOwnBooking(m.name)) {
+            html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'memberCancelBooking(' +
+              JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,class_name:slot.class_name,name:m.name}).replace(/'/g, "\\'") +
+              ')\'>キャンセル</button>';
           }
           html += '</div>';
         });
