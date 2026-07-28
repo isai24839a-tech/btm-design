@@ -50,7 +50,9 @@
 ```
 deploy-gas.bat をダブルクリック（またはClaude Codeに「GASデプロイして」）
 ```
-**★Claude Codeセッションへのルール（Discord Remote含む）**: booking-script.gsを変更したら、push後に`deploy-gas.bat`を自分で実行して本番反映まで完了させること。「⏳再デプロイ待ち」で止める運用は廃止（2026-07-28社長指示）
+**★Claude Codeセッションへのルール（Discord Remote含む・2026-07-28社長指示）**:
+- booking-script.gsを変更したら、push後に`deploy-gas.bat`を自分で実行して本番反映まで完了させること。「⏳再デプロイ待ち」で止める運用は廃止
+- **ただし致命的変更はデプロイ前に1ラリー確認**（変更内容+リスク+影響範囲を短く提示→社長OK→デプロイ）。該当基準: ①実データの書込/削除ロジック ②メール送信まわり ③予約可否・満員・定員判定 ④シート構造変更 ⑤appsscript.json ⑥フロント互換を壊すAPI変更。軽微（表示・文言・read-only API追加）は確認不要で即デプロイ。迷ったら確認に倒す。実装・pushまでは確認不要（デプロイだけ止める）
 - 中身: `clasp push -f`（booking-script.gs＋appsscript.jsonのみ送信）→ `clasp update-deployment`（本番デプロイID固定＝**URL据え置き**で新バージョン）→ slots APIヘルスチェック
 - 本番デプロイID: `AKfycby_j23qQkb6hhZ90wkwLUdwWFXLUpS5KWweJORvp0Z1EOXl0AuPkCAO1CUVQOpAXcoAQg`（members-page.htmlのAPPS_SCRIPT_URLと同一・変えるとURLが変わるので触らない）
 - 認証: isai24839a@gmail.com のclasp OAuth（`~/.clasprc.json`・切れたら `clasp login` し直し）
