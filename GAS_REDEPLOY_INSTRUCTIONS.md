@@ -44,7 +44,19 @@
 
 ---
 
-## 再デプロイ手順
+## 再デプロイ手順（★2026-07-28〜 clasp自動化済み・ワンコマンド）
+
+### 通常はこれだけ
+```
+deploy-gas.bat をダブルクリック（またはClaude Codeに「GASデプロイして」）
+```
+- 中身: `clasp push -f`（booking-script.gs＋appsscript.jsonのみ送信）→ `clasp update-deployment`（本番デプロイID固定＝**URL据え置き**で新バージョン）→ slots APIヘルスチェック
+- 本番デプロイID: `AKfycby_j23qQkb6hhZ90wkwLUdwWFXLUpS5KWweJORvp0Z1EOXl0AuPkCAO1CUVQOpAXcoAQg`（members-page.htmlのAPPS_SCRIPT_URLと同一・変えるとURLが変わるので触らない）
+- 認証: isai24839a@gmail.com のclasp OAuth（`~/.clasprc.json`・切れたら `clasp login` し直し）
+- 紐付け: `.clasp.json`（スクリプトID）+ `.claspignore`（サイトHTML群を誤pushしないためのフィルタ・**新しい.gsファイルを増やしたら追記必要**）
+- 初回セットアップ完了: 2026-07-28（clasp 3.3.0・push→@27/@28で検証済み）
+
+## 手動フォールバック（clasp不調時のみ）
 
 ### Step 1: Apps Scriptエディタを開く
 1. BTMのスプレッドシートを開く
