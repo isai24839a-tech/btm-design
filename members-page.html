@@ -3537,7 +3537,8 @@ function renderDayLessons(dateStr) {
             html += '<button class="admin-cancel-btn" title="欠席連絡を削除" onclick=\'adminCancelBooking(' +
               JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,name:m.name}).replace(/'/g, "\\'") +
               ')\'>削除</button>';
-          } else if (isOwnBooking(m.name)) {
+          } else if (currentCategory === 'future' && isOwnBooking(m.name)) {
+            // 欠席連絡はFUTURE限定機能 — 取消ボタンもFUTUREのみ（KIDSは欠席もLINE連絡運用）
             html += '<button class="admin-cancel-btn" title="欠席連絡を取り消す" onclick=\'memberCancelAbsence(' +
               JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,class_name:slot.class_name,name:m.name}).replace(/'/g, "\\'") +
               ')\'>取消</button>';
