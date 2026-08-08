@@ -407,6 +407,10 @@ body {
     <li><a href="#sec-announce-delete">お知らせを削除する</a></li>
     <li><a href="#sec-announce-pin">お知らせをピン留めする</a></li>
     <li><a href="#sec-holidays">定期休みを管理する</a></li>
+    <li><a href="#sec-lesson-cancel">レッスンを1日だけお休みにする（メモ機能も）</a></li>
+    <li><a href="#sec-capacity">この日だけ定員を変える（FUTURE）</a></li>
+    <li><a href="#sec-proxy">生徒さんの代わりに予約を入れる（FUTURE）</a></li>
+    <li><a href="#sec-absence">欠席連絡を確認・削除する（FUTURE）</a></li>
     <li><a href="#sec-signout">サインアウトする</a></li>
   </ol>
 </div>
@@ -747,11 +751,11 @@ body {
         <div style="margin-top:0.8rem;padding-top:0.5rem;border-top:1px solid #eee;">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;">
             <span style="font-size:0.9rem;">山田 太郎</span>
-            <span style="color:#c62828;font-size:1.2rem;font-weight:700;cursor:default;">&times;</span>
+            <span style="font-size:0.75rem;font-weight:600;background:#fff;color:#c62828;border:1px solid #c62828;padding:0.2rem 0.7rem;border-radius:50px;">削除</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;">
             <span style="font-size:0.9rem;">鈴木 花子</span>
-            <span style="color:#c62828;font-size:1.2rem;font-weight:700;cursor:default;">&times;</span>
+            <span style="font-size:0.75rem;font-weight:600;background:#fff;color:#c62828;border:1px solid #c62828;padding:0.2rem 0.7rem;border-radius:50px;">削除</span>
           </div>
         </div>
       </div>
@@ -761,10 +765,16 @@ body {
   <div class="step">
     <div class="step-num">3</div>
     <div class="step-content">
-      <p><strong>名前の右の赤い <span style="color:#c62828;font-weight:700;font-size:1.2rem;">&times;</span> をタップ</strong></p>
+      <p><strong>名前の右の赤い「削除」ボタンをタップ</strong></p>
       <p>「山田太郎 さんの予約をキャンセルしますか？」と確認されます。</p>
       <p>「OK」を押すとキャンセル完了です。</p>
     </div>
+  </div>
+
+  <div class="highlight">
+    <strong>生徒さん本人によるキャンセルについて</strong><br>
+    <strong>FUTURE</strong>：予約した本人が会員ページからキャンセルできます（予約したときと同じスマホのみ）。<br>
+    <strong>KIDS</strong>：本人はキャンセル操作できません。LINEで連絡を受けたら、先生がこの「削除」ボタンでキャンセルしてください。
   </div>
 </div>
 
@@ -1039,9 +1049,114 @@ body {
   </div>
 </div>
 
-<!-- ========== 13. サインアウト ========== -->
+<!-- ========== 13. 日別休講・メモ ========== -->
+<div class="section" id="sec-lesson-cancel">
+  <h2>13. レッスンを1日だけお休みにする（メモ機能も）</h2>
+
+  <p>毎週の定期休み（12章）とは別に、<strong>特定の日だけ</strong>レッスンをお休みにできます。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>カレンダーでお休みにしたい日をタップして、レッスンカードを表示</strong></p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>カードの「&#10005; この日はお休み」ボタンをタップ</strong></p>
+      <p>その日のカードに「この日はお休み」と表示され、生徒さんは予約できなくなります。</p>
+      <p>元に戻すときは「キャンセル解除」ボタンをタップします。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p><strong>「&#128221; メモ追加」でその日のカードにメモを表示できます</strong></p>
+      <p>例）「発表会前のため場所変更」など。メモは生徒さんにも見えます。消すときは「メモ削除」。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 14. 臨時定員 ========== -->
+<div class="section" id="sec-capacity">
+  <h2>14. この日だけ定員を変える（FUTURE）</h2>
+
+  <p>FUTUREの毎週レッスンで、<strong>特定の日だけ</strong>定員を増やしたり減らしたりできます。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>FUTUREカレンダーで日付をタップし、レッスンカードの「&#128101; この日の定員」をタップ</strong></p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>その日だけの定員を数字で入力（0 = 無制限）</strong></p>
+      <p>カードに「この日だけ定員 ◯名（通常: ◯名）」と青く表示され、満員の判定にもその定員が使われます。</p>
+      <p>「解除」ボタンで通常の定員に戻ります。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 15. 代理予約 ========== -->
+<div class="section" id="sec-proxy">
+  <h2>15. 生徒さんの代わりに予約を入れる（FUTURE）</h2>
+
+  <p>スマホ操作が苦手な生徒さんの代わりに、先生が予約を入れられます。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>FUTUREのレッスンカードの「&#128100; 生徒の予約を入れる」ボタンをタップ</strong></p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>生徒さんのニックネームを入力して予約</strong></p>
+      <p>メールアドレスは任意です。入力すると、その生徒さんに予約確認メールが届きます。</p>
+      <p>満員のときは「満員でも予約する」にチェックを入れると予約できます（登録スタジオ生の優先など）。</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <strong>注意：</strong>代理予約した予約は、生徒さん本人のスマホにはキャンセルボタンが表示されません。<br>
+    キャンセルするときは、先生が予約者一覧の「削除」ボタンで対応してください。
+  </div>
+</div>
+
+<!-- ========== 16. 欠席連絡 ========== -->
+<div class="section" id="sec-absence">
+  <h2>16. 欠席連絡を確認・削除する（FUTURE）</h2>
+
+  <p>FUTUREの生徒さんは、会員ページの「&#128587; 欠席連絡」ボタンからお休みの連絡を送れます（KIDSは従来どおりLINEで連絡）。</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p><strong>レッスンカードの予約者一覧の下に「&#10060; 欠席連絡」として表示されます</strong></p>
+      <p>欠席の生徒さんは取り消し線付きで表示され、<strong>定員にはカウントされません</strong>（その分の枠が空きます）。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p><strong>間違いなどで消したいときは、欠席行の「削除」ボタンをタップ</strong></p>
+      <p>生徒さん本人も、同じスマホからなら「取消」で自分の欠席連絡を取り消せます。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 17. サインアウト ========== -->
 <div class="section" id="sec-signout">
-  <h2>13. サインアウトする</h2>
+  <h2>17. サインアウトする</h2>
 
   <div class="step">
     <div class="step-num">1</div>
