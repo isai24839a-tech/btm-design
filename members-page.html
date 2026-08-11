@@ -3488,13 +3488,20 @@ function renderDayLessons(dateStr) {
       html += '<button class="slot-book-btn" onclick=\'openBookingModal(' +
         JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>予約する</button>';
     } else if (currentCategory === 'future' && !DEMO_MODE) {
-      html += '<button class="slot-book-btn" style="background:transparent;color:var(--navy);border:1.5px solid var(--navy)" onclick=\'openWaitlistModal(' +
-        JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>&#128276; キャンセル待ち</button>';
+      // Full FUTURE calendar slot: home-studio members (✅) can still book as priority, same as regular lessons
+      var fullSlot = { date: slot.date, studio: slot.studio, time: slot.time, class_name: slot.class_name, max: slot.max, booked: sAttending.length };
+      html += '<button class="slot-book-btn" onclick=\'openBookingModal(' +
+        JSON.stringify(fullSlot).replace(/'/g, "\\'") + ')\'>登録スタジオ生の方はこちら</button>';
     } else {
       html += '<button class="slot-book-btn" disabled>満員</button>';
     }
 
     html += '</div>';
+
+    if (isFull && currentCategory === 'future' && !DEMO_MODE && !isAdminMode) {
+      html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--navy);border:1.5px solid var(--navy)" onclick=\'openWaitlistModal(' +
+        JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>&#128276; キャンセル待ち登録</button></div>';
+    }
 
     // 欠席連絡: FUTUREはカレンダー枠（スケジュール枠）でも受付。満員でも入力できる（定員に関係しないため）
     if (currentCategory === 'future' && !DEMO_MODE && !isAdminMode) {
@@ -3584,9 +3591,9 @@ function openBookingModal(slot) {
   // Admin proxy booking: teacher enters the student's name instead of their own
   var isProxy = !!slot.adminProxy;
 
-  // Home-studio checkbox: regular lessons (priority when full) + FUTURE calendar slots (✅ shown in booking list only — no priority, GAS grants priority to regular lessons alone)
+  // Home-studio checkbox: regular lessons + FUTURE calendar slots — both get priority booking when full (GAS enforces)
   var isRegular = !!slot.isRegular;
-  var isFullPriority = isRegular && slot.max > 0 && slot.booked >= slot.max;
+  var isFullPriority = slot.max > 0 && slot.booked >= slot.max;
   var homeFieldHtml = '';
   if (isRegular || currentCategory === 'future') {
     homeFieldHtml =
@@ -3598,7 +3605,7 @@ function openBookingModal(slot) {
           (isProxy ? 'このスタジオに登録している生徒の予約です' : 'このスタジオに登録している生徒です') +
         '</label>' +
         '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">' +
-          (isRegular ? '登録スタジオの生徒（✅）は満員時も優先的に予約できます' : '登録スタジオの生徒は予約者一覧に✅マークで表示されます') +
+          '登録スタジオの生徒（✅）は満員時も優先的に予約できます' +
         '</span>' +
       '</div>';
   }
@@ -3878,8 +3885,8 @@ function submitBooking() {
   var homeCb = document.getElementById('booking-home-studio');
   var homeStudio = homeCb ? homeCb.checked : false;
 
-  // Full regular lesson: only home-studio members (✅) can book
-  if (currentBookingSlot.isRegular && currentBookingSlot.max > 0 &&
+  // Full lesson (regular or FUTURE calendar slot): only home-studio members (✅) can book
+  if (currentBookingSlot.max > 0 &&
       currentBookingSlot.booked >= currentBookingSlot.max && !homeStudio) {
     showBookingError('満員のため、登録スタジオの生徒のみ予約できます');
     return;

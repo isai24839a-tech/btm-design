@@ -392,10 +392,11 @@ function bookSlot(params) {
   }
 
   // maxCapacity=0 means unlimited.
-  // Regular lessons: when full, home-studio members (✅) can still book as priority; others are rejected.
+  // Regular lessons + FUTURE calendar slots: when full, home-studio members (✅) can still book as priority; others are rejected.
+  // (KIDS calendar slots have no home-studio checkbox, so homeStudio is never set there.)
   var overCapacity = false;
   if (maxCapacity > 0 && currentBookings >= maxCapacity) {
-    if (isRegularLesson && homeStudio) {
+    if (homeStudio && (isRegularLesson || lessonCategory === 'FUTURE')) {
       overCapacity = true;
     } else {
       return jsonResponse({ success: false, error: 'このレッスンは満員です' });
