@@ -3507,7 +3507,7 @@ function renderDayLessons(dateStr) {
       html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--gray-100)">';
       var capLabel = isUnlimited ? '無制限' : ((slot.max || 10) + '名');
       if (sAttending.length > 0) {
-        html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin-bottom:0.4rem;">予約者 (' + sAttending.length + '/' + capLabel + ')</div>';
+        html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin-bottom:0.4rem;">予約者 (' + sAttending.length + '/' + capLabel + ')' + (currentCategory === 'future' ? '　✅=登録スタジオ生' : '') + '</div>';
         sAttending.forEach(function(m) {
           html += '<div class="bklist-member">';
           html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
@@ -3584,11 +3584,11 @@ function openBookingModal(slot) {
   // Admin proxy booking: teacher enters the student's name instead of their own
   var isProxy = !!slot.adminProxy;
 
-  // Regular lessons: home-studio checkbox (priority when full)
+  // Home-studio checkbox: regular lessons (priority when full) + FUTURE calendar slots (✅ shown in booking list only — no priority, GAS grants priority to regular lessons alone)
   var isRegular = !!slot.isRegular;
   var isFullPriority = isRegular && slot.max > 0 && slot.booked >= slot.max;
   var homeFieldHtml = '';
-  if (isRegular) {
+  if (isRegular || currentCategory === 'future') {
     homeFieldHtml =
       (isFullPriority ?
         '<div style="margin-bottom:0.8rem;padding:0.6rem 0.8rem;background:#FFF3E0;border-left:3px solid #FB8C00;border-radius:4px;font-size:0.82rem;color:#E65100">このレッスンは満員です。<strong>登録スタジオの生徒のみ</strong>優先予約できます。</div>' : '') +
@@ -3597,7 +3597,9 @@ function openBookingModal(slot) {
           '<input type="checkbox" id="booking-home-studio" style="width:auto;margin:0">' +
           (isProxy ? 'このスタジオに登録している生徒の予約です' : 'このスタジオに登録している生徒です') +
         '</label>' +
-        '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">登録スタジオの生徒（✅）は満員時も優先的に予約できます</span>' +
+        '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">' +
+          (isRegular ? '登録スタジオの生徒（✅）は満員時も優先的に予約できます' : '登録スタジオの生徒は予約者一覧に✅マークで表示されます') +
+        '</span>' +
       '</div>';
   }
 
