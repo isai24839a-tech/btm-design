@@ -31,6 +31,8 @@ function mailOptions() {
 var FUTURE_BOOKING_NOTIFY_EMAILS = [];
 var ADMIN_KEY = 'potofu7386'; // members-page.htmlのADMIN_PASSWORDと合わせる
 var IMAGE_FOLDER_NAME = 'BTM_お知らせ画像';
+// お知らせメール配信: 予約一覧FUTUREのメール列に加えて、このシートに手動追記したアドレスにも配信される（初回配信時に自動作成）
+var FUTURE_MAIL_LIST_SHEET = 'メール配信先FUTURE';
 
 function getOrCreateImageFolder() {
   var folders = DriveApp.getFoldersByName(IMAGE_FOLDER_NAME);
@@ -46,7 +48,7 @@ function setupSheets() {
     { name: 'スケジュール', headers: ['日付', 'スタジオ', '時間', 'クラス', '定員', 'category'] },
     { name: '予約一覧KIDS', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時', '登録スタジオ'] },
     { name: '予約一覧FUTURE', headers: ['日付', 'スタジオ', '時間', 'クラス', 'お名前', 'メール', '予約日時', '登録スタジオ'] },
-    { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像', 'カテゴリ', 'ピン留め'] },
+    { name: 'お知らせ', headers: ['日付', 'タイトル', '内容', '重要度', '画像', 'カテゴリ', 'ピン留め', '表示順'] },
     { name: '定期レッスン', headers: ['曜日', 'スタジオ', '時間', 'クラス', 'カテゴリ', '頻度', '基準日', '定員', '期間開始', '期間終了'] },
     { name: 'KIDSニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
     { name: 'FUTUREニュース', headers: ['日付', 'タイトル', '内容', 'カテゴリ', '画像URL'] },
@@ -226,6 +228,7 @@ function doPost(e) {
   if (action === 'addregularholiday') return adminGuardPost(payload, adminAddRegularHoliday);
   if (action === 'deleteregularholiday') return adminGuardPost(payload, adminDeleteRegularHoliday);
   if (action === 'togglepinannouncement') return adminGuardPost(payload, adminTogglePinAnnouncement);
+  if (action === 'reorderannouncements') return adminGuardPost(payload, adminReorderAnnouncements);
   if (action === 'addlessoncancel') return adminGuardPost(payload, adminAddLessonCancel);
   if (action === 'deletelessoncancel') return adminGuardPost(payload, adminDeleteLessonCancel);
   if (action === 'addirregularholiday') return adminGuardPost(payload, adminAddIrregularHoliday);
@@ -613,6 +616,7 @@ function getAnnouncements() {
     var imageIds = String(row[4] || '').split(',').filter(function(s) { return s.trim(); });
     var imageUrls = imageIds.map(function(id) { return 'https://lh3.googleusercontent.com/d/' + id.trim(); });
     var pinned = String(row[6] || '').toUpperCase() === 'TRUE';
+    var orderVal = parseFloat(row[7]);
     items.push({
       date: formatDate(row[0]),
       title: String(row[1]),
@@ -621,6 +625,7 @@ function getAnnouncements() {
       images: imageUrls,
       category: String(row[5] || ''),
       pinned: pinned,
+      order: isNaN(orderVal) ? null : orderVal,
       row: i + 1
     });
   }
@@ -1182,7 +1187,12 @@ function adminAddAnnouncement(params) {
 
   var category = params.category || '';
   sheet.appendRow([date, title, content, importance, imageIds.join(','), category]);
-  return jsonResponse({ success: true, message: 'お知らせを追加しました' });
+
+  var notified = 0;
+  if (String(params.notifyFuture || '') === '1') {
+    notified = sendFutureAnnouncementMail(date, title, content, String(params.notifyDryRun || '') === '1');
+  }
+  return jsonResponse({ success: true, message: 'お知らせを追加しました', notified: notified });
 }
 
 // ===== 管理者: お知らせ削除 =====
@@ -1223,7 +1233,100 @@ function adminEditAnnouncement(params) {
   if (params.content !== undefined) sheet.getRange(row, 3).setValue(params.content);
   if (params.importance !== undefined) sheet.getRange(row, 4).setValue(params.importance);
 
-  return jsonResponse({ success: true, message: 'お知らせを更新しました' });
+  var notified = 0;
+  if (String(params.notifyFuture || '') === '1') {
+    var rowData = sheet.getRange(row, 1, 1, 3).getValues()[0];
+    notified = sendFutureAnnouncementMail(formatDate(rowData[0]), String(rowData[1] || ''), String(rowData[2] || ''), String(params.notifyDryRun || '') === '1');
+  }
+  return jsonResponse({ success: true, message: 'お知らせを更新しました', notified: notified });
+}
+
+// ===== 管理者: お知らせ並べ替え（FUTURE表示順） =====
+// params.rows = sheet row numbers in the desired display order; writes 1..N to the 表示順 column (H)
+function adminReorderAnnouncements(params) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('お知らせ');
+  if (!sheet) return jsonResponse({ success: false, error: 'シートがありません' });
+
+  var rows = params.rows;
+  if (!rows || !rows.length) return jsonResponse({ success: false, error: '並び順が指定されていません' });
+
+  var last = sheet.getLastRow();
+  for (var i = 0; i < rows.length; i++) {
+    var r = parseInt(rows[i]);
+    if (!r || r < 2 || r > last) return jsonResponse({ success: false, error: '無効な行番号です: ' + rows[i] });
+  }
+  if (!sheet.getRange(1, 8).getValue()) sheet.getRange(1, 8).setValue('表示順');
+  for (var j = 0; j < rows.length; j++) {
+    sheet.getRange(parseInt(rows[j]), 8).setValue(j + 1);
+  }
+  return jsonResponse({ success: true, message: '並び順を更新しました' });
+}
+
+// ===== FUTURE生徒へのお知らせメール配信 =====
+// 配信先 = 予約一覧FUTUREのメール列（予約時入力）+ メール配信先FUTUREシート（手動管理）の重複除去ユニオン
+function getFutureAnnouncementRecipients() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var seen = {};
+  var emails = [];
+  function addEmail(v) {
+    var e = String(v || '').trim();
+    if (!e || e.indexOf('@') === -1) return;
+    var key = e.toLowerCase();
+    if (seen[key]) return;
+    seen[key] = true;
+    emails.push(e);
+  }
+
+  var listSheet = ss.getSheetByName(FUTURE_MAIL_LIST_SHEET);
+  if (!listSheet) {
+    listSheet = ss.insertSheet(FUTURE_MAIL_LIST_SHEET);
+    var header = listSheet.getRange(1, 1, 1, 2);
+    header.setValues([['メールアドレス', 'メモ（生徒名など・自由記入）']]);
+    header.setFontWeight('bold');
+    header.setBackground('#4285f4');
+    header.setFontColor('#ffffff');
+  } else if (listSheet.getLastRow() > 1) {
+    var listData = listSheet.getRange(2, 1, listSheet.getLastRow() - 1, 1).getValues();
+    for (var i = 0; i < listData.length; i++) addEmail(listData[i][0]);
+  }
+
+  var bookSheet = ss.getSheetByName('予約一覧FUTURE');
+  if (bookSheet && bookSheet.getLastRow() > 1) {
+    var data = bookSheet.getRange(2, 6, bookSheet.getLastRow() - 1, 1).getValues();
+    for (var j = 0; j < data.length; j++) addEmail(data[j][0]);
+  }
+  return emails;
+}
+
+function sendFutureAnnouncementMail(date, title, content, dryRun) {
+  var recipients = getFutureAnnouncementRecipients();
+  if (recipients.length === 0 || dryRun) return recipients.length;
+
+  var subject = '【BTM】お知らせ: ' + title;
+  var body = 'BEAT THE MIX からのお知らせです。\n'
+    + '------------------------------\n'
+    + '日付: ' + date + '\n'
+    + title + '\n\n'
+    + (content || '') + '\n'
+    + '------------------------------\n'
+    + '最新のお知らせは会員ページでご確認ください。\n'
+    + 'https://tibadance.com/members-page\n\n'
+    + '※このメールはFUTUREのレッスン予約時にご入力いただいたメールアドレス宛にお送りしています。\n'
+    + '※配信停止をご希望の場合は、このメールに返信してお知らせください。\n';
+
+  // BCC so students never see each other's addresses; batches of 50 for Gmail quota safety
+  var sent = 0;
+  for (var i = 0; i < recipients.length; i += 50) {
+    var batch = recipients.slice(i, i + 50);
+    var opts = mailOptions();
+    opts.bcc = batch.join(',');
+    try {
+      GmailApp.sendEmail(ADMIN_EMAILS[0], subject, body, opts);
+      sent += batch.length;
+    } catch (e) {}
+  }
+  return sent;
 }
 
 // ===== 管理者: 定期レッスン追加 =====
