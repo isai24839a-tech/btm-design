@@ -3424,10 +3424,8 @@ function renderDayLessons(dateStr) {
       if (rIsFull && !isAdminMode) {
         html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--navy);border:1.5px solid var(--navy)" onclick=\'openWaitlistModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>&#128276; キャンセル待ち登録</button></div>';
       }
-      // 欠席連絡: 満員でも入力できる（定員に関係しないため）
-      if (!isAdminMode) {
-        html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--gray-500);border:1.5px solid #ccc" onclick=\'openAbsenceModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>&#128587; 欠席連絡</button></div>';
-      }
+      // 欠席連絡: 満員でも入力できる（定員に関係しないため）。admin時はregSlot.adminProxy=trueで生徒の代理入力になる
+      html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--gray-500);border:1.5px solid #ccc" onclick=\'openAbsenceModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>&#128587; 欠席連絡</button></div>';
 
       if (rMembers.length > 0) {
         html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--gray-100)">';
@@ -3528,14 +3526,26 @@ function renderDayLessons(dateStr) {
 
     html += '</div>';
 
+    // Admin (FUTURE): 定期レッスンと同じ操作を単発枠でも — この日の定員（スケジュール行の定員をeditSlotで直接更新）+ 生徒の代理予約（同じbook API）
+    if (isAdminMode && currentCategory === 'future' && !DEMO_MODE) {
+      var proxySlot = { date: slot.date, studio: slot.studio, time: slot.time, class_name: slot.class_name, max: slot.max, booked: sAttending.length, adminProxy: true };
+      html += '<div style="margin-top:0.5rem;display:flex;gap:0.4rem;justify-content:flex-end;flex-wrap:wrap;align-items:center">';
+      html += '<button class="admin-cancel-lesson-btn" style="background:#E3F2FD;color:#1565C0;border-color:#64B5F6" onclick=\'adminSetSlotCapacity(' +
+        JSON.stringify({date: slot.date, studio: slot.studio, time: slot.time, class_name: slot.class_name, max: slot.max || 0}).replace(/'/g, "\\'") +
+        ')\'>👥 この日の定員</button>';
+      html += '<button class="slot-book-btn" onclick=\'openBookingModal(' + JSON.stringify(proxySlot).replace(/'/g, "\\'") + ')\'>&#128100; 生徒の予約を入れる</button>';
+      html += '</div>';
+    }
+
     if (isFull && currentCategory === 'future' && !DEMO_MODE && !isAdminMode) {
       html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--navy);border:1.5px solid var(--navy)" onclick=\'openWaitlistModal(' +
         JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>&#128276; キャンセル待ち登録</button></div>';
     }
 
-    // 欠席連絡: FUTUREはカレンダー枠（スケジュール枠）でも受付。満員でも入力できる（定員に関係しないため）
-    if (currentCategory === 'future' && !DEMO_MODE && !isAdminMode) {
+    // 欠席連絡: FUTUREはカレンダー枠（スケジュール枠）でも受付。満員でも入力できる（定員に関係しないため）。admin=生徒の代理入力
+    if (currentCategory === 'future' && !DEMO_MODE) {
       var absSlot = { date: slot.date, studio: slot.studio, time: slot.time, class_name: slot.class_name };
+      if (isAdminMode) absSlot.adminProxy = true;
       html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--gray-500);border:1.5px solid #ccc" onclick=\'openAbsenceModal(' + JSON.stringify(absSlot).replace(/'/g, "\\'") + ')\'>&#128587; 欠席連絡</button></div>';
     }
 
@@ -3795,19 +3805,22 @@ function openAbsenceModal(slot) {
     '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>' +
     '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
 
+  // Admin proxy absence: teacher records an absence reported via LINE etc. on behalf of a student
+  var isProxy = !!slot.adminProxy;
+
   document.getElementById('booking-modal-body').innerHTML =
     '<h3>&#128587; 欠席連絡</h3>' +
-    '<p class="booking-modal-sub">以下のレッスンをお休みすることを先生にお知らせします。ご予約済みの場合は予約を取り消して欠席に変更します</p>' +
+    '<p class="booking-modal-sub">' + (isProxy ? '先生が生徒に代わって欠席連絡を記録します。生徒がご予約済みの場合は予約を取り消して欠席に変更します' : '以下のレッスンをお休みすることを先生にお知らせします。ご予約済みの場合は予約を取り消して欠席に変更します') + '</p>' +
     '<div class="booking-modal-slot">' + slotHtml + '</div>' +
     '<form id="booking-form" onsubmit="event.preventDefault();submitAbsence()">' +
       '<div class="booking-field">' +
-        '<label>ニックネーム <span class="required-mark" style="color:var(--navy)">*</span></label>' +
-        '<input type="text" id="booking-name" required placeholder="タロウ" autocomplete="nickname">' +
+        '<label>' + (isProxy ? '生徒のニックネーム' : 'ニックネーム') + ' <span class="required-mark" style="color:var(--navy)">*</span></label>' +
+        '<input type="text" id="booking-name" required placeholder="タロウ" autocomplete="' + (isProxy ? 'off' : 'nickname') + '">' +
       '</div>' +
       '<div class="booking-field">' +
-        '<label>メールアドレス</label>' +
-        '<input type="email" id="booking-email" placeholder="example@gmail.com" autocomplete="email">' +
-        '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">任意。入力すると欠席連絡の確認メールが届きます</span>' +
+        '<label>' + (isProxy ? '生徒のメールアドレス' : 'メールアドレス') + '</label>' +
+        '<input type="email" id="booking-email" placeholder="example@gmail.com" autocomplete="' + (isProxy ? 'off' : 'email') + '">' +
+        '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">' + (isProxy ? '任意。入力すると生徒本人に欠席連絡の確認メールが届きます' : '任意。入力すると欠席連絡の確認メールが届きます') + '</span>' +
       '</div>' +
       '<div class="booking-modal-actions">' +
         '<button type="button" class="booking-cancel-btn" onclick="closeBookingModal()">閉じる</button>' +
@@ -3819,13 +3832,15 @@ function openAbsenceModal(slot) {
   if (currentCategory === 'future') modal.classList.add('modal-future');
   modal.classList.add('active');
 
-  // Restore saved name/email from localStorage
-  try {
-    var savedName = localStorage.getItem('btm_booking_name');
-    var savedEmail = localStorage.getItem('btm_booking_email');
-    if (savedName) document.getElementById('booking-name').value = savedName;
-    if (savedEmail) document.getElementById('booking-email').value = savedEmail;
-  } catch(e) {}
+  // Restore saved name/email from localStorage (skip for proxy: the teacher's own info must not autofill)
+  if (!isProxy) {
+    try {
+      var savedName = localStorage.getItem('btm_booking_name');
+      var savedEmail = localStorage.getItem('btm_booking_email');
+      if (savedName) document.getElementById('booking-name').value = savedName;
+      if (savedEmail) document.getElementById('booking-email').value = savedEmail;
+    } catch(e) {}
+  }
 }
 
 function submitAbsence() {
@@ -3842,8 +3857,11 @@ function submitAbsence() {
     return;
   }
 
-  try { localStorage.setItem('btm_booking_name', name); } catch(e) {}
-  if (email) { try { localStorage.setItem('btm_booking_email', email); } catch(e) {} }
+  // Save for next time (skip for proxy: don't overwrite the teacher's own info)
+  if (!currentAbsenceSlot.adminProxy) {
+    try { localStorage.setItem('btm_booking_name', name); } catch(e) {}
+    if (email) { try { localStorage.setItem('btm_booking_email', email); } catch(e) {} }
+  }
 
   var btn = document.getElementById('booking-submit-btn');
   btn.disabled = true;
@@ -5571,6 +5589,32 @@ function getCapacityOverrideData(dateStr, studio, time, className) {
   return capacityOverrides.find(function(o) {
     return o.date === dateStr && o.studio === studio && o.time === time && o.class_name === className;
   }) || null;
+}
+
+// カレンダー枠（単発枠）の定員変更: 枠自体が日付固有なので臨時定員シートではなくスケジュール行の定員列をeditSlotで直接更新する
+function adminSetSlotCapacity(info) {
+  var normalMax = info.max || 0;
+  var input = prompt(
+    info.class_name + '（' + info.studio + ' ' + info.time + '）\n' +
+    info.date + ' の定員を入力してください（0 = 無制限）\n' +
+    '現在の定員: ' + (normalMax === 0 ? '無制限' : normalMax + '名'),
+    String(normalMax)
+  );
+  if (input === null) return;
+  var max = parseInt(String(input).trim(), 10);
+  if (isNaN(max) || max < 0) {
+    alert('定員は0以上の数字で入力してください');
+    return;
+  }
+
+  var params = new URLSearchParams({
+    action: 'editSlot', adminKey: ADMIN_PASSWORD,
+    old_date: info.date, old_studio: info.studio, old_time: info.time,
+    max: String(max)
+  });
+  apiCall(params, function() {
+    fetchSlotsFromAPI(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); });
+  });
 }
 
 function adminSetCapacityOverride(info) {
