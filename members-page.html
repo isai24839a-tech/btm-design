@@ -4163,6 +4163,20 @@ function showAnnounceEmpty(container) {
 
 // ===== ADMIN FUNCTIONS =====
 var adminSlotMode = 'single'; // 'single' or 'bulk'
+// Class-name presets for the single-slot (単発追加) form. FUTURE: 振付マスター (private lesson) is the main one-off slot type.
+var CLASS_NAME_PRESETS = { FUTURE: ['振付マスター'], KIDS: [] };
+function buildClassPresetSelect(cat, inputId) {
+  var presets = CLASS_NAME_PRESETS[cat] || [];
+  if (presets.length === 0) return '';
+  return '<select id="' + inputId + '-preset" onchange="applyClassPreset(\'' + inputId + '\', this)">' +
+    '<option value="">クラスを選択（または下に入力）</option>' +
+    presets.map(function(n) { return '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</option>'; }).join('') +
+    '</select>';
+}
+function applyClassPreset(inputId, sel) {
+  var el = document.getElementById(inputId);
+  if (el && sel.value) el.value = sel.value;
+}
 
 function initAdminSlotForm() {
   if (!isAdminMode) return;
@@ -4226,6 +4240,7 @@ function initAdminSlotForm() {
             '<span class="admin-time-sep">〜</span>' +
             '<select id="admin-slot-time-end">' + timeOptions + '</select>' +
           '</div>' +
+          buildClassPresetSelect(activeCat, 'admin-slot-class') +
           '<input type="text" id="admin-slot-class" placeholder="' + catLabel + 'クラス">' +
           '<div style="display:flex;align-items:center;gap:8px">' +
             '<input type="number" id="admin-slot-max" value="8" min="1" max="30" style="flex:1;margin:0">' +
