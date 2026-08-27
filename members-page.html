@@ -4175,16 +4175,16 @@ function applyClassPreset(inputId, sel) {
   var el = document.getElementById(inputId);
   if (el && sel.value) el.value = sel.value;
 }
-// When the class/studio select is set to 振付マスター, mirror it into the class-name input
+// When the class/studio select is set to 振付マスター(場所), mirror "振付マスター" into the class-name input
 // (and clear it again if the admin switches back to a team while it still says 振付マスター).
-var CLASS_SELECT_AUTOFILL = ['振付マスター'];
+var CLASS_SELECT_AUTOFILL_PREFIX = '振付マスター';
 function syncClassFromStudio(sel, inputId) {
   var el = document.getElementById(inputId);
   if (!el || !sel) return;
   var v = sel.value || '';
-  if (CLASS_SELECT_AUTOFILL.indexOf(v) !== -1) {
-    el.value = v;
-  } else if (CLASS_SELECT_AUTOFILL.indexOf(el.value.trim()) !== -1) {
+  if (v.indexOf(CLASS_SELECT_AUTOFILL_PREFIX) === 0) {
+    el.value = CLASS_SELECT_AUTOFILL_PREFIX;
+  } else if (el.value.trim().indexOf(CLASS_SELECT_AUTOFILL_PREFIX) === 0) {
     el.value = '';
   }
 }
@@ -4213,7 +4213,7 @@ function initAdminSlotForm() {
   // studioMap and buildStudioOptions are global for onchange access
   window._studioMap = {
     'KIDS': ['若葉studio', '稲毛studio'],
-    'FUTURE': ['team kiki(千葉)', 'team coco(美浜)', 'team zizi(稲毛)', 'team roro(若葉)', '振付マスター']
+    'FUTURE': ['team kiki(千葉)', 'team coco(美浜)', 'team zizi(稲毛)', 'team roro(若葉)', '振付マスター(千葉)', '振付マスター(稲毛)', '振付マスター(美浜)', '振付マスター(若葉)']
   };
 
   window._buildStudioOptions = function(cat) {
