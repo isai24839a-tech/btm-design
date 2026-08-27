@@ -720,6 +720,28 @@ body.category-future .navbar {
   line-height: 1.3;
   letter-spacing: 0.05em;
 }
+/* FUTURE: 満 marker split by lesson type (2026-08-27) — 定期Lesson = white/navy pill, 振付マスター = gold pill.
+   Colors are fixed (not inherited from the cell) so they read on light, navy and gray cells alike. */
+.day-full-label.reg,
+.day-full-label.choreo {
+  padding: 1px 4px;
+  line-height: 1.25;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.day-full-label.reg {
+  color: var(--navy);
+  background: #fff;
+  border: 1px solid var(--navy);
+}
+.day-full-label.choreo {
+  color: #1a1a1a;
+  background: #E2B93B;
+  border: 1px solid #E2B93B;
+}
+.calendar-day .day-full-label + .day-full-label {
+  margin-top: -1px;
+}
 
 /* Regular lesson card */
 .slot-card.regular-lesson {
@@ -3154,6 +3176,26 @@ function getRegularLessonMembers(dateStr, r) {
   return [];
 }
 
+// FUTURE calendar 満 marker: is this regular lesson full on this date? Same rule as renderDayLessons
+// (臨時定員 override > regular max, absent members don't count, max 0 = unlimited).
+function isRegularLessonFull(dateStr, r) {
+  var capOvr = getCapacityOverrideData(dateStr, r.studio, r.time, r.class_name);
+  var rMax = Number(capOvr ? capOvr.max : (r.max || 0)) || 0;
+  if (rMax === 0) return false;
+  var attending = getRegularLessonMembers(dateStr, r).filter(function(m) { return !m.absent; });
+  return rMax - attending.length <= 0;
+}
+
+// 振付マスター slots are calendar (単発) slots whose class/studio carries the 振付マスター name (e.g. 振付マスター(千葉)).
+function isChoreoMasterSlot(s) {
+  return /振付マスター/.test((s.class_name || '') + ' ' + (s.studio || ''));
+}
+
+function isCalendarSlotFull(s) {
+  var isUnlimited = s.max === 0 || s.max === '0';
+  return !isUnlimited && (s.available || 0) <= 0;
+}
+
 function renderCalendar() {
   var year = currentMonth.getFullYear();
   var month = currentMonth.getMonth();
@@ -3219,13 +3261,32 @@ function renderCalendar() {
       html += '</div>';
     } else {
       var isFullDay = lessonDates[dateStr] && fullDates[dateStr];
+      var fullLabels = '';
+      if (currentCategory === 'future' && !DEMO_MODE) {
+        // FUTURE (2026-08-27): show the 満 marker per lesson type — 定期Lesson / 振付マスター(単発) / other 単発 —
+        // so a full 振付マスター day doesn't hide an open 定期Lesson (and vice versa).
+        var activeRegulars = regularsForDay.filter(function(r) { return !isLessonCancelled(dateStr, r.studio, r.time); });
+        var daySlots = slotsByDate[dateStr] || [];
+        var choreoSlots = daySlots.filter(isChoreoMasterSlot);
+        var otherSlots = daySlots.filter(function(s) { return !isChoreoMasterSlot(s); });
+        var regFull = activeRegulars.length > 0 && activeRegulars.every(function(r) { return isRegularLessonFull(dateStr, r); });
+        var choreoFull = choreoSlots.length > 0 && choreoSlots.every(isCalendarSlotFull);
+        var otherFull = otherSlots.length > 0 && otherSlots.every(isCalendarSlotFull);
+        if (regFull) fullLabels += '<span class="day-full-label reg">定期満</span>';
+        if (choreoFull) fullLabels += '<span class="day-full-label choreo">振付満</span>';
+        if (otherFull) fullLabels += '<span class="day-full-label">満</span>';
+        // Gray the whole cell only when everything bookable that day is full
+        isFullDay = isFullDay && (activeRegulars.length === 0 || regFull);
+      } else if (isFullDay) {
+        fullLabels = '<span class="day-full-label">満</span>';
+      }
       if (lessonDates[dateStr]) classes.push('has-lessons');
       if (hasRegular && !allRegularsCancelled) classes.push('has-regular');
       if (isFullDay) classes.push('is-full');
       html += '<div class="' + classes.join(' ') + '" onclick="selectDate(\'' + dateStr + '\')">';
       html += '<span class="day-number">' + d + '</span>';
-      if (isFullDay) {
-        html += '<span class="day-full-label">満</span>';
+      if (fullLabels) {
+        html += fullLabels;
       } else if (lessonDates[dateStr] || (hasRegular && !allRegularsCancelled)) {
         html += '<span class="day-dot"></span>';
       }
@@ -5606,6 +5667,9 @@ function fetchCapacityOverrides(callback) {
         capacityOverrides = data;
       }
       if (callback) callback();
+      // Calendar 満 marker (定期満) depends on 臨時定員 — refresh it if the grid is already drawn
+      var calGrid = document.getElementById('calendar-grid');
+      if (calGrid && calGrid.children.length) renderCalendar();
       if (selectedDate) renderDayLessons(selectedDate);
     })
     .catch(function() {
