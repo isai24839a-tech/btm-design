@@ -4160,8 +4160,9 @@ function showAnnounceEmpty(container) {
 
 // ===== ADMIN FUNCTIONS =====
 var adminSlotMode = 'single'; // 'single' or 'bulk'
-// Class-name presets for the admin class-name fields (単発追加 + 定期レッスン追加). FUTURE: 振付マスター (private lesson) is the main one-off slot type.
-var CLASS_NAME_PRESETS = { FUTURE: ['振付マスター'], KIDS: [] };
+// Class-name presets for the admin class-name fields. FUTURE: 振付マスター is now an option of the class/studio select itself
+// (see window._studioMap + syncClassFromStudio), so no separate preset select is rendered.
+var CLASS_NAME_PRESETS = { FUTURE: [], KIDS: [] };
 function buildClassPresetSelect(cat, inputId) {
   var presets = CLASS_NAME_PRESETS[cat] || [];
   if (presets.length === 0) return '';
@@ -4173,6 +4174,19 @@ function buildClassPresetSelect(cat, inputId) {
 function applyClassPreset(inputId, sel) {
   var el = document.getElementById(inputId);
   if (el && sel.value) el.value = sel.value;
+}
+// When the class/studio select is set to 振付マスター, mirror it into the class-name input
+// (and clear it again if the admin switches back to a team while it still says 振付マスター).
+var CLASS_SELECT_AUTOFILL = ['振付マスター'];
+function syncClassFromStudio(sel, inputId) {
+  var el = document.getElementById(inputId);
+  if (!el || !sel) return;
+  var v = sel.value || '';
+  if (CLASS_SELECT_AUTOFILL.indexOf(v) !== -1) {
+    el.value = v;
+  } else if (CLASS_SELECT_AUTOFILL.indexOf(el.value.trim()) !== -1) {
+    el.value = '';
+  }
 }
 
 function initAdminSlotForm() {
@@ -4199,7 +4213,7 @@ function initAdminSlotForm() {
   // studioMap and buildStudioOptions are global for onchange access
   window._studioMap = {
     'KIDS': ['若葉studio', '稲毛studio'],
-    'FUTURE': ['team kiki(千葉)', 'team coco(美浜)', 'team zizi(稲毛)', 'team roro(若葉)']
+    'FUTURE': ['team kiki(千葉)', 'team coco(美浜)', 'team zizi(稲毛)', 'team roro(若葉)', '振付マスター']
   };
 
   window._buildStudioOptions = function(cat) {
@@ -4231,7 +4245,7 @@ function initAdminSlotForm() {
       '<div id="admin-single-form" style="display:' + (adminSlotMode === 'single' ? 'block' : 'none') + '">' +
         '<div class="admin-form-grid">' +
           '<input type="date" id="admin-slot-date" value="' + defaultDate + '">' +
-          '<select id="admin-slot-studio">' + buildStudioOptions(activeCat) + '</select>' +
+          '<select id="admin-slot-studio" onchange="syncClassFromStudio(this, \'admin-slot-class\')">' + buildStudioOptions(activeCat) + '</select>' +
           '<div class="admin-time-picker">' +
             '<select id="admin-slot-time-start">' + timeOptions + '</select>' +
             '<span class="admin-time-sep">〜</span>' +
@@ -4256,7 +4270,7 @@ function initAdminSlotForm() {
         '<div class="admin-form-grid" style="margin-top:0.75rem">' +
           '<div><label style="font-size:0.8rem;color:var(--gray-600)">開始日</label><input type="date" id="admin-bulk-start" value="' + defaultDate + '"></div>' +
           '<div><label style="font-size:0.8rem;color:var(--gray-600)">終了日</label><input type="date" id="admin-bulk-end" value="' + defaultEnd + '"></div>' +
-          '<select id="admin-bulk-studio">' + buildStudioOptions(activeCat) + '</select>' +
+          '<select id="admin-bulk-studio" onchange="syncClassFromStudio(this, \'admin-bulk-class\')">' + buildStudioOptions(activeCat) + '</select>' +
           '<div class="admin-time-picker">' +
             '<select id="admin-bulk-time-start">' + timeOptions + '</select>' +
             '<span class="admin-time-sep">〜</span>' +
@@ -4293,7 +4307,7 @@ function initAdminSlotForm() {
         '<p style="font-size:0.8rem;color:var(--gray-500);margin:-0.5rem 0 1rem">毎週・隔週・単発から選択。カレンダーに塗りつぶしで表示されます。</p>' +
         '<div class="admin-form-grid">' +
           '<select id="admin-regular-dow">' + dowOptionsReg + '</select>' +
-          '<select id="admin-regular-studio">' + buildStudioOptions(activeCat) + '</select>' +
+          '<select id="admin-regular-studio" onchange="syncClassFromStudio(this, \'admin-regular-class\')">' + buildStudioOptions(activeCat) + '</select>' +
           '<div class="admin-time-picker">' +
             '<select id="admin-regular-time-start">' + timeOptions + '</select>' +
             '<span class="admin-time-sep">〜</span>' +
