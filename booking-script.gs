@@ -32,6 +32,7 @@ var FUTURE_BOOKING_NOTIFY_EMAILS = [];
 var ADMIN_KEY = 'potofu7386'; // members-page.htmlのADMIN_PASSWORDと合わせる
 var IMAGE_FOLDER_NAME = 'BTM_お知らせ画像';
 // お知らせメール配信: 予約一覧FUTUREのメール列に加えて、このシートに手動追記したアドレスにも配信される（初回配信時に自動作成）
+// ※お名前が「体験」で始まる予約（体験レッスンの方）は配信対象外（2026-08-27指示）
 var FUTURE_MAIL_LIST_SHEET = 'メール配信先FUTURE';
 
 function getOrCreateImageFolder() {
@@ -1265,6 +1266,11 @@ function adminReorderAnnouncements(params) {
 
 // ===== FUTURE生徒へのお知らせメール配信 =====
 // 配信先 = 予約一覧FUTUREのメール列（予約時入力）+ メール配信先FUTUREシート（手動管理）の重複除去ユニオン
+// 体験レッスンの方（お名前が「体験」で始まる行・例「体験　山田」）は除外。同じアドレスで通常名義の予約があれば（入会後）その行で拾われる
+function isTrialBookingName(name) {
+  return /^体験/.test(String(name || '').trim());
+}
+
 function getFutureAnnouncementRecipients() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var seen = {};
@@ -1293,8 +1299,12 @@ function getFutureAnnouncementRecipients() {
 
   var bookSheet = ss.getSheetByName('予約一覧FUTURE');
   if (bookSheet && bookSheet.getLastRow() > 1) {
-    var data = bookSheet.getRange(2, 6, bookSheet.getLastRow() - 1, 1).getValues();
-    for (var j = 0; j < data.length; j++) addEmail(data[j][0]);
+    // E列=お名前, F列=メール
+    var data = bookSheet.getRange(2, 5, bookSheet.getLastRow() - 1, 2).getValues();
+    for (var j = 0; j < data.length; j++) {
+      if (isTrialBookingName(data[j][0])) continue;
+      addEmail(data[j][1]);
+    }
   }
   return emails;
 }
