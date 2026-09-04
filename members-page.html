@@ -1043,6 +1043,40 @@ body.category-future .navbar {
 .slot-tag.studio { background: rgba(13,27,42,0.08); color: var(--navy); }
 .slot-tag.time { background: rgba(255,107,53,0.08); color: var(--coral); }
 
+/* FUTURE team color coding: 振付マスター + team kiki/zizi/roro/coco (studio tag + card left border) */
+.slot-tag.studio.st-master { background: rgba(212,160,23,0.15); color: #8A6D00; }
+.slot-tag.studio.st-kiki   { background: rgba(233,30,99,0.12);  color: #C2185B; }
+.slot-tag.studio.st-zizi   { background: rgba(21,101,192,0.12); color: #1565C0; }
+.slot-tag.studio.st-roro   { background: rgba(46,125,50,0.12);  color: #2E7D32; }
+.slot-tag.studio.st-coco   { background: rgba(123,31,162,0.12); color: #7B1FA2; }
+.category-future .slot-card.st-master { border-left-color: #D4A017; }
+.category-future .slot-card.st-kiki   { border-left-color: #E91E63; }
+.category-future .slot-card.st-zizi   { border-left-color: #1565C0; }
+.category-future .slot-card.st-roro   { border-left-color: #2E7D32; }
+.category-future .slot-card.st-coco   { border-left-color: #7B1FA2; }
+
+/* Legend under the calendar — FUTURE only */
+.team-color-legend {
+  display: none;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-top: 0.8rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--gray-100);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--charcoal);
+}
+.category-future .team-color-legend { display: flex; }
+.team-color-legend .legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: -1px;
+}
+
 .slot-availability {
   display: flex;
   align-items: center;
@@ -2648,6 +2682,14 @@ body.category-future .navbar {
           <span class="calendar-weekday">日</span>
         </div>
         <div class="calendar-grid" id="calendar-grid"></div>
+        <!-- FUTURE only: team color legend (matches slot-card border / studio tag colors) -->
+        <div class="team-color-legend">
+          <span><span class="legend-dot" style="background:#D4A017"></span>振付マスター</span>
+          <span><span class="legend-dot" style="background:#E91E63"></span>team kiki(千葉)</span>
+          <span><span class="legend-dot" style="background:#1565C0"></span>team zizi(稲毛)</span>
+          <span><span class="legend-dot" style="background:#2E7D32"></span>team roro(若葉)</span>
+          <span><span class="legend-dot" style="background:#7B1FA2"></span>team coco(美浜)</span>
+        </div>
       </div>
 
       <!-- Selected Date Lessons -->
@@ -3186,6 +3228,18 @@ function isRegularLessonFull(dateStr, r) {
   return rMax - attending.length <= 0;
 }
 
+// FUTURE team color coding: modifier class for slot tags/cards — 振付マスター + team kiki/zizi/roro/coco.
+// Matches on studio + class_name so both 単発枠 and 定期レッスン get colored. KIDS studios match nothing → no class.
+function studioColorClass(studio, className) {
+  var s = (studio || '') + ' ' + (className || '');
+  if (/振付マスター/.test(s)) return ' st-master';
+  if (/kiki/i.test(s)) return ' st-kiki';
+  if (/zizi/i.test(s)) return ' st-zizi';
+  if (/roro/i.test(s)) return ' st-roro';
+  if (/coco/i.test(s)) return ' st-coco';
+  return '';
+}
+
 // 振付マスター slots are calendar (単発) slots whose class/studio carries the 振付マスター name (e.g. 振付マスター(千葉)).
 function isChoreoMasterSlot(s) {
   return /振付マスター/.test((s.class_name || '') + ' ' + (s.studio || ''));
@@ -3398,12 +3452,12 @@ function renderDayLessons(dateStr) {
     var cancelData = cancelled ? getLessonCancelData(dateStr, r.studio, r.time) : null;
     var noteData = getLessonNoteData(dateStr, r.studio, r.time);
     var capOvr = getCapacityOverrideData(dateStr, r.studio, r.time, r.class_name);
-    var cardClass = 'slot-card regular-lesson' + (cancelled ? ' cancelled-lesson' : '');
+    var cardClass = 'slot-card regular-lesson' + studioColorClass(r.studio, r.class_name) + (cancelled ? ' cancelled-lesson' : '');
     html += '<div class="' + cardClass + '" id="regular-card-' + idx + '">';
     html += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
     html += '<div class="slot-card-info">';
     html += '<span class="regular-lesson-badge">定期レッスン</span>';
-    if (r.studio) html += '<span class="slot-tag studio">' + escapeHtml(r.studio) + '</span>';
+    if (r.studio) html += '<span class="slot-tag studio' + studioColorClass(r.studio, r.class_name) + '">' + escapeHtml(r.studio) + '</span>';
     html += '<span class="slot-tag time">' + escapeHtml(r.time || '') + '</span>';
     html += '<span class="slot-tag">' + escapeHtml(r.class_name || '') + '</span>';
     html += '</div>';
@@ -3548,13 +3602,13 @@ function renderDayLessons(dateStr) {
     var spotClass = isUnlimited ? '' : (available <= 0 ? 'full' : available <= 2 ? 'few' : '');
 
     var isFull = !isUnlimited && available <= 0;
-    html += '<div class="slot-card' + (isFull ? ' slot-full' : '') + '" id="slot-card-' + idx + '">';
+    html += '<div class="slot-card' + studioColorClass(slot.studio, slot.class_name) + (isFull ? ' slot-full' : '') + '" id="slot-card-' + idx + '">';
     if (isFull) {
       html += '<span class="slot-full-badge">満員</span>';
     }
     html += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
     html += '<div class="slot-card-info">';
-    html += '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>';
+    html += '<span class="slot-tag studio' + studioColorClass(slot.studio, slot.class_name) + '">' + escapeHtml(slot.studio || '') + '</span>';
     html += '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>';
     html += '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
     html += '</div>';
@@ -3681,7 +3735,7 @@ function openBookingModal(slot) {
 
   var slotHtml =
     '<span class="slot-tag">' + escapeHtml(slot.date || '') + '</span>' +
-    '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>' +
+    '<span class="slot-tag studio' + studioColorClass(slot.studio, slot.class_name) + '">' + escapeHtml(slot.studio || '') + '</span>' +
     '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>' +
     '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
 
@@ -3766,7 +3820,7 @@ function openWaitlistModal(slot) {
 
   var slotHtml =
     '<span class="slot-tag">' + escapeHtml(slot.date || '') + '</span>' +
-    '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>' +
+    '<span class="slot-tag studio' + studioColorClass(slot.studio, slot.class_name) + '">' + escapeHtml(slot.studio || '') + '</span>' +
     '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>' +
     '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
 
@@ -3859,7 +3913,7 @@ function openAbsenceModal(slot) {
 
   var slotHtml =
     '<span class="slot-tag">' + escapeHtml(slot.date || '') + '</span>' +
-    '<span class="slot-tag studio">' + escapeHtml(slot.studio || '') + '</span>' +
+    '<span class="slot-tag studio' + studioColorClass(slot.studio, slot.class_name) + '">' + escapeHtml(slot.studio || '') + '</span>' +
     '<span class="slot-tag time">' + escapeHtml(slot.time || '') + '</span>' +
     '<span class="slot-tag">' + escapeHtml(slot.class_name || '') + '</span>';
 
@@ -5282,7 +5336,7 @@ function renderAdminRegularLessons(items, container) {
     if (r.frequency !== 'oneshot' && (r.periodStart || r.periodEnd)) {
       html += '<span class="slot-tag" style="background:#e3f2fd;color:#1565c0">📅 ' + escapeHtml(r.periodStart || '') + '〜' + escapeHtml(r.periodEnd || '') + '</span>';
     }
-    if (r.studio) html += '<span class="slot-tag studio">' + escapeHtml(r.studio) + '</span>';
+    if (r.studio) html += '<span class="slot-tag studio' + studioColorClass(r.studio, r.class_name) + '">' + escapeHtml(r.studio) + '</span>';
     if (r.time) html += '<span class="slot-tag time">' + escapeHtml(r.time) + '</span>';
     html += '<span class="slot-tag">' + escapeHtml(r.class_name || '') + '</span>';
     html += '<span class="slot-tag" style="background:#E8EAF6;color:#3949AB">定員' + (maxNum > 0 ? maxNum + '名' : 'なし') + '</span>';
