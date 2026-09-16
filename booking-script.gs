@@ -184,14 +184,83 @@ function findRegularLessonCategoryLoose(regData, studio, time, className) {
 }
 
 // ===== メインルーター =====
-function doGet(e) {
-  var action = (e.parameter.action || '').toLowerCase();
+// ===== 読み取りAPIキャッシュ（CacheService・2026-09-16） =====
+// カレンダーは表示のたびに slots / list / regularlessons 等の読み取りAPIを同時に叩き、
+// GAS側は毎回シート全読みしていた（応答が2〜44秒でブレる主因）。
+// 成功応答のJSON文字列をスクリプトキャッシュに保持し、書き込み系リクエスト
+// （予約・欠席・キャンセル待ち・全管理者POST・会員キャンセル）とシート手編集（onEdit）で全無効化する。
+// 予約可否の判定（bookSlot 等）はキャッシュを使わず常にシートを直接読むので、二重予約防止には影響しない。
+// デバッグ用: ?nocache=1 を付けるとキャッシュを読まずに計算する（結果はキャッシュに書き戻す）。
+var READ_CACHE_TTL_SEC = 300;        // 無効化を取りこぼした場合でも最大5分で更新される
+var READ_CACHE_CHUNK = 90000;        // CacheService は1キー100KB上限 → 分割保存（list は約160KB）
+var READ_CACHE_MAX_CHUNKS = 20;      // これを超える応答（1.8MB超）はキャッシュしない
+var READ_CACHE_ACTIONS = ['slots', 'list', 'announcements', 'regularlessons', 'regularholidays',
+                          'lessoncancels', 'irregularholidays', 'lessonnotes', 'capacityoverrides'];
 
-  // Public actions (read-only)
+function readCacheMetaKey_(action) { return 'rc1:' + action + ':meta'; }
+function readCacheChunkKey_(action, stamp, i) { return 'rc1:' + action + ':' + stamp + ':' + i; }
+
+// キャッシュ取得。無ければ null。meta に「チャンク数|スタンプ」を持ち、同一スタンプのチャンクだけを結合する
+// （同時実行の書き込みが混ざって壊れたJSONを返さないため）
+function readCacheGet_(action) {
+  try {
+    var cache = CacheService.getScriptCache();
+    var meta = cache.get(readCacheMetaKey_(action));
+    if (!meta) return null;
+    var mp = meta.split('|');
+    var n = parseInt(mp[0], 10);
+    var stamp = mp[1];
+    if (!(n > 0) || !stamp) return null;
+    var keys = [];
+    for (var i = 0; i < n; i++) keys.push(readCacheChunkKey_(action, stamp, i));
+    var parts = cache.getAll(keys);
+    var text = '';
+    for (var j = 0; j < n; j++) {
+      var part = parts[keys[j]];
+      if (part == null) return null; // 一部欠落 → ミス扱いで再計算
+      text += part;
+    }
+    if (text.charAt(0) !== '[' || text.charAt(text.length - 1) !== ']') return null;
+    return text;
+  } catch (err) {
+    return null;
+  }
+}
+
+function readCachePut_(action, text) {
+  try {
+    if (!text || text.charAt(0) !== '[') return; // エラー応答（{error:...}）はキャッシュしない
+    var n = Math.ceil(text.length / READ_CACHE_CHUNK);
+    if (n < 1 || n > READ_CACHE_MAX_CHUNKS) return;
+    var cache = CacheService.getScriptCache();
+    var stamp = String(new Date().getTime()) + String(Math.floor(Math.random() * 1000));
+    var values = {};
+    for (var i = 0; i < n; i++) {
+      values[readCacheChunkKey_(action, stamp, i)] = text.substr(i * READ_CACHE_CHUNK, READ_CACHE_CHUNK);
+    }
+    cache.putAll(values, READ_CACHE_TTL_SEC);
+    cache.put(readCacheMetaKey_(action), n + '|' + stamp, READ_CACHE_TTL_SEC);
+  } catch (err) {}
+}
+
+// 全読み取りキャッシュを無効化（meta を消せば十分・チャンクは TTL で消える）
+function invalidateReadCache_() {
+  try {
+    CacheService.getScriptCache().removeAll(READ_CACHE_ACTIONS.map(readCacheMetaKey_));
+  } catch (err) {}
+}
+
+// シートを手で編集したときもキャッシュを捨てる（シンプルトリガー・スクリプト自身の書き込みでは発火しない）
+function onEdit(e) {
+  invalidateReadCache_();
+}
+
+function textJsonResponse_(text) {
+  return ContentService.createTextOutput(text).setMimeType(ContentService.MimeType.JSON);
+}
+
+function dispatchReadAction_(action) {
   if (action === 'slots') return getAvailableSlots();
-  if (action === 'book') return bookSlot(e.parameter);
-  if (action === 'absent') return markAbsent(e.parameter);
-  if (action === 'waitlist') return joinWaitlist(e.parameter);
   if (action === 'list') return getBookingList();
   if (action === 'announcements') return getAnnouncements();
   if (action === 'regularlessons') return getRegularLessons();
@@ -200,11 +269,40 @@ function doGet(e) {
   if (action === 'irregularholidays') return getIrregularHolidays();
   if (action === 'lessonnotes') return getLessonNotes();
   if (action === 'capacityoverrides') return getCapacityOverrides();
+  return jsonResponse({ error: 'Unknown action' });
+}
+
+function doGet(e) {
+  var action = (e.parameter.action || '').toLowerCase();
+
+  // Write actions (GET): run, then drop the read cache even if the handler throws
+  // (e.g. appendRow succeeded but the notification mail hit the daily quota)
+  if (action === 'book' || action === 'absent' || action === 'waitlist') {
+    try {
+      if (action === 'book') return bookSlot(e.parameter);
+      if (action === 'absent') return markAbsent(e.parameter);
+      return joinWaitlist(e.parameter);
+    } finally {
+      invalidateReadCache_();
+    }
+  }
+
+  // Public read actions: served from cache when possible
+  if (READ_CACHE_ACTIONS.indexOf(action) >= 0) {
+    if (String(e.parameter.nocache || '') !== '1') {
+      var cached = readCacheGet_(action);
+      if (cached !== null) return textJsonResponse_(cached);
+    }
+    var out = dispatchReadAction_(action);
+    readCachePut_(action, out.getContent());
+    return out;
+  }
 
   return jsonResponse({ error: 'Unknown action' });
 }
 
 // Admin actions are POST-only (adminKey is in the request body, not the URL)
+// 全POSTは書き込み系なので、処理後（例外時も）に読み取りキャッシュを無効化する
 function doPost(e) {
   var payload;
   try {
@@ -214,7 +312,14 @@ function doPost(e) {
   }
 
   var action = (payload.action || '').toLowerCase();
+  try {
+    return dispatchPostAction_(payload, action);
+  } finally {
+    invalidateReadCache_();
+  }
+}
 
+function dispatchPostAction_(payload, action) {
   if (action === 'addslot') return adminGuardPost(payload, adminAddSlot);
   if (action === 'deleteslot') return adminGuardPost(payload, adminDeleteSlot);
   if (action === 'cancelbooking') return adminGuardPost(payload, adminCancelBooking);

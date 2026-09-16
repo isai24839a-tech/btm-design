@@ -2771,6 +2771,36 @@ const ANNOUNCE_SHEET = 'お知らせ';
 const MEMBER_PASSWORD = 'btm2026';
 const ADMIN_PASSWORD = 'potofu7386';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_j23qQkb6hhZ90wkwLUdwWFXLUpS5KWweJORvp0Z1EOXl0AuPkCAO1CUVQOpAXcoAQg/exec';
+
+// GAS Web app の読み取り専用 fetch。Google 側の一時的な 404/5xx・空応答を1回のミスで「データなし」にせず、
+// 短い間隔で最大3回まで再試行する（予約などの書き込みリクエストには使わない）。
+// 1回あたり40秒で打ち切る（正常時の遅い側でも約44秒以内には返っていた実測に合わせた上限。それ以上は 404 に落ちるケース）。
+function fetchGasJson(url, tries) {
+  tries = tries || 3;
+  var attempt = 0;
+  function once() {
+    attempt++;
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function() { ctrl.abort(); }, 40000) : null;
+    var opts = { redirect: 'follow' };
+    if (ctrl) opts.signal = ctrl.signal;
+    return fetch(url, opts)
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(data) {
+        if (timer) clearTimeout(timer);
+        return data;
+      })
+      .catch(function(err) {
+        if (timer) clearTimeout(timer);
+        if (attempt >= tries) throw err;
+        return new Promise(function(resolve) { setTimeout(resolve, 700 * attempt); }).then(once);
+      });
+  }
+  return once();
+}
 const REGULAR_LESSON_SHEET = '定期レッスン';
 const DEMO_MODE = false;
 // =========================
@@ -3091,6 +3121,12 @@ function initCalendar() {
   var slotsReady = false;
   var regularsReady = false;
 
+  // 初回描画までは空白ではなくスピナーを出す（GAS 応答待ちが数秒〜数十秒になることがある）
+  var grid = document.getElementById('calendar-grid');
+  if (grid && !grid.children.length) {
+    grid.innerHTML = '<div class="loading-container" style="grid-column:1/-1;padding:2.5rem 1rem"><div class="spinner"></div><span class="loading-text">カレンダーを読み込み中...</span></div>';
+  }
+
   function tryRender() {
     if (slotsReady && regularsReady) renderCalendar();
   }
@@ -3115,8 +3151,7 @@ function fetchRegularLessons(callback) {
     return;
   }
 
-  fetch(APPS_SCRIPT_URL + '?action=regularLessons', { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+  fetchGasJson(APPS_SCRIPT_URL + '?action=regularLessons')
     .then(function(data) {
       if (data && data.length > 0) {
         regularLessons = [];
@@ -3202,13 +3237,11 @@ function fetchSlotsFromAPI(callback) {
     if (callback) callback();
   }
 
-  fetch(APPS_SCRIPT_URL + '?action=slots', { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+  fetchGasJson(APPS_SCRIPT_URL + '?action=slots')
     .then(function(data) { allSlots = data; slotsOk = true; mergeAndFinish(); })
     .catch(function() { allSlots = []; slotsOk = true; mergeAndFinish(); });
 
-  fetch(APPS_SCRIPT_URL + '?action=list', { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+  fetchGasJson(APPS_SCRIPT_URL + '?action=list')
     .then(function(data) { bookingData = Array.isArray(data) ? data : []; allBookingData = bookingData; bookingsOk = true; mergeAndFinish(); })
     .catch(function() { bookingsOk = true; mergeAndFinish(); });
 }
@@ -4310,8 +4343,7 @@ function fetchAnnouncements() {
 
   container.innerHTML = '<div class="loading-container"><div class="spinner"></div><span class="loading-text">お知らせを読み込み中...</span></div>';
 
-  fetch(APPS_SCRIPT_URL + '?action=announcements', { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+  fetchGasJson(APPS_SCRIPT_URL + '?action=announcements')
     .then(function(data) {
       cachedAnnouncements = data || [];
       renderAnnouncements();
@@ -4857,8 +4889,7 @@ function fetchAdminAnnouncements() {
   }
 
   container.innerHTML = '<div class="loading-container"><div class="spinner"></div><span class="loading-text">読み込み中...</span></div>';
-  fetch(APPS_SCRIPT_URL + '?action=announcements', { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+  fetchGasJson(APPS_SCRIPT_URL + '?action=announcements')
     .then(function(data) { renderAdminAnnouncements(data, container); })
     .catch(function() { renderAdminAnnouncements([], container); });
 }
@@ -5355,8 +5386,7 @@ function fetchAdminRegularLessons() {
   }
 
   container.innerHTML = '<div class="loading-container"><div class="spinner"></div><span class="loading-text">読み込み中...</span></div>';
-  fetch(APPS_SCRIPT_URL + '?action=regularLessons', { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+  fetchGasJson(APPS_SCRIPT_URL + '?action=regularLessons')
     .then(function(data) { renderAdminRegularLessons(data, container); })
     .catch(function() { container.innerHTML = '<div class="day-lessons-empty">定期レッスンはまだありません</div>'; });
 }
@@ -5500,8 +5530,7 @@ function fetchRegularHolidays(callback) {
     if (callback) callback();
     return;
   }
-  fetch(APPS_SCRIPT_URL + '?action=regularholidays', { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+  fetchGasJson(APPS_SCRIPT_URL + '?action=regularholidays')
     .then(function(data) {
       if (data && Array.isArray(data)) {
         regularHolidays = data;
@@ -5611,8 +5640,7 @@ function fetchLessonCancels(callback) {
     if (callback) callback();
     return;
   }
-  fetch(APPS_SCRIPT_URL + '?action=lessoncancels', { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+  fetchGasJson(APPS_SCRIPT_URL + '?action=lessoncancels')
     .then(function(data) {
       if (data && Array.isArray(data)) {
         lessonCancels = data;
@@ -5691,8 +5719,7 @@ function fetchLessonNotes(callback) {
     if (callback) callback();
     return;
   }
-  fetch(APPS_SCRIPT_URL + '?action=lessonnotes', { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+  fetchGasJson(APPS_SCRIPT_URL + '?action=lessonnotes')
     .then(function(data) {
       if (data && Array.isArray(data)) {
         lessonNotes = data;
@@ -5767,8 +5794,7 @@ function fetchCapacityOverrides(callback) {
     if (callback) callback();
     return;
   }
-  fetch(APPS_SCRIPT_URL + '?action=capacityoverrides', { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+  fetchGasJson(APPS_SCRIPT_URL + '?action=capacityoverrides')
     .then(function(data) {
       if (data && Array.isArray(data)) {
         capacityOverrides = data;
@@ -5883,8 +5909,7 @@ function fetchIrregularHolidays(callback) {
     if (callback) callback();
     return;
   }
-  fetch(APPS_SCRIPT_URL + '?action=irregularholidays', { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+  fetchGasJson(APPS_SCRIPT_URL + '?action=irregularholidays')
     .then(function(data) {
       if (data && Array.isArray(data)) {
         irregularHolidays = data;
