@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <title>KIDSニュース | BEAT THE MIX ダンススタジオ 千葉市</title>
 <meta name="description" content="BEAT THE MIX KIDSクラスの最新ニュース・イベント情報。千葉市のキッズダンススタジオ。レッスン情報やイベント告知。">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://tibadance.com/kids-news">
 <meta property="og:title" content="KIDSニュース | BEAT THE MIX ダンススタジオ">
 <meta property="og:description" content="BEAT THE MIX KIDSクラスの最新ニュース・イベント情報。">
@@ -918,7 +918,7 @@ body {
 <!-- ===================== JAVASCRIPT ===================== -->
 <script>
 // ===== CONFIGURATION =====
-const SPREADSHEET_ID = '1M96QizLwfPFPwNXBJHteMCpiVXkV3FIAqXasHAY0Le4';
+const SPREADSHEET_ID = ''; // Not connected (news is posted on Instagram for now)
 const NEWS_SHEET = 'KIDSニュース'; // Sheet name
 // =========================
 
@@ -984,19 +984,9 @@ function showLoading() {
 function showSetup() {
   postsContainer.innerHTML = `
     <div class="setup-card">
-      <h2>SETUP REQUIRED</h2>
-      <p>Google Spreadsheet との接続設定が必要です。</p>
-      <ol>
-        <li>Google Spreadsheet を作成し、シート名を <code>${NEWS_SHEET}</code> にしてください。</li>
-        <li>スプレッドシートを <strong>「リンクを知っている全員が閲覧可」</strong> に設定してください。</li>
-        <li>このHTMLファイルの <code>SPREADSHEET_ID</code> を、スプレッドシートのIDに変更してください。<br>
-            <small>URLが <code>https://docs.google.com/spreadsheets/d/<strong>xxxxxxx</strong>/edit</code> なら、太字部分がIDです。</small>
-        </li>
-      </ol>
-      <div class="columns-note">
-        <strong>必要な列構成（1行目がヘッダー）:</strong><br>
-        A列: 日付 ｜ B列: タイトル ｜ C列: 内容 ｜ D列: カテゴリ ｜ E列: 画像URL
-      </div>
+      <h2>NEWS</h2>
+      <p>現在、掲載中のお知らせはありません。<br>最新情報はInstagramで発信しています。</p>
+      <p style="margin-top:1rem;"><a href="https://www.instagram.com/beat_the_mix_kids/" target="_blank" rel="noopener" style="color:var(--orange);font-weight:700;">Instagramを見る &rarr;</a></p>
     </div>
   `;
 }
@@ -1143,7 +1133,7 @@ function fetchSheet(sheetName) {
 }
 
 function fetchAndRender() {
-  if (SPREADSHEET_ID === '1M96QizLwfPFPwNXBJHteMCpiVXkV3FIAqXasHAY0Le4' || !SPREADSHEET_ID) {
+  if (!SPREADSHEET_ID) {
     showSetup();
     return;
   }

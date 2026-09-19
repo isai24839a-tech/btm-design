@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <title>FUTUREニュース | BEAT THE MIX 40歳以上 ダンススタジオ 千葉市</title>
 <meta name="description" content="BEAT THE MIX FUTURE部門の最新お知らせ・イベント情報。40歳以上限定のダンスプログラム。千葉市のダンススタジオ。">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://tibadance.com/future-news">
 <meta property="og:title" content="FUTUREニュース | BEAT THE MIX 40歳以上">
 <meta property="og:description" content="BEAT THE MIX FUTURE部門の最新お知らせ・イベント情報。">
@@ -806,7 +806,7 @@ canvas#particles {
   'use strict';
 
   // ===== CONFIGURATION =====
-  const SPREADSHEET_ID = '1M96QizLwfPFPwNXBJHteMCpiVXkV3FIAqXasHAY0Le4';
+  const SPREADSHEET_ID = ''; // Not connected (news is posted on Instagram for now)
   const NEWS_SHEET = 'FUTUREニュース'; // Sheet name
   // =========================
 
@@ -1083,12 +1083,10 @@ canvas#particles {
             '<path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>' +
           '</svg>' +
         '</div>' +
-        '<h3>SETUP REQUIRED</h3>' +
-        '<p>Google Spreadsheet と連携するには、HTMLファイル内の設定を変更してください。</p>' +
+        '<h3>NEWS</h3>' +
+        '<p>現在、掲載中のお知らせはありません。<br>最新情報はInstagramで発信しています。</p>' +
         '<p style="margin-top:16px;">' +
-          '<code>SPREADSHEET_ID</code> にスプレッドシートのIDを設定<br>' +
-          'シート名: <code>' + escapeHtml(NEWS_SHEET) + '</code><br><br>' +
-          '列構成: <code>日付</code> | <code>タイトル</code> | <code>内容</code> | <code>カテゴリ</code> | <code>画像URL</code>' +
+          '<a href="https://www.instagram.com/beat_the_mix_future/" target="_blank" rel="noopener" style="color:var(--gold);font-weight:500;">Instagramを見る &rarr;</a>' +
         '</p>' +
       '</div>';
   }
@@ -1168,7 +1166,7 @@ canvas#particles {
   }
 
   function fetchNews() {
-    if (SPREADSHEET_ID === '1M96QizLwfPFPwNXBJHteMCpiVXkV3FIAqXasHAY0Le4') {
+    if (!SPREADSHEET_ID) {
       showSetup();
       return;
     }
