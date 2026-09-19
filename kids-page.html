@@ -796,6 +796,231 @@ body {
 .reasons-section .reason-item.delay-3 { transition-delay: 0.55s; }
 
 /* ============================================
+   STAGE (DANCE CONTINUE - annual hall performance)
+   ============================================ */
+.stage-section {
+  background: #17121e;
+  color: var(--white);
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Spotlight beams */
+.stage-section::before,
+.stage-section::after {
+  content: '';
+  position: absolute;
+  top: -12%;
+  width: 60%;
+  height: 80%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at top, rgba(255,210,63,0.20) 0%, rgba(255,107,53,0.08) 40%, transparent 70%);
+  /* Fade the beam near the top edge so it doesn't leave a seam under the wave */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 12%, #000 40%);
+  mask-image: linear-gradient(to bottom, transparent 12%, #000 40%);
+}
+.stage-section::before { left: -12%; transform: rotate(-16deg); }
+.stage-section::after { right: -12%; transform: rotate(16deg); }
+
+.stage-section .container { position: relative; z-index: 1; }
+.stage-section .section-label { color: var(--yellow); }
+.stage-section .section-title { color: var(--white); }
+.stage-section .section-desc { color: rgba(255,255,255,0.78); }
+
+.stage-name {
+  display: block;
+  margin-top: 1.2rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(1.7rem, 4.5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  background: linear-gradient(135deg, var(--yellow), var(--orange) 55%, var(--coral));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stage-pro {
+  max-width: 1000px;
+  margin: 0 auto 4.5rem;
+}
+.stage-subtitle {
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.6rem;
+}
+.stage-chunk { display: inline-block; }
+.stage-lead {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.72);
+  line-height: 1.9;
+  margin-bottom: 2rem;
+}
+.stage-pro-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.stage-pro-item {
+  padding: 1.6rem 1rem 1.4rem;
+  border: 1px solid rgba(255,210,63,0.22);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.04);
+}
+.stage-pro-item svg {
+  width: 30px;
+  height: 30px;
+  stroke: var(--yellow);
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  margin-bottom: 0.6rem;
+}
+.stage-pro-en {
+  display: block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  color: var(--yellow);
+  opacity: 0.85;
+}
+.stage-pro-ja {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 0.2rem;
+}
+
+.stage-growth {
+  max-width: 1000px;
+  margin: 0 auto 4.5rem;
+}
+.stage-growth-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  text-align: left;
+}
+.stage-growth-item {
+  padding: 1.8rem 1.6rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.06);
+}
+.stage-growth-num {
+  font-family: 'Oswald', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stage-growth-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0.7rem 0 0.5rem;
+}
+.stage-growth-desc {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.72);
+  line-height: 1.9;
+}
+
+.stage-history {
+  max-width: 760px;
+  margin: 0 auto 4rem;
+}
+.stage-history-list {
+  list-style: none;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+.stage-history-item {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  text-align: left;
+}
+.stage-history-vol {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--yellow);
+}
+.stage-history-date {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+}
+.stage-history-venue {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.75);
+}
+.stage-history-item.is-next {
+  background: linear-gradient(90deg, rgba(255,107,53,0.18), transparent);
+}
+.stage-history-item.is-next .stage-history-venue {
+  display: inline-block;
+  padding: 0.15rem 0.8rem;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.stage-cta-text {
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  font-weight: 700;
+  line-height: 1.8;
+  margin-bottom: 1.4rem;
+}
+.stage-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 2.6rem;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  color: var(--white);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(255,77,109,0.35);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.stage-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 36px rgba(255,77,109,0.45);
+}
+.stage-cta svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+
+@media (max-width: 768px) {
+  .stage-pro-grid { grid-template-columns: repeat(2, 1fr); }
+  .stage-growth-grid { grid-template-columns: 1fr; }
+  .stage-history-item {
+    grid-template-columns: 4.8rem 1fr;
+    gap: 0.2rem 0.8rem;
+  }
+  .stage-history-venue { grid-column: 2; }
+  .stage-history-item.is-next .stage-history-venue { justify-self: start; }
+}
+
+/* ============================================
    ABOUT / CLASSES SECTION
    ============================================ */
 .about-section {
@@ -2490,6 +2715,7 @@ body {
     </div>
   </div>
   <div class="nav-links" id="navLinks">
+    <a href="#stage" class="nav-link">ステージ公演</a>
     <a href="#about" class="nav-link">クラス紹介</a>
     <a href="#instructors" class="nav-link">講師紹介</a>
     <a href="#studios" class="nav-link">スタジオ</a>
@@ -2606,10 +2832,111 @@ body {
   </div>
 </section>
 
-<!-- Wave: Concept to About -->
-<div class="wave-separator">
+<!-- Wave: Concept to Stage -->
+<div class="wave-separator" style="background:var(--light-bg);">
   <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-    <path d="M0,40 C360,100 720,0 1080,60 C1260,90 1380,40 1440,50 L1440,120 L0,120 Z" fill="#FFFFFF"/>
+    <path d="M0,40 C360,100 720,0 1080,60 C1260,90 1380,40 1440,50 L1440,120 L0,120 Z" fill="#17121e"/>
+  </svg>
+</div>
+
+<!-- ===================== STAGE (DANCE CONTINUE) ===================== -->
+<section class="section stage-section" id="stage">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="section-label">ANNUAL STAGE</div>
+      <h2 class="section-title">年に一度、<br>本格的なステージへ。</h2>
+      <p class="section-desc">
+        8年続く、プロ仕様のホール自主公演。<br>
+        NANAMI先生プロデュースのメインイベントで、<br>
+        1年間の練習の成果を大きな舞台で発揮します。
+      </p>
+      <span class="stage-name">DANCE CONTINUE</span>
+    </div>
+
+    <div class="stage-pro fade-in delay-1">
+      <h3 class="stage-subtitle">プロのスタッフがつくる、本物の本番</h3>
+      <p class="stage-lead">照明・音響・舞台設営、そして撮影まで。<br>プロのスタッフが入る、本格的な舞台です。</p>
+      <div class="stage-pro-grid">
+        <div class="stage-pro-item">
+          <svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>
+          <span class="stage-pro-en">LIGHTING</span>
+          <span class="stage-pro-ja">照明</span>
+        </div>
+        <div class="stage-pro-item">
+          <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          <span class="stage-pro-en">SOUND</span>
+          <span class="stage-pro-ja">音響</span>
+        </div>
+        <div class="stage-pro-item">
+          <svg viewBox="0 0 24 24"><path d="M2 20h20"/><path d="M4 20V5"/><path d="M20 20V5"/><path d="M2 5h20"/><path d="M4 5c2 3.5 4 5 7 5"/><path d="M20 5c-2 3.5-4 5-7 5"/></svg>
+          <span class="stage-pro-en">STAGE</span>
+          <span class="stage-pro-ja">舞台設営</span>
+        </div>
+        <div class="stage-pro-item">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span class="stage-pro-en">PHOTO</span>
+          <span class="stage-pro-ja">カメラマン撮影</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-growth fade-in delay-1">
+      <h3 class="stage-subtitle"><span class="stage-chunk">舞台に立つことで、</span><span class="stage-chunk">子どもはこう成長します</span></h3>
+      <p class="stage-lead"><span class="stage-chunk">ステージは、発表の場であると同時に、</span><span class="stage-chunk">心を育てる場所です。</span></p>
+      <div class="stage-growth-grid">
+        <div class="stage-growth-item">
+          <div class="stage-growth-num">01</div>
+          <h4 class="stage-growth-title">目標に向かって、続ける力</h4>
+          <p class="stage-growth-desc">「本番」という大きな目標があるから、毎回のレッスンに意味が生まれます。1年かけて積み重ねる経験が、あきらめない心を育てます。</p>
+        </div>
+        <div class="stage-growth-item">
+          <div class="stage-growth-num">02</div>
+          <h4 class="stage-growth-title">本番で出しきる、度胸と自信</h4>
+          <p class="stage-growth-desc">大きなホール、たくさんのお客さま。緊張を乗りこえて踊りきった経験は、ダンス以外の場面でもお子さまの自信になります。</p>
+        </div>
+        <div class="stage-growth-item">
+          <div class="stage-growth-num">03</div>
+          <h4 class="stage-growth-title">仲間とつくる、協調性</h4>
+          <p class="stage-growth-desc">チームで一つの作品を仕上げる中で、仲間を思いやる気持ちや、自分の役割を果たす責任感が育ちます。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-history fade-in delay-1">
+      <h3 class="stage-subtitle">開催実績</h3>
+      <ul class="stage-history-list">
+        <li class="stage-history-item is-next">
+          <span class="stage-history-vol">vol.8</span>
+          <span class="stage-history-date">2026.11.7 SAT</span>
+          <span class="stage-history-venue">開催予定</span>
+        </li>
+        <li class="stage-history-item">
+          <span class="stage-history-vol">vol.7</span>
+          <span class="stage-history-date">2025.11.29 SAT</span>
+          <span class="stage-history-venue">若葉文化ホール</span>
+        </li>
+        <li class="stage-history-item">
+          <span class="stage-history-vol">vol.6</span>
+          <span class="stage-history-date">2024.11.30 SAT</span>
+          <span class="stage-history-venue">若葉文化ホール</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="fade-in delay-1">
+      <p class="stage-cta-text">次のステージに、あなたのお子さまも。</p>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSck2gvaKBhbpE8hJqAwyume9r-ghJhlEAOaOUUXefHl5jGflQ/viewform?usp=header" target="_blank" rel="noopener" class="stage-cta">
+        体験レッスンに申し込む
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Wave: Stage to About -->
+<div class="wave-separator" style="background:#17121e;">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <path d="M0,40 C360,100 720,0 1080,60 C1260,90 1380,40 1440,50 L1440,120 L0,120 Z" fill="#FFF9F5"/>
   </svg>
 </div>
 
