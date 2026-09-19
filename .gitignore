@@ -8,3 +8,16 @@ scrape2.js
 test-studio-filter.md
 wp-plan-analysis.md
 site-info.md
+
+# Backend / internal files: keep local only (the repo root is published as the website)
+.clasp.json
+.claspignore
+appsscript.json
+*.gs
+gas-booking.js
+deploy-gas.bat
+GAS_REDEPLOY_INSTRUCTIONS.md
+project-memo.md
+*.md
+*.bat
+*.csv
