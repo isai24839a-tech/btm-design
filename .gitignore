@@ -21,3 +21,7 @@ project-memo.md
 *.md
 *.bat
 *.csv
+scratchpad/
+analytics_dump/
+growth-plan/
+soga-*
