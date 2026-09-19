@@ -2767,8 +2767,11 @@ body.category-future .navbar {
 <script>
 // ===== CONFIGURATION =====
 const ANNOUNCE_SHEET = 'お知らせ';
-const MEMBER_PASSWORD = 'btm2026';
-const ADMIN_PASSWORD = 'potofu7386';
+// Passwords are verified by GAS (action=auth) and are never written in this file.
+// AUTH_KEY: the password the user entered (sent as `key` for member-only reads such as slots/list)
+// ADMIN_PASSWORD: same value when logged in as admin (sent as `adminKey` for admin actions)
+var AUTH_KEY = sessionStorage.getItem('btm_key') || '';
+var ADMIN_PASSWORD = sessionStorage.getItem('btm_mode') === 'admin' ? AUTH_KEY : '';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_j23qQkb6hhZ90wkwLUdwWFXLUpS5KWweJORvp0Z1EOXl0AuPkCAO1CUVQOpAXcoAQg/exec';
 
 // GAS Web app の読み取り専用 fetch。Google 側の一時的な 404/5xx・空応答を1回のミスで「データなし」にせず、
@@ -2850,7 +2853,10 @@ var demoAnnouncements = [
 
   var storedMode = sessionStorage.getItem('btm_mode');
   var storedCat = sessionStorage.getItem('btm_category');
-  if (storedMode === 'member' || storedMode === 'admin') {
+  if ((storedMode === 'member' || storedMode === 'admin') && !AUTH_KEY) {
+    // Session from before server-side login: ask for the password again
+    sessionStorage.removeItem('btm_mode');
+  } else if (storedMode === 'member' || storedMode === 'admin') {
     isAdminMode = storedMode === 'admin';
     gate.classList.add('hidden');
     if (storedCat === 'kids' || storedCat === 'future') {
@@ -2874,22 +2880,56 @@ var demoAnnouncements = [
     input.focus();
   });
 
+  function showGateError(message) {
+    errorEl.textContent = message || 'パスワードが違います';
+    errorEl.classList.add('visible');
+    inputWrapper.classList.add('shake');
+    input.value = '';
+    input.focus();
+    setTimeout(function() { inputWrapper.classList.remove('shake'); }, 500);
+    setTimeout(function() { errorEl.classList.remove('visible'); }, 3000);
+  }
+
+  var gateBusy = false;
+  var submitBtn = form.querySelector('.gate-submit');
   form.addEventListener('submit', function(e) {
     e.preventDefault();
     var value = input.value.trim();
-    if (value === MEMBER_PASSWORD || value === ADMIN_PASSWORD) {
-      isAdminMode = value === ADMIN_PASSWORD;
-      sessionStorage.setItem('btm_mode', isAdminMode ? 'admin' : 'member');
-      gate.classList.add('hidden');
-      setTimeout(showCategorySelectScreen, 300);
-    } else {
-      errorEl.classList.add('visible');
-      inputWrapper.classList.add('shake');
-      input.value = '';
-      input.focus();
-      setTimeout(function() { inputWrapper.classList.remove('shake'); }, 500);
-      setTimeout(function() { errorEl.classList.remove('visible'); }, 3000);
-    }
+    if (!value || gateBusy) return;
+    gateBusy = true;
+    if (submitBtn) submitBtn.disabled = true;
+    input.disabled = true;
+    input.placeholder = '確認中…';
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'auth', password: value }),
+      redirect: 'follow'
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(res) {
+        if (res && res.success && (res.role === 'admin' || res.role === 'member')) {
+          isAdminMode = res.role === 'admin';
+          AUTH_KEY = value;
+          ADMIN_PASSWORD = isAdminMode ? value : '';
+          sessionStorage.setItem('btm_key', value);
+          sessionStorage.setItem('btm_mode', res.role);
+          gate.classList.add('hidden');
+          setTimeout(showCategorySelectScreen, 300);
+        } else {
+          input.disabled = false;
+          showGateError('パスワードが違います');
+        }
+      })
+      .catch(function() {
+        input.disabled = false;
+        showGateError('通信エラーです。もう一度お試しください');
+      })
+      .then(function() {
+        gateBusy = false;
+        if (submitBtn) submitBtn.disabled = false;
+        input.disabled = false;
+        input.placeholder = 'パスワード';
+      });
   });
 })();
 
@@ -2922,6 +2962,7 @@ function showCategorySelect() {
 }
 
 function signOut() {
+  sessionStorage.removeItem('btm_key');
   sessionStorage.removeItem('btm_mode');
   sessionStorage.removeItem('btm_category');
   location.reload();
@@ -3236,11 +3277,11 @@ function fetchSlotsFromAPI(callback) {
     if (callback) callback();
   }
 
-  fetchGasJson(APPS_SCRIPT_URL + '?action=slots')
+  fetchGasJson(APPS_SCRIPT_URL + '?action=slots&key=' + encodeURIComponent(AUTH_KEY))
     .then(function(data) { allSlots = data; slotsOk = true; mergeAndFinish(); })
     .catch(function() { allSlots = []; slotsOk = true; mergeAndFinish(); });
 
-  fetchGasJson(APPS_SCRIPT_URL + '?action=list')
+  fetchGasJson(APPS_SCRIPT_URL + '?action=list&key=' + encodeURIComponent(AUTH_KEY))
     .then(function(data) { bookingData = Array.isArray(data) ? data : []; allBookingData = bookingData; bookingsOk = true; mergeAndFinish(); })
     .catch(function() { bookingsOk = true; mergeAndFinish(); });
 }
