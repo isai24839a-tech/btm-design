@@ -3632,7 +3632,8 @@ function renderDayLessons(dateStr) {
     // FUTURE regular lessons: capacity display + booking (home-studio members get priority when full)
     var todayD = new Date(); todayD.setHours(0, 0, 0, 0);
     var isPastDate = dateObj < todayD;
-    if (!cancelled && !DEMO_MODE && currentCategory === 'future' && !isPastDate) {
+    // Past dates: keep showing the booked members (read-only, no booking/absence buttons) — ended lessons must not look like their bookings vanished
+    if (!cancelled && !DEMO_MODE && currentCategory === 'future') {
       // Per-date capacity override (臨時定員) takes precedence over the regular capacity
       var rMax = capOvr ? capOvr.max : (r.max || 0);
       var rMembers = getRegularLessonMembers(dateStr, r);
@@ -3645,6 +3646,9 @@ function renderDayLessons(dateStr) {
       var rIsFull = !rUnlimited && rMax - rBooked <= 0;
       var regSlot = { date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name, isRegular: true, max: rMax, booked: rBooked };
 
+      if (isPastDate) {
+        html += '<div class="slot-availability" style="margin-top:0.7rem"><span class="slot-spots" style="color:var(--gray-500)">終了しました</span></div>';
+      } else {
       html += '<div class="slot-availability" style="margin-top:0.7rem">';
       if (rUnlimited) {
         html += '<span class="slot-spots" style="color:var(--navy)">予約受付中</span>';
@@ -3667,6 +3671,7 @@ function renderDayLessons(dateStr) {
       }
       // 欠席連絡: 満員でも入力できる（定員に関係しないため）。admin時はregSlot.adminProxy=trueで生徒の代理入力になる
       html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--gray-500);border:1.5px solid #ccc" onclick=\'openAbsenceModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>&#128587; 欠席連絡</button></div>';
+      }
 
       if (rMembers.length > 0) {
         html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--gray-100)">';
@@ -3682,7 +3687,7 @@ function renderDayLessons(dateStr) {
               html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
                 JSON.stringify({date: dateStr, studio: r.studio, time: r.time, name: m.name}).replace(/'/g, "\\'") +
                 ')\'>削除</button>';
-            } else if (isOwnBooking(m.name)) {
+            } else if (!isPastDate && isOwnBooking(m.name)) {
               html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'memberCancelBooking(' +
                 JSON.stringify({date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name, name: m.name}).replace(/'/g, "\\'") +
                 ')\'>キャンセル</button>';
@@ -3701,7 +3706,7 @@ function renderDayLessons(dateStr) {
               html += '<button class="admin-cancel-btn" title="欠席連絡を削除" onclick=\'adminCancelBooking(' +
                 JSON.stringify({date: dateStr, studio: r.studio, time: r.time, name: m.name}).replace(/'/g, "\\'") +
                 ')\'>削除</button>';
-            } else if (isOwnBooking(m.name)) {
+            } else if (!isPastDate && isOwnBooking(m.name)) {
               html += '<button class="admin-cancel-btn" title="欠席連絡を取り消す" onclick=\'memberCancelAbsence(' +
                 JSON.stringify({date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name, name: m.name}).replace(/'/g, "\\'") +
                 ')\'>取消</button>';
@@ -3715,6 +3720,8 @@ function renderDayLessons(dateStr) {
     html += '</div>';
   });
 
+  var slotTodayD = new Date(); slotTodayD.setHours(0, 0, 0, 0);
+  var slotDayPast = dateObj < slotTodayD; // ended single slots stay visible with their bookings (read-only)
   slots.forEach(function(slot, idx) {
     var isUnlimited = slot.max === 0 || slot.max === '0';
     // 欠席連絡（absent）は定員にカウントしない（membersはlist APIからマージ済みでabsentフラグを持つ）
@@ -3744,7 +3751,9 @@ function renderDayLessons(dateStr) {
     }
     html += '</div>';
     html += '<div class="slot-availability">';
-    if (isUnlimited) {
+    if (slotDayPast) {
+      html += '<span class="slot-spots" style="color:var(--gray-500)">終了しました</span>';
+    } else if (isUnlimited) {
       html += '<span class="slot-spots" style="color:var(--coral)">予約受付中</span>';
     } else {
       html += '<span class="slot-spots ' + spotClass + '">残り <strong>' + available + '</strong> 枠</span>';
@@ -3753,6 +3762,8 @@ function renderDayLessons(dateStr) {
     if (isAdminMode) {
       html += '<button class="admin-delete-btn" onclick=\'adminDeleteSlot(' +
         JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time}).replace(/'/g, "\\'") + ')\'>削除</button>';
+    } else if (slotDayPast) {
+      // ended: no booking button
     } else if (available > 0) {
       html += '<button class="slot-book-btn" onclick=\'openBookingModal(' +
         JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>予約する</button>';
@@ -3764,7 +3775,7 @@ function renderDayLessons(dateStr) {
     html += '</div>';
 
     // Admin (FUTURE): 定期レッスンと同じ操作を単発枠でも — この日の定員（スケジュール行の定員をeditSlotで直接更新）+ 生徒の代理予約（同じbook API）
-    if (isAdminMode && currentCategory === 'future' && !DEMO_MODE) {
+    if (isAdminMode && currentCategory === 'future' && !DEMO_MODE && !slotDayPast) {
       var proxySlot = { date: slot.date, studio: slot.studio, time: slot.time, class_name: slot.class_name, max: slot.max, booked: sAttending.length, adminProxy: true };
       html += '<div style="margin-top:0.5rem;display:flex;gap:0.4rem;justify-content:flex-end;flex-wrap:wrap;align-items:center">';
       html += '<button class="admin-cancel-lesson-btn" style="background:#E3F2FD;color:#1565C0;border-color:#64B5F6" onclick=\'adminSetSlotCapacity(' +
@@ -3774,13 +3785,13 @@ function renderDayLessons(dateStr) {
       html += '</div>';
     }
 
-    if (isFull && currentCategory === 'future' && !DEMO_MODE && !isAdminMode) {
+    if (isFull && currentCategory === 'future' && !DEMO_MODE && !isAdminMode && !slotDayPast) {
       html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--navy);border:1.5px solid var(--navy)" onclick=\'openWaitlistModal(' +
         JSON.stringify(slot).replace(/'/g, "\\'") + ')\'>&#128276; キャンセル待ち登録</button></div>';
     }
 
     // 欠席連絡: FUTUREはカレンダー枠（スケジュール枠）でも受付。満員でも入力できる（定員に関係しないため）。admin=生徒の代理入力
-    if (currentCategory === 'future' && !DEMO_MODE) {
+    if (currentCategory === 'future' && !DEMO_MODE && !slotDayPast) {
       var absSlot = { date: slot.date, studio: slot.studio, time: slot.time, class_name: slot.class_name };
       if (isAdminMode) absSlot.adminProxy = true;
       html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--gray-500);border:1.5px solid #ccc" onclick=\'openAbsenceModal(' + JSON.stringify(absSlot).replace(/'/g, "\\'") + ')\'>&#128587; 欠席連絡</button></div>';
@@ -3791,17 +3802,17 @@ function renderDayLessons(dateStr) {
       html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--gray-100)">';
       var capLabel = isUnlimited ? '無制限' : ((slot.max || 10) + '名');
       if (sAttending.length > 0) {
-        html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin-bottom:0.4rem;">予約者 (' + sAttending.length + '/' + capLabel + ')</div>';
+        html += '<div style="font-size:0.8rem;font-weight:500;color:var(--gray-500);margin-bottom:0.4rem;">予約者 (' + sAttending.length + '/' + capLabel + ')' + (currentCategory === 'future' ? '　✅=登録スタジオ生' : '') + '</div>';
         sAttending.forEach(function(m) {
           html += '<div class="bklist-member">';
           html += '<div class="bklist-member-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
-          html += '<span class="bklist-member-name">' + escapeHtml(m.name) + '</span>';
+          html += '<span class="bklist-member-name">' + escapeHtml(m.name) + (currentCategory === 'future' && m.home ? ' <span title="登録スタジオ生">✅</span>' : '') + '</span>';
           if (m.booked_at) html += '<span class="bklist-member-time">' + escapeHtml(m.booked_at) + '</span>';
           if (isAdminMode) {
             html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'adminCancelBooking(' +
               JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,name:m.name}).replace(/'/g, "\\'") +
               ')\'>削除</button>';
-          } else if (currentCategory === 'future' && isOwnBooking(m.name)) {
+          } else if (currentCategory === 'future' && !slotDayPast && isOwnBooking(m.name)) {
             // KIDSは本人キャンセル不可（LINE連絡運用・確認メールも同案内）— ボタンはFUTUREのみ
             html += '<button class="admin-cancel-btn" title="予約キャンセル" onclick=\'memberCancelBooking(' +
               JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,class_name:slot.class_name,name:m.name}).replace(/'/g, "\\'") +
@@ -3821,7 +3832,7 @@ function renderDayLessons(dateStr) {
             html += '<button class="admin-cancel-btn" title="欠席連絡を削除" onclick=\'adminCancelBooking(' +
               JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,name:m.name}).replace(/'/g, "\\'") +
               ')\'>削除</button>';
-          } else if (currentCategory === 'future' && isOwnBooking(m.name)) {
+          } else if (currentCategory === 'future' && !slotDayPast && isOwnBooking(m.name)) {
             // 欠席連絡はFUTURE限定機能 — 取消ボタンもFUTUREのみ（KIDSは欠席もLINE連絡運用）
             html += '<button class="admin-cancel-btn" title="欠席連絡を取り消す" onclick=\'memberCancelAbsence(' +
               JSON.stringify({date:slot.date,studio:slot.studio,time:slot.time,class_name:slot.class_name,name:m.name}).replace(/'/g, "\\'") +
@@ -3868,12 +3879,12 @@ function openBookingModal(slot) {
   // Admin proxy booking: teacher enters the student's name instead of their own
   var isProxy = !!slot.adminProxy;
 
-  // Home-studio checkbox: regular lessons only (priority booking when full, GAS enforces).
-  // FUTURE calendar (単発) slots no longer show the ✅ field (2026-08-27) — full single slots are simply 満員 (+ waitlist).
+  // Home-studio checkbox: regular lessons (priority booking when full, GAS enforces) + FUTURE calendar (単発) slots.
+  // 単発 slots: ✅ is recorded and shown in the booking list only — full single slots stay 満員 (+ waitlist), no priority (2026-08-27 rule kept).
   var isRegular = !!slot.isRegular;
-  var isFullPriority = slot.max > 0 && slot.booked >= slot.max;
+  var isFullPriority = isRegular && slot.max > 0 && slot.booked >= slot.max;
   var homeFieldHtml = '';
-  if (isRegular) {
+  if (isRegular || currentCategory === 'future') {
     homeFieldHtml =
       (isFullPriority ?
         '<div style="margin-bottom:0.8rem;padding:0.6rem 0.8rem;background:#FFF3E0;border-left:3px solid #FB8C00;border-radius:4px;font-size:0.82rem;color:#E65100">このレッスンは満員です。<strong>登録スタジオの生徒のみ</strong>優先予約できます。</div>' : '') +
@@ -3883,7 +3894,7 @@ function openBookingModal(slot) {
           (isProxy ? 'このスタジオに登録している生徒の予約です' : 'このスタジオに登録している生徒です') +
         '</label>' +
         '<span style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block;">' +
-          '登録スタジオの生徒（✅）は満員時も優先的に予約できます' +
+          (isRegular ? '登録スタジオの生徒（✅）は満員時も優先的に予約できます' : '予約者一覧に✅マークで表示されます') +
         '</span>' +
       '</div>';
   }
@@ -4173,7 +4184,7 @@ function submitBooking() {
 
   // Full lesson: regular lessons allow home-studio members (✅) as priority; calendar (単発) slots are simply full
   if (currentBookingSlot.max > 0 &&
-      currentBookingSlot.booked >= currentBookingSlot.max && !homeStudio) {
+      currentBookingSlot.booked >= currentBookingSlot.max && !(homeStudio && currentBookingSlot.isRegular)) {
     showBookingError(currentBookingSlot.isRegular ? '満員のため、登録スタジオの生徒のみ予約できます' : 'このレッスンは満員です');
     return;
   }
