@@ -995,6 +995,20 @@ body {
   font-size: 0.68rem;
   vertical-align: middle;
 }
+.stage-schedule-item.is-done {
+  background: rgba(255,255,255,0.03);
+  border-color: transparent;
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+.stage-schedule-item.is-done .stage-schedule-time {
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.1rem 0.7rem;
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 50px;
+}
 .stage-schedule-note { font-size: 0.78rem; color: rgba(255,255,255,0.55); margin-top: 0.4rem; }
 
 .stage-history {
@@ -1086,7 +1100,7 @@ body {
     padding: 0.9rem 0.9rem;
   }
   .stage-schedule-date { font-size: 1.05rem; }
-  .stage-schedule-time { grid-column: 2; font-size: 0.85rem; }
+  .stage-schedule-time { grid-column: 2; justify-self: start; font-size: 0.85rem; }
   .stage-history-item {
     grid-template-columns: 4.8rem 1fr;
     gap: 0.2rem 0.8rem;
@@ -3120,10 +3134,10 @@ body {
     </div>
 
     <div class="stage-schedule fade-in delay-1" id="stage-schedule">
-      <h3 class="stage-subtitle">今後の出演スケジュール</h3>
+      <h3 class="stage-subtitle">2026 出演スケジュール</h3>
       <p class="stage-lead">地域のおまつりにも出演します。お近くの方はぜひ応援に来てください。</p>
       <ul class="stage-schedule-list">
-        <!-- data-date: hidden automatically after this day passes -->
+        <!-- data-date: greyed out as 終了 automatically after this day passes -->
         <li class="stage-schedule-item" data-date="2026-10-10">
           <span class="stage-schedule-date">10.10<small>土</small></span>
           <span><span class="stage-schedule-name">小倉台まつり</span></span>
@@ -3150,13 +3164,14 @@ body {
     <script>
     (function(){
       var today = new Date(); today.setHours(0,0,0,0);
-      var box = document.getElementById('stage-schedule');
-      var items = box.querySelectorAll('[data-date]'), left = 0;
+      var items = document.querySelectorAll('#stage-schedule [data-date]');
       items.forEach(function(li){
         var p = li.getAttribute('data-date').split('-');
-        if (new Date(+p[0], p[1]-1, +p[2]) < today) li.remove(); else left++;
+        if (new Date(+p[0], p[1]-1, +p[2]) < today) {
+          li.classList.add('is-done');
+          li.querySelector('.stage-schedule-time').textContent = '終了しました';
+        }
       });
-      if (!left) box.remove();
     })();
     </script>
 
