@@ -930,6 +930,73 @@ body {
   line-height: 1.9;
 }
 
+.stage-gallery {
+  max-width: 1000px;
+  margin: 2.5rem auto 4.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.stage-gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+}
+.stage-gallery .is-main { grid-column: 1 / -1; aspect-ratio: 16 / 8; object-position: center 80%; }
+
+.stage-schedule {
+  max-width: 760px;
+  margin: 0 auto 4.5rem;
+}
+.stage-schedule-list {
+  list-style: none;
+  text-align: left;
+}
+.stage-schedule-item {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  margin-bottom: 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.06);
+}
+.stage-schedule-date {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--yellow);
+}
+.stage-schedule-date small { font-size: 0.75rem; margin-left: 0.2rem; color: rgba(255,255,255,0.7); }
+.stage-schedule-name { display: block; font-weight: 700; font-size: 1rem; }
+.stage-schedule-place { display: block; font-size: 0.8rem; color: rgba(255,255,255,0.65); margin-top: 0.15rem; }
+.stage-schedule-time {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.85);
+  white-space: nowrap;
+}
+.stage-schedule-item.is-main {
+  background: linear-gradient(90deg, rgba(255,107,53,0.28), rgba(255,77,109,0.12));
+  border: 1px solid rgba(255,210,63,0.4);
+}
+.stage-schedule-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.6rem;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--orange), var(--coral));
+  font-size: 0.68rem;
+  vertical-align: middle;
+}
+.stage-schedule-note { font-size: 0.78rem; color: rgba(255,255,255,0.55); margin-top: 0.4rem; }
+
 .stage-history {
   max-width: 760px;
   margin: 0 auto 4rem;
@@ -1012,6 +1079,14 @@ body {
 @media (max-width: 768px) {
   .stage-pro-grid { grid-template-columns: repeat(2, 1fr); }
   .stage-growth-grid { grid-template-columns: 1fr; }
+  .stage-gallery { gap: 8px; margin-bottom: 3.5rem; }
+  .stage-schedule-item {
+    grid-template-columns: 5.6rem 1fr;
+    gap: 0.2rem 0.8rem;
+    padding: 0.9rem 0.9rem;
+  }
+  .stage-schedule-date { font-size: 1.05rem; }
+  .stage-schedule-time { grid-column: 2; font-size: 0.85rem; }
   .stage-history-item {
     grid-template-columns: 4.8rem 1fr;
     gap: 0.2rem 0.8rem;
@@ -2989,6 +3064,12 @@ body {
       <span class="stage-name">DANCE CONTINUE</span>
     </div>
 
+    <div class="stage-gallery fade-in delay-1">
+      <img class="is-main" src="images/stage-dc-main.webp" alt="DANCE CONTINUE 本番ステージで踊るキッズクラスの子どもたち" width="1244" height="690" loading="lazy" decoding="async">
+      <img src="images/stage-dc-sub1.webp" alt="DANCE CONTINUE ステージでのチーム演技" width="1244" height="690" loading="lazy" decoding="async">
+      <img src="images/stage-dc-sub2.webp" alt="DANCE CONTINUE ステージでのダンスパフォーマンス" width="1244" height="690" loading="lazy" decoding="async">
+    </div>
+
     <div class="stage-pro fade-in delay-1">
       <h3 class="stage-subtitle">プロのスタッフがつくる、本物の本番</h3>
       <p class="stage-lead">照明・音響・舞台設営、そして撮影まで。<br>プロのスタッフが入る、本格的な舞台です。</p>
@@ -3037,6 +3118,47 @@ body {
         </div>
       </div>
     </div>
+
+    <div class="stage-schedule fade-in delay-1" id="stage-schedule">
+      <h3 class="stage-subtitle">今後の出演スケジュール</h3>
+      <p class="stage-lead">地域のおまつりにも出演します。お近くの方はぜひ応援に来てください。</p>
+      <ul class="stage-schedule-list">
+        <!-- data-date: hidden automatically after this day passes -->
+        <li class="stage-schedule-item" data-date="2026-10-10">
+          <span class="stage-schedule-date">10.10<small>土</small></span>
+          <span><span class="stage-schedule-name">小倉台まつり</span></span>
+          <span class="stage-schedule-time">14:35〜 出演</span>
+        </li>
+        <li class="stage-schedule-item" data-date="2026-10-18">
+          <span class="stage-schedule-date">10.18<small>日</small></span>
+          <span><span class="stage-schedule-name">稲毛区民祭り</span><span class="stage-schedule-place">穴川公園 メインステージ</span></span>
+          <span class="stage-schedule-time">11:05〜 出演</span>
+        </li>
+        <li class="stage-schedule-item" data-date="2026-11-03">
+          <span class="stage-schedule-date">11.3<small>火祝</small></span>
+          <span><span class="stage-schedule-name">大漁まつり</span></span>
+          <span class="stage-schedule-time">時間は後日</span>
+        </li>
+        <li class="stage-schedule-item is-main" data-date="2026-11-07">
+          <span class="stage-schedule-date">11.7<small>土</small></span>
+          <span><span class="stage-schedule-name">DANCE CONTINUE vol.8<span class="stage-schedule-badge">主催</span></span><span class="stage-schedule-place">若葉文化ホール</span></span>
+          <span class="stage-schedule-time">一般入館 15:30</span>
+        </li>
+      </ul>
+      <p class="stage-schedule-note">※予定は変更になる場合があります。最新情報はInstagramでお知らせします。</p>
+    </div>
+    <script>
+    (function(){
+      var today = new Date(); today.setHours(0,0,0,0);
+      var box = document.getElementById('stage-schedule');
+      var items = box.querySelectorAll('[data-date]'), left = 0;
+      items.forEach(function(li){
+        var p = li.getAttribute('data-date').split('-');
+        if (new Date(+p[0], p[1]-1, +p[2]) < today) li.remove(); else left++;
+      });
+      if (!left) box.remove();
+    })();
+    </script>
 
     <div class="stage-history fade-in delay-1">
       <h3 class="stage-subtitle">開催実績</h3>
