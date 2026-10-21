@@ -6,27 +6,27 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://tibadance.com/kids-page.html</loc>
+    <loc>https://tibadance.com/kids-page</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://tibadance.com/future-page.html</loc>
+    <loc>https://tibadance.com/future-page</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://tibadance.com/future-trial.html</loc>
+    <loc>https://tibadance.com/future-trial</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://tibadance.com/choreography-master.html</loc>
+    <loc>https://tibadance.com/choreography-master</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://tibadance.com/kids-choreography-master.html</loc>
+    <loc>https://tibadance.com/kids-choreography-master</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
