@@ -1138,11 +1138,13 @@ section {
 }
 
 .studio-full {
-  display: inline-block;
-  margin-left: 14px;
-  font-size: 30px;
+  position: absolute;
+  top: 50%;
+  right: clamp(20px, 3vw, 32px);
+  transform: translateY(-50%);
+  font-size: 40px;
   line-height: 1;
-  transform: rotate(-15deg);
+  z-index: 2;
 }
 
 /* ===== PRICING ===== */
