@@ -4564,6 +4564,7 @@ function initAdminSlotForm() {
             '</label>' +
           '</div>' +
         '</div>' +
+        buildLessonNotifyFields(activeCat, 'single') +
         '<button type="button" class="admin-add-btn" onclick="adminAddSlot()" style="margin-top:0.75rem">追加する</button>' +
       '</div>' +
 
@@ -4589,6 +4590,7 @@ function initAdminSlotForm() {
           '</div>' +
         '</div>' +
         '<div class="admin-bulk-info" id="admin-bulk-preview">曜日を選んで日程を確認</div>' +
+        buildLessonNotifyFields(activeCat, 'bulk') +
         '<button type="button" class="admin-add-btn" id="admin-bulk-submit" onclick="adminBulkAddSlots()" style="margin-top:0.75rem;opacity:0.5;pointer-events:none" disabled>曜日を選んでください</button>' +
       '</div>' +
     '</div>';
@@ -4837,7 +4839,46 @@ function adminAddSlot() {
     action: 'addSlot', adminKey: ADMIN_PASSWORD,
     date: dateStr, studio: studio, time: time, class_name: className, max: max, category: category
   });
-  apiCall(params, function() { alert('追加しました'); fetchSlotsFromAPI(function() { renderCalendar(); }); });
+  apiCall(params, function() {
+    notifyFutureLessonsAfterAdd('single', [{ date: dateStr, studio: studio, time: time, class_name: className }], function(msg) {
+      alert('追加しました' + msg);
+      fetchSlotsFromAPI(function() { renderCalendar(); });
+    });
+  });
+}
+
+// FUTURE: memo + 「メールも送る」 under 単発追加 / まとめて追加 (2026-10-27). Memo goes into the mail only.
+function buildLessonNotifyFields(cat, mode) {
+  if (cat !== 'FUTURE') return '';
+  return '<div style="margin-top:0.75rem">' +
+      '<textarea id="admin-' + mode + '-memo" rows="3" placeholder="メモ（メールに入ります・例：持ち物、内容など）" style="width:100%;box-sizing:border-box"></textarea>' +
+      '<label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--navy);margin-top:6px;cursor:pointer">' +
+        '<input type="checkbox" id="admin-' + mode + '-notify" style="width:auto;margin:0"> FUTUREの生徒さんにメールも送る' +
+      '</label>' +
+    '</div>';
+}
+
+// Sends one mail for all added lessons when the box is ticked; done(msg) is always called
+function notifyFutureLessonsAfterAdd(mode, lessons, done) {
+  var notifyEl = document.getElementById('admin-' + mode + '-notify');
+  var memoEl = document.getElementById('admin-' + mode + '-memo');
+  if (currentCategory !== 'future' || !notifyEl || !notifyEl.checked || lessons.length === 0) { done(''); return; }
+  var body = {
+    action: 'notifyFutureLessons', adminKey: ADMIN_PASSWORD,
+    lessons: JSON.stringify(lessons), memo: memoEl ? memoEl.value.trim() : ''
+  };
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        notifyEl.checked = false;
+        if (memoEl) memoEl.value = '';
+        done(result.notified ? '（' + result.notified + '名にメールで通知しました）' : '（メールの送り先がありませんでした）');
+      } else {
+        done('（メールは送れませんでした: ' + (result.error || 'エラー') + '）');
+      }
+    })
+    .catch(function() { done('（メールは送れませんでした）'); });
 }
 
 function adminBulkAddSlots() {
@@ -4887,14 +4928,18 @@ function adminBulkAddSlots() {
 
   // Real mode: sequential API calls
   var i = 0;
+  var added = [];
   function addNext() {
     if (i >= dates.length) {
-      alert(dates.length + '件追加しました');
-      fetchSlotsFromAPI(function() { renderCalendar(); });
+      notifyFutureLessonsAfterAdd('bulk', added, function(msg) {
+        alert(dates.length + '件追加しました' + msg);
+        fetchSlotsFromAPI(function() { renderCalendar(); });
+      });
       return;
     }
     var d = dates[i];
     var dateStr = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+    added.push({ date: dateStr, studio: studio, time: time, class_name: className });
     var params = new URLSearchParams({
       action: 'addSlot', adminKey: ADMIN_PASSWORD,
       date: dateStr, studio: studio, time: time, class_name: className, max: max, category: category
