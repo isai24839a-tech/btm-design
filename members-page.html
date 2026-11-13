@@ -3696,6 +3696,9 @@ function renderDayLessons(dateStr) {
       var rAvailable = rUnlimited ? 999 : Math.max(0, rMax - rBooked);
       var rIsFull = !rUnlimited && rMax - rBooked <= 0;
       var regSlot = { date: dateStr, studio: r.studio, time: r.time, class_name: r.class_name, isRegular: true, max: rMax, booked: rBooked };
+      // 撮影 day (memo contains 撮影): home-studio members only (2026-11-13 mama). GAS enforces too.
+      var rHomeOnly = isFilmingNote(noteData);
+      if (rHomeOnly) regSlot.homeOnly = true;
 
       if (isPastDate) {
         html += '<div class="slot-availability" style="margin-top:0.7rem"><span class="slot-spots" style="color:var(--gray-500)">終了しました</span></div>';
@@ -3709,7 +3712,7 @@ function renderDayLessons(dateStr) {
         html += '<span class="slot-spots ' + (rAvailable <= 2 ? 'few' : '') + '">残り <strong>' + rAvailable + '</strong> 枠</span>';
       }
       if (!isAdminMode) {
-        var regBtnLabel = rIsFull ? '登録スタジオ生の方はこちら' : '予約する';
+        var regBtnLabel = (rIsFull || rHomeOnly) ? '登録スタジオ生の方はこちら' : '予約する';
         html += '<button class="slot-book-btn" onclick=\'openBookingModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>' + regBtnLabel + '</button>';
       } else {
         // Admin proxy booking: teacher books on behalf of a student (same book API, no GAS change)
@@ -3717,6 +3720,9 @@ function renderDayLessons(dateStr) {
         html += '<button class="slot-book-btn" onclick=\'openBookingModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>&#128100; 生徒の予約を入れる</button>';
       }
       html += '</div>';
+      if (rHomeOnly) {
+        html += '<div style="margin-top:0.5rem;padding:0.5rem 0.7rem;background:#FFF3E0;border-left:3px solid #FB8C00;border-radius:4px;font-size:0.82rem;color:#E65100">この日は撮影のため、<strong>登録スタジオの生徒のみ</strong>予約できます。</div>';
+      }
       if (rIsFull && !isAdminMode) {
         html += '<div style="margin-top:0.5rem;text-align:right"><button class="slot-book-btn" style="background:transparent;color:var(--navy);border:1.5px solid var(--navy)" onclick=\'openWaitlistModal(' + JSON.stringify(regSlot).replace(/'/g, "\\'") + ')\'>&#128276; キャンセル待ち登録</button></div>';
       }
@@ -3939,7 +3945,9 @@ function openBookingModal(slot) {
   // 振付マスター: no home-studio checkbox (2026-10-10 shun)
   if (isRegular || (currentCategory === 'future' && !isChoreoMasterSlot(slot))) {
     homeFieldHtml =
-      (isFullPriority ?
+      (slot.homeOnly ?
+        '<div style="margin-bottom:0.8rem;padding:0.6rem 0.8rem;background:#FFF3E0;border-left:3px solid #FB8C00;border-radius:4px;font-size:0.82rem;color:#E65100">この日は撮影のため、<strong>登録スタジオの生徒のみ</strong>予約できます。</div>' :
+      isFullPriority ?
         '<div style="margin-bottom:0.8rem;padding:0.6rem 0.8rem;background:#FFF3E0;border-left:3px solid #FB8C00;border-radius:4px;font-size:0.82rem;color:#E65100">このレッスンは満員です。<strong>登録スタジオの生徒のみ</strong>優先予約できます。</div>' : '') +
       '<div class="booking-field">' +
         '<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-weight:500">' +
@@ -4234,6 +4242,12 @@ function submitBooking() {
 
   var homeCb = document.getElementById('booking-home-studio');
   var homeStudio = homeCb ? homeCb.checked : false;
+
+  // 撮影 day: home-studio members only
+  if (currentBookingSlot.homeOnly && !homeStudio) {
+    showBookingError('この日は撮影のため、登録スタジオの生徒のみ予約できます');
+    return;
+  }
 
   // Full lesson: regular lessons allow home-studio members (✅) as priority; calendar (単発) slots are simply full
   if (currentBookingSlot.max > 0 &&
@@ -5887,6 +5901,10 @@ function getLessonNoteData(dateStr, studio, time) {
   return lessonNotes.find(function(n) {
     return n.date === dateStr && n.studio === studio && n.time === time;
   }) || null;
+}
+
+function isFilmingNote(note) {
+  return !!(note && String(note.memo || '').indexOf('撮影') !== -1);
 }
 
 function adminAddLessonNote(info) {
