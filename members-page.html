@@ -3350,6 +3350,56 @@ function getRegularLessonMembers(dateStr, r) {
   return [];
 }
 
+// Waitlist names for a lesson (from list API, registration order)
+function getWaitlistFor(dateStr, studio, time, className) {
+  for (var i = 0; i < allBookingData.length; i++) {
+    if (allBookingData[i].date !== dateStr) continue;
+    var slots = allBookingData[i].slots || [];
+    for (var j = 0; j < slots.length; j++) {
+      var b = slots[j];
+      if (b.studio === studio && b.time === time && b.class_name === className) return b.waitlist || [];
+    }
+  }
+  return [];
+}
+
+// Waitlist block under the booking list: admin sees all + 削除, member sees names + 取消 on own name
+function waitlistBlockHtml(dateStr, studio, time, className, isPast) {
+  if (DEMO_MODE) return '';
+  var wl = getWaitlistFor(dateStr, studio, time, className);
+  if (!wl.length) return '';
+  var html = '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--gray-100)">';
+  html += '<div style="font-size:0.8rem;font-weight:500;color:var(--navy);margin-bottom:0.4rem;">&#128276; キャンセル待ち (' + wl.length + '名・登録順)</div>';
+  wl.forEach(function(m, i) {
+    var info = JSON.stringify({date: dateStr, studio: studio, time: time, class_name: className, name: m.name}).replace(/'/g, "\\'");
+    html += '<div class="bklist-member">';
+    html += '<div class="bklist-member-icon" style="font-size:0.8rem;font-weight:700;color:var(--navy);display:flex;align-items:center;justify-content:center">' + (i + 1) + '</div>';
+    html += '<span class="bklist-member-name">' + escapeHtml(m.name) + '</span>';
+    if (m.registered_at) html += '<span class="bklist-member-time">' + escapeHtml(m.registered_at) + '</span>';
+    if (isAdminMode) {
+      html += '<button class="admin-cancel-btn" title="キャンセル待ちを削除" onclick=\'cancelWaitlistEntry(' + info + ')\'>削除</button>';
+    } else if (!isPast && isOwnBooking(m.name)) {
+      html += '<button class="admin-cancel-btn" title="キャンセル待ちを取り消す" onclick=\'cancelWaitlistEntry(' + info + ')\'>取消</button>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function cancelWaitlistEntry(info) {
+  var who = isAdminMode ? (info.name + 'さんの') : '';
+  if (!confirm(info.date + ' ' + info.time + '\n' + info.class_name + ' の' + who + 'キャンセル待ちを取り消しますか？')) return;
+  var params = new URLSearchParams({
+    action: 'cancelWaitlist',
+    date: info.date, studio: info.studio, time: info.time, class_name: info.class_name, name: info.name
+  });
+  apiCall(params, function(result) {
+    alert(result.message || 'キャンセル待ちを取り消しました');
+    fetchSlotsFromAPI(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); });
+  });
+}
+
 // FUTURE calendar 満 marker: is this regular lesson full on this date? Same rule as renderDayLessons
 // (臨時定員 override > regular max, absent members don't count, max 0 = unlimited).
 function isRegularLessonFull(dateStr, r) {
@@ -3773,6 +3823,7 @@ function renderDayLessons(dateStr) {
         }
         html += '</div>';
       }
+      html += waitlistBlockHtml(dateStr, r.studio, r.time, r.class_name, isPastDate);
     }
     html += '</div>';
   });
@@ -3901,6 +3952,7 @@ function renderDayLessons(dateStr) {
       }
       html += '</div>';
     }
+    if (currentCategory === 'future') html += waitlistBlockHtml(slot.date, slot.studio, slot.time, slot.class_name, slotDayPast);
 
     html += '</div>';
   });
@@ -4098,6 +4150,8 @@ function showWaitlistSuccess() {
       '<br>' +
       '<button class="slot-book-btn" onclick="closeBookingModal()">閉じる</button>' +
     '</div>';
+  // Refresh so the new name shows in the waitlist block
+  fetchSlotsFromAPI(function() { renderCalendar(); if (selectedDate) renderDayLessons(selectedDate); });
 }
 
 // ===== ABSENCE (FUTURE: 生徒が「この日は休みます」を連絡) =====
